@@ -136,3 +136,5 @@ test.ipynb
 
 # configuration
 config.yaml
+
+*.toml
