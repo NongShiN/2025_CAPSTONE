@@ -1,0 +1,52 @@
+/* 네비게이션 바 스타일 */
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    background-color: #003366;
+    padding: 15px 0;
+    position: fixed;
+    top: 50px;
+    width: 90%;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    transition: all 0.3s ease;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar a:hover {
+    background-color: #0055cc; /* 호버 시 배경색 변경 */
+}
+
+/* 네비게이션 바가 고정되어 있어서 콘텐츠가 위로 밀리지 않도록 여백을 추가 */
+body {
+    padding-top: 80px; /* 네비게이션 바 높이 만큼 여백 추가 */
+}
+
+/* 미디어 쿼리: 화면이 작을 때(모바일, 작은 화면) */
+@media (max-width: 768px) {
+    .navbar a {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+    .navbar {
+        padding: 10px 0;
+    }
+}
+
+/* 미디어 쿼리: 더 큰 화면에서 네비게이션 바 스타일 유지 */
+@media (min-width: 769px) {
+    .navbar a {
+        font-size: 18px;
+        padding: 10px 20px;
+    }
+}

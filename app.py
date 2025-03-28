@@ -1,0 +1,27 @@
+import streamlit as st
+from components.auth import is_authenticated, show_login
+from components.chatbot import show_chatbot
+
+# 페이지 설정
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
+# CSS 적용
+css_path = 'style.css'
+with open(css_path, encoding='utf-8') as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# 세션 상태 초기화
+if "page" not in st.session_state:
+    st.session_state.page = "login"
+if "conversation_sections" not in st.session_state:
+    st.session_state.conversation_sections = []
+if "current_conversation" not in st.session_state:
+    st.session_state.current_conversation = []
+if "selected_style" not in st.session_state:
+    st.session_state.selected_style = None
+
+# 라우팅: 로그인 상태에 따라 화면 전환
+if not is_authenticated():
+    show_login()
+else:
+    show_chatbot()
