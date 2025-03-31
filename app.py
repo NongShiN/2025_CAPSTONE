@@ -19,9 +19,16 @@ if "current_conversation" not in st.session_state:
     st.session_state.current_conversation = []
 if "selected_style" not in st.session_state:
     st.session_state.selected_style = None
+    
+# 페이지 라우팅
+if "page" not in st.session_state:
+    st.session_state.page = "login"
 
-# 라우팅: 로그인 상태에 따라 화면 전환
-if not is_authenticated():
+if st.session_state.page == "login":
     show_login()
-else:
+
+elif st.session_state.page == "signup":
+    st.warning("회원가입 페이지는 준비 중입니다!")  # 추후 구현
+
+elif st.session_state.page == "chatbot":
     show_chatbot()
