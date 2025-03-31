@@ -19,8 +19,9 @@ def show_chatbot():
     render_sidebar_top_buttons()
     render_conversation_history()
 
-    # 페이지 제목
-    #st.title("마음의 소리")
+    # ✅ guest 유저에게 경고 메시지 출력
+    if st.session_state.get("username") == "guest":
+        st.warning("⚠️ 로그인 없이 시작하신 경우, 대화 기록은 저장되지 않습니다.")
 
     # 상담 스타일 선택 드롭다운
     render_style_selector()
