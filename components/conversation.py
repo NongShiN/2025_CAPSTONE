@@ -1,5 +1,3 @@
-# components/conversation.py
-
 import streamlit as st
 
 def add_current_message(role, content):
