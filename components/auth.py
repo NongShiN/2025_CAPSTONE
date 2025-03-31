@@ -10,9 +10,7 @@ def show_login():
     # 로고 중앙 정렬
     col_logo1, col_logo2, col_logo3 = st.columns([1, 2, 1])
     with col_logo2:
-        st.image("assets/logo(example).png", width=500)
-
-    # st.title("🔐 로그인")
+        st.image("assets/logo(example).png", width=700)
 
     username = st.text_input("아이디")
     password = st.text_input("비밀번호", type="password")
@@ -33,7 +31,7 @@ def show_login():
             st.session_state.page = "signup"
 
     with col2:
-        if st.button("🚀 로그인 없이 시작", use_container_width=True):
+        if st.button("🤖 게스트", use_container_width=True):
             st.session_state.page = "chatbot"
             st.session_state.username = "guest"
             st.rerun()
