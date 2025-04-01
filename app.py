@@ -1,6 +1,7 @@
 import streamlit as st
 from components.auth import is_authenticated, show_login
 from components.chatbot import show_chatbot
+from components.signup import show_signup
 
 # 페이지 설정
 st.set_page_config(layout="wide", initial_sidebar_state="expanded")
@@ -28,7 +29,7 @@ if st.session_state.page == "login":
     show_login()
 
 elif st.session_state.page == "signup":
-    st.warning("회원가입 페이지는 준비 중입니다!")  # 추후 구현
+    show_signup()
 
 elif st.session_state.page == "chatbot":
     show_chatbot()
