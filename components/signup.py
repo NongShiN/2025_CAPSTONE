@@ -29,8 +29,10 @@ def show_signup():
                 st.success("회원가입이 완료되었습니다. 로그인 화면으로 이동합니다.")
                 st.session_state.page = "login"
                 st.rerun()
+                return  # rerun 이후 코드 실행 방지
 
     with col2:
         if st.button("뒤로가기", use_container_width=True):
             st.session_state.page = "login"
             st.rerun()
+            return

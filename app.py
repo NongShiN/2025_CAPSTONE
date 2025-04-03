@@ -30,6 +30,5 @@ if st.session_state.page == "login":
 
 elif st.session_state.page == "signup":
     show_signup()
-
 elif st.session_state.page == "chatbot":
     show_chatbot()
