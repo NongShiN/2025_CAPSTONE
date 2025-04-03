@@ -3,8 +3,12 @@ import pandas as pd
 import openai
 import numpy as np
 from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-OPENAI_API_KEY="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"
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("API_KEY")
 
 client = OpenAI(api_key = OPENAI_API_KEY)
 

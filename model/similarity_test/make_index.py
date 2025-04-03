@@ -5,8 +5,12 @@ import numpy as np
 from datasets import load_dataset
 import pickle
 from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
-OPENAI_API_KEY="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"
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("API_KEY")
 
 client = OpenAI(api_key = OPENAI_API_KEY)
 
@@ -21,6 +25,8 @@ df_sorted = df.sort_values(by=['questionText', 'preference_score'], ascending=[T
 df_unique = df_sorted.drop_duplicates(subset='questionText', keep='first').reset_index(drop=True)
 # none 값 제거
 empty_or_nan = df_unique['questionText'].isnull() | (df_unique['questionText'].str.strip() == '')
+df_unique = df_unique[~empty_or_nan].reset_index(drop=True)
+empty_or_nan = df_unique['answerText'].isnull() | (df_unique['answerText'].str.strip() == '')
 df_unique = df_unique[~empty_or_nan].reset_index(drop=True)
 
 # 임베딩 함수
