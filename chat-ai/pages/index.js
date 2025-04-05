@@ -1,11 +1,12 @@
-import Sidebar from "@/components/Sidebar";
-import ChatWindow from "@/components/ChatWindow";
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Home() {
-  return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar />
-      <ChatWindow />
-    </div>
-  );
+    const router = useRouter();
+
+    useEffect(() => {
+        router.replace('/login');
+    }, []);
+
+    return null;
 }
