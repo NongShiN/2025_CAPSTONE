@@ -1,36 +1,14 @@
-import { useState } from "react";
-import { FaPlus, FaSearch, FaTrash } from "react-icons/fa";
-
-const Sidebar = () => {
-  const [chats, setChats] = useState([
-    "첫 번째 대화",
-    "두 번째 대화",
-    "세 번째 대화",
-  ]);
-
+export default function Sidebar() {
   return (
-    <div className="w-64 bg-gray-900 text-white flex flex-col p-4">
-      {/* 상단 버튼 */}
-      <div className="flex justify-between mb-4">
-        <button className="bg-blue-500 p-2 rounded"><FaPlus /></button>
-        <button className="bg-gray-700 p-2 rounded"><FaSearch /></button>
+    <div className="w-64 bg-[#121212] text-white h-full border-r border-gray-700 p-4 hidden md:block">
+      <div className="space-y-4">
+        <button className="w-full text-left p-2 hover:bg-[#2A2A2A] rounded">+ New Chat</button>
+        <div className="text-sm text-gray-400 mt-6">History</div>
+        <ul className="space-y-2">
+          <li className="hover:bg-[#2A2A2A] p-2 rounded">Chat 1</li>
+          <li className="hover:bg-[#2A2A2A] p-2 rounded">Chat 2</li>
+        </ul>
       </div>
-
-      {/* 대화 리스트 */}
-      <ul className="flex-1 overflow-auto space-y-2">
-        {chats.map((chat, index) => (
-          <li key={index} className="bg-gray-800 p-2 rounded cursor-pointer hover:bg-gray-700">
-            {chat}
-          </li>
-        ))}
-      </ul>
-
-      {/* 하단 버튼 */}
-      <button className="bg-red-500 p-2 mt-4 rounded flex items-center justify-center">
-        <FaTrash className="mr-2" /> 삭제
-      </button>
     </div>
   );
-};
-
-export default Sidebar;
+}
