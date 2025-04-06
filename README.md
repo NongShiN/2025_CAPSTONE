@@ -30,6 +30,7 @@ chore: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정)
 
 
 ## 프로젝트 구조도 (예시)
+```
 2025_CAPSTONE/
 │
 ├── frontend/              # 프론트엔드 (React, Next.js 등)
@@ -60,3 +61,4 @@ chore: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정)
 ├── .env                   # 공통 환경 변수 (백/모델에서 공유할 경우)
 ├── README.md
 └── docker-compose.yml     # 전체 시스템 통합 (옵션)
+```
