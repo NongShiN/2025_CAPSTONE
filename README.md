@@ -25,4 +25,38 @@ test: 테스트 코트, 리펙토링 테스트 코드 추가
 chore: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정)
 
 
-예시) 이슈번호가 5 일때 커밋메시지 -> feat#5: add new function.
+예시) 이슈번호가 5 일때 커밋메시지 -> feat #5: add new function.
+                      브랜치 이름 -> feat#5
+
+
+## 프로젝트 구조도 (예시)
+2025_CAPSTONE/
+│
+├── frontend/              # 프론트엔드 (React, Next.js 등)
+│   ├── public/
+│   ├── src/
+│   └── package.json
+│
+├── backend/               # 백엔드 (FastAPI, Flask, Django 등)
+│   ├── app/
+│   ├── requirements.txt
+│   └── main.py
+│
+├── model/                 # AI/ML 모델
+│   ├── inference.py       # 예측 함수
+│   ├── train.py           # 학습용 코드
+│   ├── model.pkl          # 저장된 모델 파일
+│   └── utils.py
+│
+├── database/              # DB 관련 구성 (초기 스키마, 마이그레이션, 쿼리 등)
+│   ├── schema.sql
+│   ├── init_db.py
+│   └── config.py
+│
+├── streamlit/             # 프로토타입용 Streamlit 앱
+│   ├── app.py
+│   └── components/
+│
+├── .env                   # 공통 환경 변수 (백/모델에서 공유할 경우)
+├── README.md
+└── docker-compose.yml     # 전체 시스템 통합 (옵션)
