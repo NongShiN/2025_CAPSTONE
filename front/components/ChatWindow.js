@@ -4,6 +4,10 @@ import styles from "../styles/ChatWindow.module.css";
 export default function ChatWindow() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
+    const [selectedStyle, setSelectedStyle] = useState("상담스타일을 선택해주세요");
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const counselingStyles = ["다정한", "공감과 위로", "현실적인 조언"];
 
     const handleSend = () => {
         if (!input.trim()) return;
@@ -20,6 +24,36 @@ export default function ChatWindow() {
 
     return (
         <div className={styles.chatContainer}>
+            {/* 드롭다운 선택 영역 */}
+            <div className={styles.dropdownWrapper}>
+            <button
+                className={styles.dropdownToggle}
+                onClick={() => setDropdownOpen((prev) => !prev)}
+            >
+                <span className={styles.arrow}>{dropdownOpen ? "▲" : "▼"}</span>
+                <span className={styles.dropdownToggleText}>{selectedStyle}</span>
+            </button>
+
+
+
+                {dropdownOpen && (
+                    <ul className={styles.dropdownList}>
+                        {counselingStyles.map((style) => (
+                            <li
+                                key={style}
+                                className={styles.dropdownItem}
+                                onClick={() => {
+                                    setSelectedStyle(style);
+                                    setDropdownOpen(false);
+                                }}
+                            >
+                                {style}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
             {/* 메시지 출력 영역 */}
             <div className={styles.messageList}>
                 {messages.length === 0 ? (
