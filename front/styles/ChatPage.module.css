@@ -1,0 +1,7 @@
+
+.chatPage {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9fafb;
+}
