@@ -1,0 +1,158 @@
+.container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* 왼쪽 70% */
+.left {
+  flex: 5.5;
+  background: linear-gradient(135deg, #3a8dff, #72c6ff);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px;
+  text-align: center;
+}
+
+.logo {
+  width: 320px;
+  max-width: 90%;
+  height: auto;
+  margin-bottom: 40px;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.4);
+}
+
+.left h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.left p {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.chatExample {
+  margin-top: 40px;
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 16px 24px;
+  border-radius: 12px;
+}
+
+/* 오른쪽 30% */
+.right {
+  flex: 3;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.formBox {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeInUp 0.6s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.formBox h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.formBox p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.inputField {
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.inputField:focus {
+  border-color: #3a8dff;
+  box-shadow: 0 0 0 2px rgba(58, 141, 255, 0.2);
+}
+
+.submitBtn {
+  background-color: #6c63ff;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 8px;
+}
+
+.submitBtn:hover {
+  background-color: #574ed3;
+}
+
+.terms, .signupMsg, .divider {
+  font-size: 12px;
+  color: #777;
+  text-align: center;
+}
+
+.signupMsg a,
+.terms a {
+  color: #6c63ff;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.socialBtn {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 500;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.socialBtn:hover {
+  background-color: #f7f7f7;
+}
+
+.google {
+  margin-top: 10px;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

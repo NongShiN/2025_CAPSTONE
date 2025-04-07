@@ -1,0 +1,126 @@
+
+.sidebar {
+  width: 16rem; /* w-64 */
+  height: 100%;
+  background-color: #fff;
+  border-radius: 1.5rem; /* rounded-3xl */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* shadow-xl */
+  padding: 1.5rem; /* p-6 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: black;
+}
+
+.logo {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 900; /* font-black */
+  letter-spacing: 0.05em; /* tracking-wide */
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.newChatGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* gap-2 */
+  margin-bottom: 1.5rem;
+}
+
+.newChatBtn {
+  flex: 1;
+  background-color: #5A5DFF;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  transition: background 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.newChatBtn:hover {
+  background-color: #4e50e6;
+}
+
+.newChatBtn:active {
+  background-color: #3f41c8;
+}
+
+.searchBtn {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: #000;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.searchBtn:hover {
+  background-color: #1a1a1a;
+}
+
+.searchBtn:active {
+  background-color: #333;
+}
+
+.sectionTitle {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #6b7280; /* text-gray-500 */
+  padding: 0 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.clearBtn {
+  color: #5A5DFF;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+}
+
+.chatItemList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chatItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chatItem:hover {
+  background-color: #f0f0f0;
+}
+
+.footerButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  background: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.footerButton:hover {
+  background-color: #f5f5f5;
+}

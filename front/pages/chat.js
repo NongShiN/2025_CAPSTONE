@@ -1,18 +1,28 @@
-import Sidebar from '../components/Sidebar';
-import ChatWindow from '../components/ChatWindow';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Sidebar from "../components/Sidebar";
+import ChatWindow from "../components/ChatWindow";
+import styles from "../styles/ChatPage.module.css";
 
 export default function ChatPage() {
-  return (
-    <div className="flex h-screen bg-gray-50">
-      {/* 사이드바는 흰색 카드 스타일로 유지 */}
-      <div className="p-4">
-        <Sidebar />
-      </div>
+    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(true);
 
-      {/* 채팅창 영역 */}
-      <main className="flex-1 p-4">
-        <ChatWindow />
-      </main>
-    </div>
-  );
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) {
+            router.push("/login");
+        } else {
+            setIsLoading(false);
+        }
+    }, []);
+
+    if (isLoading) return <div>Loading...</div>;
+
+    return (
+        <div className={styles.chatPage}>
+            <Sidebar />
+            <ChatWindow />
+        </div>
+    );
 }
