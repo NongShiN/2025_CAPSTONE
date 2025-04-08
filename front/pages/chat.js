@@ -7,12 +7,15 @@ import styles from "../styles/ChatPage.module.css";
 export default function ChatPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
+    const [isGuest, setIsGuest] = useState(false);
 
     useEffect(() => {
         const user = JSON.parse(localStorage.getItem("user"));
+
         if (!user) {
             router.push("/login");
         } else {
+            setIsGuest(!!user.guest);
             setIsLoading(false);
         }
     }, []);
@@ -21,8 +24,8 @@ export default function ChatPage() {
 
     return (
         <div className={styles.chatPage}>
-            <Sidebar />
-            <ChatWindow />
+            <Sidebar isGuest={isGuest} />
+            <ChatWindow isGuest={isGuest} />
         </div>
     );
 }

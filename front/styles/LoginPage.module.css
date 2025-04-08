@@ -4,7 +4,6 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-/* 왼쪽 70% */
 .left {
   flex: 5.5;
   background: linear-gradient(135deg, #3a8dff, #72c6ff);
@@ -49,7 +48,6 @@
   border-radius: 12px;
 }
 
-/* 오른쪽 30% */
 .right {
   flex: 3;
   background-color: #fff;
@@ -58,92 +56,133 @@
   justify-content: center;
 }
 
-.formBox {
+.loginBox {
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
-  padding: 40px 36px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
   width: 100%;
   max-width: 400px;
   text-align: center;
   animation: fadeInUp 0.6s ease-out;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
 }
 
-.formBox h2 {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 4px;
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
 }
 
-.formBox p {
-  font-size: 14px;
+.inputGroup {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.inputGroup label {
+  font-size: 13px;
+  font-weight: 500;
   color: #555;
-  margin-bottom: 8px;
+  display: block;
+  margin-bottom: 6px;
 }
 
-.inputField {
-  padding: 14px;
+.inputWrapper {
+  display: flex;
+  align-items: center;
   border: 1px solid #ccc;
   border-radius: 10px;
-  font-size: 15px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.inputWrapper input {
+  border: none;
   outline: none;
-  transition: 0.2s ease;
+  flex: 1;
+  font-size: 14px;
+  margin-left: 8px;
+  background: transparent;
 }
 
-.inputField:focus {
-  border-color: #3a8dff;
-  box-shadow: 0 0 0 2px rgba(58, 141, 255, 0.2);
+.icon {
+  font-size: 16px;
+  color: #888;
 }
 
-.submitBtn {
-  background-color: #6c63ff;
+.forgotWrapper {
+  text-align: right;
+  margin-bottom: 16px;
+}
+
+.forgotWrapper a {
+  font-size: 12px;
+  color: #6c63ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.loginBtn {
+  background: linear-gradient(to right, #36d1dc, #5b86e5);
+  border: none;
   color: white;
   padding: 14px;
-  border: none;
-  border-radius: 12px;
+  border-radius: 30px;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 15px;
   cursor: pointer;
-  transition: background 0.3s ease;
   margin-top: 8px;
+  width: 100%;
+  transition: background 0.3s ease;
 }
 
-.submitBtn:hover {
-  background-color: #574ed3;
+.loginBtn:hover {
+  opacity: 0.95;
 }
 
-.terms, .signupMsg, .divider {
+.orText {
   font-size: 12px;
   color: #777;
-  text-align: center;
+  margin: 16px 0 10px;
 }
 
-.signupMsg a,
-.terms a {
-  color: #6c63ff;
-  text-decoration: underline;
-  font-weight: 500;
+.socialButtons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.socialBtn {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 12px;
-  font-weight: 500;
-  background-color: white;
+.socialButtons button {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.3s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
 }
 
-.socialBtn:hover {
-  background-color: #f7f7f7;
+.socialButtons button:hover {
+  transform: scale(1.1);
 }
 
-.google {
-  margin-top: 10px;
+.socialButtons img {
+  width: 20px;
+  height: 20px;
+}
+
+.signupLink {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c63ff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 @keyframes fadeInUp {
@@ -155,4 +194,21 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+.guestBtn {
+  background: #e0e0e0;
+  color: #333;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+  transition: background 0.3s ease;
+}
+
+.guestBtn:hover {
+  background-color: #d5d5d5;
 }

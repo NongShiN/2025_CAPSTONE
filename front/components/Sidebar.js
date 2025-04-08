@@ -1,11 +1,21 @@
 import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 import styles from "../styles/Sidebar.module.css";
 
-export default function Sidebar() {
+export default function Sidebar({ isGuest = false }) {
     const router = useRouter();
+    const [showMenu, setShowMenu] = useState(false);
+
+    const handleLogout = () => {
+        localStorage.removeItem("user");
+        localStorage.removeItem("chatSessions");
+        router.push("/login");
+    };
 
     const handleNewChat = () => {
-        console.log("New chat created");
+        if (!isGuest) {
+            console.log("New chat created");
+        }
     };
 
     const handleSearch = () => {
@@ -20,7 +30,12 @@ export default function Sidebar() {
                 </div>
 
                 <div className={styles.newChatGroup}>
-                    <button onClick={handleNewChat} className={styles.newChatBtn}>
+                    <button
+                        onClick={handleNewChat}
+                        className={`${styles.newChatBtn} ${isGuest ? styles.disabled : ""}`}
+                        disabled={isGuest}
+                        title={isGuest ? "게스트는 새 대화를 생성할 수 없습니다" : "새 대화"}
+                    >
                         + New chat
                     </button>
                     <button onClick={handleSearch} className={styles.searchBtn}>
@@ -31,7 +46,13 @@ export default function Sidebar() {
                 <div style={{ borderTop: "1px solid #e5e7eb", marginBottom: "8px" }} />
                 <div className={styles.sectionTitle}>
                     <span>Your conversations</span>
-                    <button className={styles.clearBtn}>Clear All</button>
+                    <button
+                        className={`${styles.clearBtn} ${isGuest ? styles.disabled : ""}`}
+                        disabled={isGuest}
+                        title={isGuest ? "게스트는 대화를 삭제할 수 없습니다" : "Clear All"}
+                    >
+                        Clear All
+                    </button>
                 </div>
                 <div style={{ borderBottom: "1px solid #e5e7eb", marginBottom: "12px" }} />
 
@@ -54,10 +75,26 @@ export default function Sidebar() {
                     <img src="/setting.svg" alt="Settings" style={{ width: "20px", height: "20px" }} />
                     Settings
                 </button>
-                <button className={styles.footerButton}>
-                    <img src="/file.svg" alt="avatar" style={{ width: "24px", height: "24px", borderRadius: "50%" }} />
-                    Andrew Neilson
-                </button>
+
+                {/* 유저 메뉴 드롭다운 */}
+                <div className={styles.userMenu}>
+                    <button
+                        onClick={() => setShowMenu(!showMenu)}
+                        className={styles.userButton}
+                    >
+                        <img src="/file.svg" alt="avatar" className={styles.avatar} />
+                        <span>{isGuest ? "Guest" : "Andrew Neilson"}</span>
+                    </button>
+
+                    {showMenu && (
+                        <div className={styles.dropdown}>
+                            {!isGuest && (
+                                <button onClick={() => router.push("/profile")}>👤 My Profile</button>
+                            )}
+                            <button onClick={handleLogout}>🚪 Log Out</button>
+                        </div>
+                    )}
+                </div>
             </div>
         </aside>
     );

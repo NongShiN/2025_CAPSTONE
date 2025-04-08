@@ -24,17 +24,15 @@ export default function ChatWindow() {
 
     return (
         <div className={styles.chatContainer}>
-            {/* 드롭다운 선택 영역 */}
+            {/* 🔽 상담 스타일 선택 드롭다운 */}
             <div className={styles.dropdownWrapper}>
-            <button
-                className={styles.dropdownToggle}
-                onClick={() => setDropdownOpen((prev) => !prev)}
-            >
-                <span className={styles.arrow}>{dropdownOpen ? "▲" : "▼"}</span>
-                <span className={styles.dropdownToggleText}>{selectedStyle}</span>
-            </button>
-
-
+                <button
+                    className={styles.dropdownToggle}
+                    onClick={() => setDropdownOpen((prev) => !prev)}
+                >
+                    <span className={styles.arrow}>{dropdownOpen ? "▲" : "▼"}</span>
+                    <span className={styles.dropdownToggleText}>{selectedStyle}</span>
+                </button>
 
                 {dropdownOpen && (
                     <ul className={styles.dropdownList}>
@@ -54,7 +52,7 @@ export default function ChatWindow() {
                 )}
             </div>
 
-            {/* 메시지 출력 영역 */}
+            {/* 💬 메시지 영역 */}
             <div className={styles.messageList}>
                 {messages.length === 0 ? (
                     <p className={styles.emptyMessage}>Let me hear your heart</p>
@@ -72,7 +70,7 @@ export default function ChatWindow() {
                 )}
             </div>
 
-            {/* 입력창 영역 */}
+            {/* ✍️ 입력창 */}
             <div className={styles.inputWrapper}>
                 <div className={styles.inputBox}>
                     <img
