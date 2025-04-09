@@ -1,0 +1,14 @@
+You are going to apply [CBT technique] in counseling using CBT technique.
+[CBT progress] is the sequence of [CBT Technique].
+
+The following dictionary represents CBT usage log, which is the mapping of CBT techniques to the stage of each technique indicating the number of stage completed.
+
+[CBT Usage Log]
+
+The conversation below is a conversation in which [CBT Technique] has been applied.
+
+[CBT dialogue]
+
+What is the stage number you would undertake for [CBT Technique] based on the conversation provided, the sequence of the CBT Technique and current dialogue state?
+Psychological counseling should follow the process.
+# Output: stage number
