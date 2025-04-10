@@ -1,8 +1,8 @@
 import os
 import json
 import logging
+import datetime
 from model import parse_args, load_memory, save_memory, extract_memory_from_utterance, compose_prompt, call_llm, load_prompt
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,13 +17,12 @@ logging.basicConfig(
 def main():
     args = parse_args()
 
-    print("🤖 Welcome to CoCoA – Your Cognitive Therapy Chatbot!")
-    print("Type 'exit' to quit.\n")
+    print("🤖 Welcome to Cognitive Therapy Chatbot!")
+    print("Type 'quit' or 'exit' to quit.\n============================================================\n")
 
     basic_memory = load_memory(args.basic_memory_path)
     cd_memory = load_memory(args.cd_memory_path)
 
-    static_prompt_template = load_prompt(args.static_prompt_name)
     cd_prompt_template = load_prompt(args.cd_prompt_name)
     insight_prompt_template = load_prompt(args.insight_prompt_name)
 
@@ -31,19 +30,21 @@ def main():
 
     while True:
         try:
-            client_input = input("🙋 You: ").strip()
+            client_input = input("You: ").strip()
             if client_input.lower() in ["quit", "exit"]:
                 print("👋 Goodbye. Take care!")
                 break
 
-            # Memory extraction
+            timestamp = datetime.datetime.now().isoformat()
+
             basic_entry, cd_entry = extract_memory_from_utterance(
                 client_input,
                 call_llm,
                 args.model,
                 args.temperature,
                 cd_prompt_template,
-                insight_prompt_template
+                insight_prompt_template,
+                timestamp
             )
             basic_memory.append(basic_entry)
             if cd_entry:
@@ -52,29 +53,24 @@ def main():
             save_memory(basic_memory, args.basic_memory_path)
             save_memory(cd_memory, args.cd_memory_path)
 
-            # Compose prompt and get response
             prompt = compose_prompt(
                 args,
                 counselor_utterance=last_counselor,
                 client_utterance=client_input,
-                task="Help the client reframe their thoughts. Respond as the counselor in only ONE reply.",
-                esc="Use empathy, reflection, and cognitive restructuring techniques.",
                 basic_memory=basic_memory,
                 cd_memory=cd_memory,
                 f_llm=call_llm,
                 model=args.model,
-                temperature=args.temperature,
-                static_template=static_prompt_template
+                temperature=args.temperature
             )
 
             response = call_llm(prompt, model=args.model, temperature=args.temperature)
             last_counselor = response
 
-            print(f"\n🧠 CoCoA: {response}")
+            print(f"\nCounselor: {response}")
 
-            # Log the full conversation
             logging.info("User: %s", client_input)
-            logging.info("CoCoA: %s", response)
+            logging.info("Counselor: %s", response)
 
         except KeyboardInterrupt:
             print("\n👋 Interrupted. Take care!")

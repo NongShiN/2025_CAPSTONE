@@ -6,7 +6,7 @@ Also, assign a severity score from 1 to 5 on a Likert scale for the cognitive di
 Output must be JSON format with three keys (type, utterance, score). In JSON, both keys and values should be enclosed in double quotes.
 
 # recent utterances:
-{latest dialogue}
+[Latest dialogue]
 
 # Types of cognitive distortion
 "All-or-Nothing Thinking",

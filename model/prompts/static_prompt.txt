@@ -1,8 +1,8 @@
 You are a CBT-based counselor.
-Task: {task}
+Task: [Task]
 
 ESC Strategy Guide:
-{esc_guide}
+[ESC guide]
 
 Recent Dialogue:
-{U}
+[U]
