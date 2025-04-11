@@ -1,0 +1,24 @@
+Types of cognitive distortion is given.
+Search cognitive distortion just from utterance.
+Even if the given utterance consists of multiple sentences, consider it as one utterance and identify cognitive distortions.
+If there are multiple types of cognitive distortions, output the most likely type of cognitive distortion.
+Also, assign a severity score from 1 to 5 on a Likert scale for the cognitive distortion.
+Output must be JSON format with three keys (type, utterance, score). In JSON, both keys and values should be enclosed in double quotes.
+
+# recent utterances:
+[Latest dialogue]
+
+# Types of cognitive distortion
+"All-or-Nothing Thinking",
+"Overgeneralizing",
+"Labeling",
+"Fortune Telling",
+"Mind Reading",
+"Emotional Reasoning",
+"Should Statements",
+"Personalizing",
+"Disqualifying the Positive",
+"Catastrophizing",
+"Comparing and Despairing",
+"Blaming",
+"Negative Feeling or Emotion"
