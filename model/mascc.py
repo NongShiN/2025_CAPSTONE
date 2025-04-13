@@ -284,12 +284,11 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer, util
-from model import parse_args
+from utils.args import parse_args
 from agents.counselor import CounselorAgent
 from utils.util import call_llm
 import datetime
 import logging
-import argparse
 import dotenv
 
 dotenv.load_dotenv()
@@ -308,20 +307,6 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--cd_prompt_name', type=str, default='detect_cognitive_distortion.txt')
-    parser.add_argument('--insight_prompt_name', type=str, default='extract_insight.txt')
-    parser.add_argument('--dynamic_prompt_name', type=str, default='dynamic_prompt.txt')
-    parser.add_argument('--model', type=str, default='gpt-4o-mini')
-    parser.add_argument('--temperature', type=float, default=0.7)
-    parser.add_argument('--basic_memory_path', type=str, default='memory/basic_memory.json')
-    parser.add_argument('--cd_memory_path', type=str, default='memory/cd_memory.json')
-    parser.add_argument('--cbt_log_name', type=str, default='cbt_log.json')
-    parser.add_argument('--cbt_info_name', type=str, default='cbt_info.json')
-    parser.add_argument('--top_k', type=int, default=5)
-    return parser.parse_args()
 
 class MASCC:
     def __init__(self, args, llm, retriever):

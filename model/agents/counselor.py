@@ -9,7 +9,7 @@ from agents.supervisor_dbt import SupervisorDBT
 from agents.supervisor_ifs import SupervisorIFS
 from agents.supervisor_ipt import SupervisorIPT
 from utils.util import call_llm, load_prompt
-from model import parse_args
+from utils.args import parse_args
 import logging
 
 logging.basicConfig(
@@ -89,7 +89,7 @@ if __name__ == "__main__":
         raise EnvironmentError("OPENAI_API_KEY not found. Check your .env file.")
 
     llm = OpenAI(api_key=OPENAI_API_KEY)
-    from sentence_transformers import SentenceTransformer, util
+    from sentence_transformers import SentenceTransformer
     retriever = SentenceTransformer("all-MiniLM-L6-v2")
     
     counselor = CounselorAgent(args, llm, retriever)

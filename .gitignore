@@ -102,7 +102,6 @@ ENV/
 
 # input data, saved log, checkpoints
 data/
-!model/data/
 raw_data/
 input/
 saved/
@@ -139,3 +138,5 @@ test.ipynb
 config.yaml
 
 *.toml
+
+!model/data/**
