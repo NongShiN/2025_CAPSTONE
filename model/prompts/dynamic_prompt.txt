@@ -16,12 +16,15 @@ Your task is to generate a response following the below instructions.
 - Information: Provide useful information to the help-seeker, for example with data, facts, opinions, resources, or by answering questions.
 - Others: Exchange pleasantries and use other support strategies that do not fall into the above categories.
 
-# recent utterances: [Latest dialogue]
+# recent utterances:
+[Latest dialogue]
 
 # CBT technique to employ: [CBT technique]
 
-# description of CBT technique : [CBT documentation]
+# description of CBT technique :
+[CBT documentation]
 
 # CBT stage to employ: [CBT stage]
 
-# utterance example of the stage: [CBT stage example]
+# utterance example of the stage:
+[CBT stage example]

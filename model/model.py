@@ -4,8 +4,8 @@ import datetime
 import json
 import os
 import logging
-from util.util import load_prompt, normalize, load_cbt_technique_info, clean_json_response
-from util.memory_management import load_memory, save_memory
+from utils.util import call_llm, load_prompt, normalize, load_cbt_technique_info, clean_json_response
+from utils.memory_management import load_memory, save_memory
 from sentence_transformers import SentenceTransformer, util
 from dotenv import load_dotenv
 
@@ -16,7 +16,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
     raise EnvironmentError("OPENAI_API_KEY not found. Check your .env file.")
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+llm = OpenAI(api_key=OPENAI_API_KEY)
 retriever_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 logging.basicConfig(
@@ -29,29 +29,21 @@ logging.basicConfig(
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--final_prompt_name', type=str, default='final_prompt.txt')
     parser.add_argument('--cd_prompt_name', type=str, default='detect_cognitive_distortion.txt')
     parser.add_argument('--insight_prompt_name', type=str, default='extract_insight.txt')
+    parser.add_argument('--dynamic_prompt_name', type=str, default='dynamic_prompt.txt')
     parser.add_argument('--model', type=str, default='gpt-4o-mini')
     parser.add_argument('--temperature', type=float, default=0.7)
-    parser.add_argument('--basic_memory_path', type=str, required=True)
-    parser.add_argument('--cd_memory_path', type=str, required=True)
+    parser.add_argument('--basic_memory_path', type=str, default='memory/basic_memory.json')
+    parser.add_argument('--cd_memory_path', type=str, default='memory/cd_memory.json')
     parser.add_argument('--cbt_log_name', type=str, default='cbt_log.json')
     parser.add_argument('--top_k', type=int, default=5)
     parser.add_argument('--cbt_info_name', type=str, default='cbt_info.json')
     return parser.parse_args()
 
-def call_llm(prompt, model="gpt-4o-mini", temperature=0.7):
-    messages = [{"role": "user", "content": prompt}]
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=temperature
-    )
-    content = response.choices[0].message.content.strip()
-    if content.lower().startswith("counselor:"):
-        content = content[len("counselor:"):].strip()
-    return content
+###################################################################################
+# To Do : Counselor - Supervisor 구조로 CBT 적용/미적용 결정 또는 다른 상담 기법 적용
+###################################################################################
 
 def update_cbt_usage_log(log_path, technique, current_stage):
     log = {}
@@ -98,9 +90,9 @@ def calculate_cd_priority(cd_memory, alpha_recency=1.0, alpha_frequency=1.0, alp
 
     return max(scores, key=scores.get) if scores else None
 
-def extract_memory_from_utterance(client_utterance, f_llm, model, temperature, cd_prompt_template, insight_prompt_template, timestamp):
+def extract_memory_from_utterance(llm, client_utterance, f_llm, model, temperature, cd_prompt_template, insight_prompt_template, timestamp):
     insight_prompt = insight_prompt_template.replace("[Client utterance]", client_utterance)
-    insight = f_llm(insight_prompt, model=model, temperature=temperature)
+    insight = f_llm(insight_prompt, llm, model=model, temperature=temperature)
 
     basic_entry = {
         "utterance": client_utterance,
@@ -109,7 +101,7 @@ def extract_memory_from_utterance(client_utterance, f_llm, model, temperature, c
     }
 
     cd_prompt = cd_prompt_template.replace("[Latest dialogue]", client_utterance)
-    cd_response = f_llm(cd_prompt, model=model, temperature=temperature)
+    cd_response = f_llm(cd_prompt, llm, model=model, temperature=temperature)
     logging.info("CD raw response: %s", cd_response)
 
     cd_entry = None
@@ -159,7 +151,7 @@ def compose_prompt(args, counselor_utterance, client_utterance,
 
         technique_prompt_template = load_prompt("decide_cbt_technique.txt")
         technique_prompt = technique_prompt_template.replace("[Distortion to treat]", cd_to_treat).replace("[Memory]", retrieved_context)
-        cbt_technique = f_llm(technique_prompt, model=model, temperature=temperature)
+        cbt_technique = f_llm(technique_prompt, llm, model=model, temperature=temperature)
 
         cbt_info = load_cbt_technique_info(args.cbt_info_name)
         technique_data = cbt_info[cbt_technique]
@@ -173,7 +165,7 @@ def compose_prompt(args, counselor_utterance, client_utterance,
         stage_prompt = stage_prompt.replace("[CBT progress]", progress_description)
         stage_prompt = stage_prompt.replace("[CBT Usage Log]", json.dumps(cbt_log))
         stage_prompt = stage_prompt.replace("[CBT dialogue]", example)
-        stage = f_llm(stage_prompt, model=model, temperature=temperature)
+        stage = f_llm(stage_prompt, llm, model=model, temperature=temperature)
         update_cbt_usage_log(args.cbt_log_name, cbt_technique, stage)
 
     final_template = load_prompt(args.final_prompt_name)
@@ -235,7 +227,7 @@ if __name__ == "__main__":
     )
     logging.info("Composed final prompt for LLM input.")
 
-    response = call_llm(full_prompt, model=args.model, temperature=args.temperature)
+    response = call_llm(full_prompt, llm=llm, model=args.model, temperature=args.temperature)
 
     print(f"Previous conversation:\nCounselor: {counselor_utterance}\nClient: {client_utterance}")
     print("\n======================================================================\n")

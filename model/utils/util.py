@@ -24,3 +24,14 @@ def load_cbt_technique_info(cbt_info_name):
     with open(cbt_info_path, 'r', encoding='utf-8') as f:
         return json.load(f)
     
+def call_llm(prompt, llm, model="gpt-4o-mini", temperature=0.7):
+    messages = [{"role": "user", "content": prompt}]
+    response = llm.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=temperature
+    )
+    content = response.choices[0].message.content.strip()
+    if content.lower().startswith("counselor:"):
+        content = content[len("counselor:"):].strip()
+    return content
