@@ -30,10 +30,13 @@ class SupervisorCBT:
         self.insight_prompt_template = load_prompt(args.insight_prompt_name)
         self.cd_prompt_template = load_prompt(args.cd_prompt_name)
         
-    def update_cbt_usage_log(self, log_path, technique, current_stage):
+    def update_cbt_usage_log(self, cbt_usage_log_path, technique, current_stage):
+        abs_path = os.path.join(os.path.dirname(__file__), "..", cbt_usage_log_path)
+        abs_path = os.path.abspath(abs_path)
+        
         log = {}
-        if os.path.exists(log_path):
-            with open(log_path, 'r', encoding='utf-8') as f:
+        if os.path.exists(abs_path):
+            with open(abs_path, 'r', encoding='utf-8') as f:
                 try:
                     content = f.read().strip()
                     if content:
@@ -43,7 +46,7 @@ class SupervisorCBT:
 
         log[technique] = int(current_stage)
 
-        with open(log_path, 'w', encoding='utf-8') as f:
+        with open(abs_path, 'w', encoding='utf-8') as f:
             json.dump(log, f, indent=2, ensure_ascii=False)
 
         return log
@@ -107,7 +110,7 @@ class SupervisorCBT:
 
         return basic_info, cd_info
 
-    def update_and_baisc_cd_memory(self, args, basic_info, cd_info):
+    def update_baisc_and_cd_memory(self, args, basic_info, cd_info):
         self.basic_memory.append(basic_info)
         if cd_info:
             self.cd_memory.append(cd_info)
@@ -145,40 +148,45 @@ class SupervisorCBT:
             retrieved_memories = self.retrieve_relevant_memories(args, cd_to_treat, self.basic_memory, self.cd_memory)
             retrieved_context = "\n".join([f"- {x}" for x in retrieved_memories])
 
-            technique_prompt_template = load_prompt("decide_cbt_technique.txt")
+            technique_prompt_template = load_prompt("prompts/cbt/decide_cbt_technique.txt")
             technique_prompt = technique_prompt_template.replace("[Distortion to treat]", cd_to_treat).replace("[Memory]", retrieved_context)
             cbt_technique = f_llm(technique_prompt, llm=self.llm, model=self.model, temperature=self.temperature)
 
-            cbt_info = load_cbt_technique_info(args.cbt_info_name)
+            cbt_info = load_cbt_technique_info(args.cbt_info_path)
             technique_data = cbt_info[cbt_technique]
             progress_description = "\n".join([f"{s['stage']}: {s['description']}" for s in technique_data.get("stages", [])])
             example = technique_data.get("example", "")
 
-            stage_prompt_template = load_prompt("decide_cbt_stage.txt")
-            cbt_log = self.update_cbt_usage_log(args.cbt_log_name, cbt_technique, "0")
+            stage_prompt_template = load_prompt("prompts/cbt/decide_cbt_stage.txt")
+            cbt_log = self.update_cbt_usage_log(args.cbt_log_path, cbt_technique, "0")
             stage_prompt = stage_prompt_template.replace("[CBT technique]", cbt_technique)
             stage_prompt = stage_prompt.replace("[CBT Technique]", cbt_technique)
             stage_prompt = stage_prompt.replace("[CBT progress]", progress_description)
             stage_prompt = stage_prompt.replace("[CBT Usage Log]", json.dumps(cbt_log))
             stage_prompt = stage_prompt.replace("[CBT dialogue]", example)
             stage = f_llm(stage_prompt, llm=self.llm, model=self.model, temperature=self.temperature)
-            self.update_cbt_usage_log(args.cbt_log_name, cbt_technique, stage)
+            self.update_cbt_usage_log(args.cbt_log_path, cbt_technique, stage)
 
-        dynamic_template = load_prompt(args.dynamic_prompt_name)
-        dynamic_prompt = dynamic_template.replace("[Latest dialogue]", latest_dialogue)
-        dynamic_prompt = dynamic_prompt.replace("[CBT technique]", cbt_technique)
-        dynamic_prompt = dynamic_prompt.replace("[CBT documentation]", progress_description)
-        dynamic_prompt = dynamic_prompt.replace("[CBT stage]", stage)
-        dynamic_prompt = dynamic_prompt.replace("[CBT stage example]", example)
+        guidance_template = load_prompt(args.dynamic_prompt_name)
+        guidance = guidance_template.replace("[Latest dialogue]", latest_dialogue)
+        guidance = guidance.replace("[CBT technique]", cbt_technique)
+        guidance = guidance.replace("[CBT documentation]", progress_description)
+        guidance = guidance.replace("[CBT stage]", stage)
+        guidance = guidance.replace("[CBT stage example]", example)
         
-        return dynamic_prompt
+        return guidance
         
 if __name__ == "__main__":
-    args = parse_args()
-    logging.info("Starting counselor agent...")
+    import dotenv
+    dotenv.load_dotenv()
+    
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     if not OPENAI_API_KEY:
         raise EnvironmentError("OPENAI_API_KEY not found. Check your .env file.")
+    
+    logging.info("Starting CBT supervisor agent...")
+    
+    args = parse_args()
     
     from openai import OpenAI
     llm = OpenAI(api_key=OPENAI_API_KEY)
@@ -202,7 +210,7 @@ if __name__ == "__main__":
         timestamp
     )
     
-    cbt_supervisor.update_and_baisc_cd_memory(args, basic_info, cd_info)
+    cbt_supervisor.update_baisc_and_cd_memory(args, basic_info, cd_info)
     logging.info("Saved updated memory files.")
 
     dynamic_prompt = cbt_supervisor.compose_dynamic_prompt(
