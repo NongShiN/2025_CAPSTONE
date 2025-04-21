@@ -1,0 +1,105 @@
+.pageWrapper {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', sans-serif;
+    transition: background 0.3s ease;
+}
+
+.pageWrapper.blue {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+}
+
+.pageWrapper.purple {
+    background: linear-gradient(to right, #d4aaff, #c2c2ff);
+}
+
+.pageWrapper.pink {
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+}
+
+.profileCard {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    max-width: 360px;
+    width: 100%;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    margin-bottom: 16px;
+}
+
+.profileCard h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    text-align: left;
+}
+
+.input, .select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+}
+
+.saveBtn, .backBtn {
+    margin-top: 16px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.saveBtn {
+    background: #6c63ff;
+    color: white;
+}
+
+.saveBtn:hover {
+    background: #574ed3;
+}
+
+.backBtn {
+    background: #eee;
+    color: #333;
+}
+
+.backBtn:hover {
+    background: #ddd;
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

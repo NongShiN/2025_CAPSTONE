@@ -1,7 +1,20 @@
-
 .chatPage {
   display: flex;
   height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f9fafb;
+  padding: 16px;
+  box-sizing: border-box;
+  gap: 16px;
 }
+
+.blueTheme {
+  background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+}
+
+.purpleTheme {
+  background: linear-gradient(to right, #d4aaff, #c2c2ff);
+}
+
+.pinkTheme {
+  background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+}
+
