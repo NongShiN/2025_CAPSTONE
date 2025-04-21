@@ -1,90 +1,115 @@
-
 .sidebar {
-  width: 16rem; /* w-64 */
-  height: 100%;
-  background-color: #fff;
-  border-radius: 1.5rem; /* rounded-3xl */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* shadow-xl */
-  padding: 1.5rem; /* p-6 */
+  width: 260px;
+  background-color: white;
+  border-radius: 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: black;
+  padding: 1.5rem 1.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  height: calc(100vh - 30px); /* 하단 잘림 방지용 살짝 줄임 */
+  margin-bottom: 30px; /* 하단 여백 추가 */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
+
 .logo {
-  font-size: 1.5rem; /* text-2xl */
-  font-weight: 900; /* font-black */
-  letter-spacing: 0.05em; /* tracking-wide */
-  margin-bottom: 1.5rem;
+  text-align: center;
+  margin-bottom: 1rem;
   cursor: pointer;
 }
 
-.newChatGroup {
+.logoImage {
+  width: 160px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.2s ease;
+}
+
+.logoImage:hover {
+  transform: scale(1.05);
+}
+
+.actionRow {
   display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
   align-items: center;
-  gap: 0.5rem; /* gap-2 */
-  margin-bottom: 1.5rem;
 }
 
 .newChatBtn {
   flex: 1;
   background-color: #5A5DFF;
   color: white;
-  font-size: 0.875rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
   border-radius: 9999px;
-  transition: background 0.3s;
   border: none;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.newChatBtn:hover {
+.newChatBtn:hover:not(:disabled) {
   background-color: #4e50e6;
 }
 
-.newChatBtn:active {
-  background-color: #3f41c8;
-}
-
-.searchBtn {
-  width: 2.5rem;
-  height: 2.5rem;
-  background-color: #000;
-  border-radius: 9999px;
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s;
+  color: #555;
+  transition: background-color 0.2s;
+}
+
+.iconBtn:hover {
+  background-color: #f1f1f1;
+  border-radius: 50%;
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.searchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.searchField {
+  flex: 1;
+  border: 2px solid #5A5DFF;
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  outline: none;
+  font-size: 0.85rem;
+}
+
+.closeSearchBtn {
+  background: none;
   border: none;
+  font-size: 1.2rem;
+  color: #888;
   cursor: pointer;
-}
-
-.searchBtn:hover {
-  background-color: #1a1a1a;
-}
-
-.searchBtn:active {
-  background-color: #333;
 }
 
 .sectionTitle {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  color: #6b7280; /* text-gray-500 */
+  color: #6b7280;
   padding: 0 0.25rem;
   margin-bottom: 0.5rem;
-}
-
-.clearBtn {
-  color: #5A5DFF;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: inherit;
 }
 
 .chatItemList {
@@ -95,16 +120,46 @@
 
 .chatItem {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.75rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+  position: relative;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .chatItem:hover {
-  background-color: #f0f0f0;
+  background-color: #f2f2f2;
+}
+
+.chatTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.chatItem:hover .deleteBtn {
+  opacity: 1;
+}
+
+.footerButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .footerButton {
@@ -124,28 +179,6 @@
 .footerButton:hover {
   background-color: #f5f5f5;
 }
-.userMenu {
-  position: relative;
-}
-
-.userButton {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 10px 16px;
-  border: 1px solid #ddd;
-  border-radius: 9999px;
-  background: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.2s;
-  width: 100%;
-}
-
-.userButton:hover {
-  background-color: #f5f5f5;
-}
 
 .avatar {
   width: 24px;
@@ -153,38 +186,8 @@
   border-radius: 9999px;
 }
 
-.dropdown {
-  position: absolute;
-  top: -100px;
-  left: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 10px;
-  width: 180px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 1000;
-}
-
-.dropdown button {
-  background: none;
-  border: none;
-  text-align: left;
-  font-size: 14px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.dropdown button:hover {
-  background-color: #f0f0f0;
-}
-
-.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
+.deleting {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.25s ease-out;
 }
