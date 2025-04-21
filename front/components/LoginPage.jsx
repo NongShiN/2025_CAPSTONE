@@ -64,7 +64,12 @@ const LoginPage = () => {
             </div>
 
             <div className={styles.forgotWrapper} style={{ textAlign: "center" }}>
-              <a href="#">Forgot password?</a>
+              <button
+                  onClick={() => router.push("/forgot-password")}
+                  style={{ background: "none", border: "none", padding: 0, color: "#6c63ff", cursor: "pointer", fontSize: "13px", fontWeight: "500" }}
+              >
+                Forgot password?
+              </button>
               <span style={{ margin: "0 8px", color: "#aaa" }}>|</span>
               <button
                   className={styles.signupLink}
