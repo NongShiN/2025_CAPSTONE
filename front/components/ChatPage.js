@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import Sidebar from "../components/Sidebar";
-import ChatWindow from "./ChatWindow";
-import styles from "../styles/ChatPage.module.css";
+import Sidebar from "@/components/Sidebar";
+import ChatWindow from "@/components/ChatWindow";
+import styles from "@/styles/ChatPage.module.css";
 
 export default function ChatPage() {
     const { data: session, status } = useSession();
+    const router = useRouter();
     const [isClient, setIsClient] = useState(false);
     const [isGuest, setIsGuest] = useState(false);
     const [theme, setTheme] = useState("blue");
@@ -31,9 +33,9 @@ export default function ChatPage() {
             setIsGuest(false);
             setTheme("blue");
         } else {
-            window.location.href = "/login";
+            router.replace("/login");
         }
-    }, [isClient, session, status]);
+    }, [isClient, session, status, router]);
 
     if (!isClient || status === "loading") return <div>Loading...</div>;
 

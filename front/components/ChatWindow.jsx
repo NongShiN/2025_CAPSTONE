@@ -80,8 +80,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId }) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    message: input,
-                    style: selectedStyle, // 선택된 상담 스타일도 서버에 보냄 (옵션)
+                    message: input
                 }),
             });
 
@@ -89,7 +88,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId }) {
             const botMessage = {
                 id: Date.now() + 1,
                 sender: "bot",
-                text: data.message || "죄송해요, 이해하지 못했어요.",
+                text: data.message || "Sorry, I couldn't understand.",
             };
 
             const finalMessages = [...updatedMessages, botMessage];
