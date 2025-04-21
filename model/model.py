@@ -4,8 +4,8 @@ import datetime
 import json
 import os
 import logging
-from util.util import load_prompt, normalize, load_cbt_technique_info, clean_json_response
-from util.memory_management import load_memory, save_memory
+from .util.util import load_prompt, normalize, load_cbt_technique_info, clean_json_response
+from .util.memory_management import load_memory, save_memory
 from sentence_transformers import SentenceTransformer, util
 from dotenv import load_dotenv
 

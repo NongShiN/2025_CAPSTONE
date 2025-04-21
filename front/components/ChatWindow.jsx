@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 export default function ChatWindow() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
+    const [isSending, setIsSending] = useState(false);
     const [selectedStyle, setSelectedStyle] = useState("상담스타일을 선택해주세요");
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [showIntro, setShowIntro] = useState(true);
@@ -22,7 +23,7 @@ export default function ChatWindow() {
         }
     }, []);
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!input.trim()) return;
 
         let currentSessionId = sessionId;
@@ -31,32 +32,61 @@ export default function ChatWindow() {
             setSessionId(currentSessionId);
         }
 
-        const newMessage = {
+        const userMessage = {
             id: Date.now(),
             sender: "user",
             text: input,
         };
 
-        const updatedMessages = [...messages, newMessage];
+        const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInput("");
         setShowIntro(false);
+        setIsSending(true);
 
-        const storedSessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-        const sessionIndex = storedSessions.findIndex((s) => s.id === currentSessionId);
-
-        if (sessionIndex !== -1) {
-            storedSessions[sessionIndex].messages = updatedMessages;
-        } else {
-            storedSessions.push({
-                id: currentSessionId,
-                title: input.slice(0, 30),
-                createdAt: new Date(),
-                messages: updatedMessages,
+        try {
+            const res = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: input }),
             });
-        }
 
-        localStorage.setItem("chatSessions", JSON.stringify(storedSessions));
+            const data = await res.json();
+            const botMessage = {
+                id: Date.now() + 1,
+                sender: "bot",
+                text: data.message || "Sorry, I couldn't understand.",
+            };
+
+            const finalMessages = [...updatedMessages, botMessage];
+            setMessages(finalMessages);
+
+            const storedSessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+            const sessionIndex = storedSessions.findIndex((s) => s.id === currentSessionId);
+
+            if (sessionIndex !== -1) {
+                storedSessions[sessionIndex].messages = finalMessages;
+            } else {
+                storedSessions.push({
+                    id: currentSessionId,
+                    title: input.slice(0, 30),
+                    createdAt: new Date(),
+                    messages: finalMessages,
+                });
+            }
+
+            localStorage.setItem("chatSessions", JSON.stringify(storedSessions));
+        } catch (error) {
+            console.error("Failed to fetch model response:", error);
+            const errorMessage = {
+                id: Date.now() + 2,
+                sender: "bot",
+                text: "⚠️ 서버 오류가 발생했어요.",
+            };
+            setMessages((prev) => [...prev, errorMessage]);
+        } finally {
+            setIsSending(false);
+        }
     };
 
     return (
@@ -132,15 +162,16 @@ export default function ChatWindow() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                            if (e.key === "Enter" && !e.nativeEvent.isComposing && !isSending) {
                                 handleSend();
                             }
                         }}
                         type="text"
                         placeholder="Let me hear your heart"
                         className={styles.inputField}
+                        disabled={isSending}
                     />
-                    <button onClick={handleSend} className={styles.sendButton}>
+                    <button onClick={handleSend} className={styles.sendButton} disabled={isSending}>
                         <img src="/send.svg" alt="Send" className={styles.sendIcon} />
                     </button>
                 </div>
