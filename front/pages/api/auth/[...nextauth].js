@@ -13,13 +13,9 @@ export default NextAuth({
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
         }),
     ],
-    secret: process.env.NEXTAUTH_SECRET,
-    pages: {
-        signIn: "/login",
-    },
     callbacks: {
         async session({ session, token }) {
-            // session.user = { ...session.user, id: token.sub }; // 필요 시 ID 추가
+            // session.user에 추가 정보 담기 가능
             return session;
         },
     },
