@@ -54,7 +54,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId }) {
         }
     }, [selectedSessionId]);
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!input.trim()) return;
 
         let currentSessionId = sessionId;
@@ -63,33 +63,64 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId }) {
             setSessionId(currentSessionId);
         }
 
-        const newMessage = {
+        const userMessage = {
             id: Date.now(),
             sender: "user",
             text: input,
         };
 
-        const updatedMessages = [...messages, newMessage];
+        const updatedMessages = [...messages, userMessage];
         setMessages(updatedMessages);
         setInput("");
         setShowIntro(false);
+        setIsSending(true);
 
-        // 🔸 [로컬] 메시지 업데이트
-        const storedSessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-        const sessionIndex = storedSessions.findIndex((s) => s.id === currentSessionId);
-
-        if (sessionIndex !== -1) {
-            storedSessions[sessionIndex].messages = updatedMessages;
-        } else {
-            storedSessions.push({
-                id: currentSessionId,
-                title: input.slice(0, 30),
-                createdAt: new Date(),
-                messages: updatedMessages,
+        try {
+            const res = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    message: input,
+                    style: selectedStyle, // 선택된 상담 스타일도 서버에 보냄 (옵션)
+                }),
             });
-        }
 
-        localStorage.setItem("chatSessions", JSON.stringify(storedSessions));
+            const data = await res.json();
+            const botMessage = {
+                id: Date.now() + 1,
+                sender: "bot",
+                text: data.message || "죄송해요, 이해하지 못했어요.",
+            };
+
+            const finalMessages = [...updatedMessages, botMessage];
+            setMessages(finalMessages);
+
+            const storedSessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+            const sessionIndex = storedSessions.findIndex((s) => s.id === currentSessionId);
+
+            if (sessionIndex !== -1) {
+                storedSessions[sessionIndex].messages = finalMessages;
+            } else {
+                storedSessions.push({
+                    id: currentSessionId,
+                    title: input.slice(0, 30),
+                    createdAt: new Date(),
+                    messages: finalMessages,
+                });
+            }
+
+            localStorage.setItem("chatSessions", JSON.stringify(storedSessions));
+        } catch (error) {
+            console.error("모델 응답 실패:", error);
+            const errorMessage = {
+                id: Date.now() + 2,
+                sender: "bot",
+                text: "⚠️ 서버 오류가 발생했어요.",
+            };
+            setMessages((prev) => [...prev, errorMessage]);
+        } finally {
+            setIsSending(false);
+        }
     };
 
     return (
