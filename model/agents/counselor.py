@@ -42,7 +42,7 @@ class CounselorAgent:
 
     def request_for_guidance(self, args, counselor_utterance, client_utterance, timestamp, dialogue_history):
         selected_role = self.select_supervisor_role(counselor_utterance, client_utterance)
-        #selected_role = "ACT"
+        # selected_role = "IPT"
         
         if selected_role == "None":
             # 특별한 상담 및 치료 기법 적용이 필요 없음
@@ -72,11 +72,13 @@ class CounselorAgent:
             supervisor.evaluate_pf_processes(dialogue_history)
             intervention_points = supervisor.decide_intervention_point(supervisor.pf_rating)
             dynamic_prompt = supervisor.generate_intervention_guidance(dialogue_history, supervisor.pf_rating, intervention_points)
-
+        elif selected_role == "IPT":
+            supervisor = SupervisorIPT(args, llm)
+            dynamic_prompt = supervisor.generate_guidance(dialogue_history)
         return dynamic_prompt
             
-    def generate_response(self, args, counselor_utterance, client_utterance, timestamp):
-        dynamic_prompt = self.request_for_guidance(args, counselor_utterance, client_utterance, timestamp)
+    def generate_response(self, args, counselor_utterance, client_utterance, timestamp, dialogue_history):
+        dynamic_prompt = self.request_for_guidance(args, counselor_utterance, client_utterance, timestamp, dialogue_history)
         final_prompt = self.static_prompt + "\n" + dynamic_prompt
 
         return call_llm(final_prompt, llm=self.llm, model=self.model, temperature=self.temperature)
@@ -118,6 +120,6 @@ if __name__ == "__main__":
     
     print("=========================================================================\n")
     print(counselor.request_for_guidance(args, counselor_utterance, client_utterance, timestamp, dialogue_history))
-    #response = counselor.generate_response(counselor_utterance, client_utterance, timestamp)
-    #print("Counselor Response:")
-    #print(response)
+    # response = counselor.generate_response(args, counselor_utterance, client_utterance, timestamp, dialogue_history)
+    # print("Counselor Response:")
+    # print(response)
