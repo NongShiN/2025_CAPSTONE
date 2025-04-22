@@ -1,0 +1,16 @@
+com/capstone/dto/ChatHistoryDTO.class
+com/capstone/controller/HomeController.class
+com/capstone/service/AuthService.class
+com/capstone/controller/AuthController.class
+com/capstone/config/WebConfig.class
+com/capstone/service/JwtService.class
+com/capstone/repository/UserRepository.class
+com/capstone/config/SecurityConfig.class
+com/capstone/dto/UserDTO$UserDTOBuilder.class
+com/capstone/repository/ChatHistoryRepository.class
+com/capstone/BackendApplication.class
+com/capstone/entity/User$UserBuilder.class
+com/capstone/entity/User.class
+com/capstone/entity/ChatHistory.class
+com/capstone/controller/CustomErrorController.class
+com/capstone/dto/UserDTO.class
