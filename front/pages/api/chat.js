@@ -14,7 +14,5 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error("Model API error:", error);
         res.status(500).json({ message: "Error fetching model response" });
-    }
-
-    
+    }   
 }
