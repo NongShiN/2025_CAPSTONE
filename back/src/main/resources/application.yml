@@ -3,19 +3,48 @@ server:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
+    url: jdbc:mysql://localhost:3306/capstone?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
     password: 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
   h2:
     console:
       enabled: true
       path: /h2-console
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .html
+  resources:
+    static-locations: classpath:/static/
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
 
 jwt:
   secret: your-secret-key-here-must-be-at-least-256-bits-long
-  expiration: 86400000 # 24 hours in milliseconds 
+  expiration: 86400000 # 24 hours in milliseconds
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}?useSSL=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false 
