@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import Sidebar from "@/components/Sidebar";
-import ChatWindow from "@/components/ChatWindow.jsx";
+import ChatWindow from "@/components/ChatWindow";
 import styles from "@/styles/ChatPage.module.css";
+import { v4 as uuidv4 } from "uuid";
 
 export default function ChatPage() {
     const { data: session, status } = useSession();
@@ -37,14 +38,18 @@ export default function ChatPage() {
         }
     }, [isClient, session, status, router]);
 
-    if (!isClient || status === "loading") return <div>Loading...</div>;
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        setSelectedSessionId(newId);
+        setNewChatTrigger((prev) => prev + 1);
+    };
 
     return (
         <div className={`${styles.chatPage} ${styles[theme + "Theme"]}`}>
             <Sidebar
                 isGuest={isGuest}
-                onNewChat={() => setNewChatTrigger((prev) => prev + 1)}
-                newChatTrigger={newChatTrigger} // ✅ 추가됨
+                onNewChat={handleNewChat}
+                newChatTrigger={newChatTrigger}
                 onSelectChat={(id) => setSelectedSessionId(id)}
             />
             <ChatWindow

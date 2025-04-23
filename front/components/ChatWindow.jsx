@@ -18,7 +18,7 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                 setSessionId(found.id);
             } else {
                 setMessages([]);
-                setSessionId(null);
+                setSessionId(selectedSessionId);
             }
             setShowIntro(true);
         }
@@ -27,15 +27,6 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
     useEffect(() => {
         if (!selectedSessionId && newChatTrigger > 0) {
             const newId = uuidv4();
-            const newSession = {
-                id: newId,
-                title: "New Chat",
-                createdAt: new Date(),
-                messages: []
-            };
-            const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-            stored.push(newSession);
-            localStorage.setItem("chatSessions", JSON.stringify(stored));
             setSessionId(newId);
             setMessages([]);
             setShowIntro(true);
@@ -66,10 +57,21 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
             const updated = [...newMessages, reply];
             setMessages(updated);
 
-            const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-            const index = stored.findIndex((s) => s.id === sessionId);
-            if (index !== -1) {
-                stored[index].messages = updated;
+            if (typeof window !== "undefined") {
+                const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+                const sessionIndex = stored.findIndex((s) => s.id === sessionId);
+
+                if (sessionIndex !== -1) {
+                    stored[sessionIndex].messages = updated;
+                } else {
+                    stored.push({
+                        id: sessionId,
+                        title: newMessages[0]?.text.slice(0, 30) || "New Chat",
+                        createdAt: new Date(),
+                        messages: updated
+                    });
+                }
+
                 localStorage.setItem("chatSessions", JSON.stringify(stored));
             }
         } catch (e) {
