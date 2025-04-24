@@ -1,35 +1,29 @@
-// CommunityPage.jsx - unified top bar (search + post button)
-import React from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
-import styles from "@/styles/CommunityPage.module.css";
+import styles from "../styles/CommunityPage.module.css";
 
-export default function CommunityPage({ theme = "blue" }) {
+export default function CommunityPage() {
+    const [isGuest, setIsGuest] = useState(false);
+
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        setIsGuest(!!storedUser?.guest);
+    }, []);
+
     return (
-        <div className={`${styles.communityPage} ${styles[theme + "Theme"]}`}>
-            <Sidebar />
+        <div className={`${styles.communityPage} ${styles.blueTheme}`}>
+            <Sidebar isGuest={isGuest} />
             <main className={styles.mainContent}>
                 <div className={styles.topBarWrapper}>
                     <div className={styles.inputSearchBox}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className={styles.searchIcon}
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
+                        <svg className={styles.searchIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="11" cy="11" r="8" />
                             <line x1="21" y1="21" x2="16.65" y2="16.65" />
                         </svg>
-                        <input
-                            className={styles.inputField}
-                            placeholder="Search topics or experiences..."
-                        />
+                        <input className={styles.inputField} placeholder="Search posts..." />
                         <button className={styles.searchBtn}>Search</button>
                     </div>
-                    <button className={styles.createPostButton}>Create Post</button>
+                    <button className={styles.createPostButton} disabled={isGuest}>Create Post</button>
                 </div>
 
                 <div className={styles.postList}>

@@ -33,6 +33,9 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
     const handleNewChat = () => {
         if (!isGuest && onNewChat) {
             onNewChat();
+            if (router.pathname === "/community") {
+                router.push("/chat");
+            }
         }
     };
 
@@ -61,10 +64,14 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
         setEditingId(null);
     };
 
-    const filteredSessions = chatSessions.filter((session) =>
-        session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        session.messages?.some(msg => msg.text?.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const filteredSessions = chatSessions
+        .filter((s) => s.id && s.title && s.title.trim() !== "")
+        .filter((session) =>
+            session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            session.messages?.some((msg) =>
+                msg.text?.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+        );
 
     return (
         <aside className={styles.sidebar}>
