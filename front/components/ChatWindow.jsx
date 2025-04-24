@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "../styles/ChatWindow.module.css";
 import { v4 as uuidv4 } from "uuid";
 
-export default function ChatWindow({ selectedSessionId, newChatTrigger, theme }) {
+export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
