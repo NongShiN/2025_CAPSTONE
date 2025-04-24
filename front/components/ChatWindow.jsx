@@ -18,7 +18,9 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                 setSessionId(found.id);
             } else {
                 setMessages([]);
-                setSessionId(selectedSessionId); // 세션이 없더라도 ID는 설정함
+
+                setSessionId(selectedSessionId);
+
             }
             setShowIntro(true);
         }
@@ -33,8 +35,18 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
         }
     }, [newChatTrigger]);
 
+    useEffect(() => {
+        if (!sessionId && selectedSessionId) {
+            setSessionId(selectedSessionId);
+        }
+    }, [sessionId, selectedSessionId]);
+
     const handleSend = async () => {
         if (!input.trim()) return;
+        if (!sessionId) {
+            console.warn("❗ sessionId가 아직 null입니다. 저장 중단");
+            return;
+        }
 
         const newMessages = [...messages, { id: Date.now(), sender: "user", text: input }];
         setMessages(newMessages);
@@ -57,31 +69,32 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
             const updated = [...newMessages, reply];
             setMessages(updated);
 
-            if (sessionId) {
-                const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-                const sessionIndex = stored.findIndex((s) => s.id === sessionId);
+            const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+            const sessionIndex = stored.findIndex((s) => s.id === sessionId);
 
-                if (sessionIndex !== -1) {
-                    stored[sessionIndex].messages = updated;
-                } else {
-                    stored.push({
-                        id: sessionId,
-                        title: newMessages[0]?.text?.slice(0, 30) || "New Chat",
-                        createdAt: new Date(),
-                        messages: updated
-                    });
-                }
-
-                localStorage.setItem("chatSessions", JSON.stringify(stored));
+            if (sessionIndex !== -1) {
+                stored[sessionIndex].messages = updated;
             } else {
-                console.warn("세션 ID가 없습니다. 대화 저장 불가.");
+                stored.push({
+                    id: sessionId,
+                    title: newMessages[0]?.text?.slice(0, 30) || "New Chat",
+                    createdAt: new Date(),
+                    messages: updated
+                });
+
             }
+
+            localStorage.setItem("chatSessions", JSON.stringify(stored));
         } catch (e) {
-            console.error("메시지 저장 오류:", e);
+
+            console.error("메시지 저장 중 오류:", e);
+
         } finally {
             setIsSending(false);
         }
     };
+
+    if (!sessionId) return <div className={styles.chatContainer}>채팅 세션을 초기화 중입니다...</div>;
 
     return (
         <div className={styles.chatContainer}>
@@ -119,14 +132,14 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.nativeEvent.isComposing && !isSending) {
+                            if (e.key === "Enter" && !e.nativeEvent.isComposing && !isSending && sessionId) {
                                 handleSend();
                             }
                         }}
-                        disabled={isSending}
+                        disabled={isSending || !sessionId}
                         className={styles.inputField}
                     />
-                    <button onClick={handleSend} disabled={isSending} className={styles.sendButton}>
+                    <button onClick={handleSend} disabled={isSending || !sessionId} className={styles.sendButton}>
                         <img src="/send.svg" alt="Send" className={styles.sendIcon} />
                     </button>
                 </div>
