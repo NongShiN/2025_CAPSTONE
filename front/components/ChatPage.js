@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import Sidebar from "@/components/Sidebar";
 import ChatWindow from "@/components/ChatWindow.jsx";
 import styles from "@/styles/ChatPage.module.css";
+import { v4 as uuidv4 } from "uuid";
 
 export default function ChatPage() {
     const { data: session, status } = useSession();
@@ -37,14 +38,29 @@ export default function ChatPage() {
         }
     }, [isClient, session, status, router]);
 
-    if (!isClient || status === "loading") return <div>Loading...</div>;
+    useEffect(() => {
+        // ✅ 진입 시 무조건 세션 자동 생성
+        if (isClient && !selectedSessionId) {
+            const newId = uuidv4();
+            setSelectedSessionId(newId);
+            setNewChatTrigger((prev) => prev + 1);
+        }
+    }, [isClient, selectedSessionId]);
+
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        setSelectedSessionId(newId);
+        setNewChatTrigger((prev) => prev + 1);
+    };
+
+    if (!isClient || status === "loading" || !selectedSessionId) return <div>Loading chat session...</div>;
 
     return (
         <div className={`${styles.chatPage} ${styles[theme + "Theme"]}`}>
             <Sidebar
                 isGuest={isGuest}
-                onNewChat={() => setNewChatTrigger((prev) => prev + 1)}
-                newChatTrigger={newChatTrigger} // ✅ 추가됨
+                onNewChat={handleNewChat}
+                newChatTrigger={newChatTrigger}
                 onSelectChat={(id) => setSelectedSessionId(id)}
             />
             <ChatWindow

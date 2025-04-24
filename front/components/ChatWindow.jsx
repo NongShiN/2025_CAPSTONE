@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "../styles/ChatWindow.module.css";
 import { v4 as uuidv4 } from "uuid";
 
-export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
+export default function ChatWindow({ selectedSessionId, newChatTrigger, theme }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
@@ -18,7 +18,7 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                 setSessionId(found.id);
             } else {
                 setMessages([]);
-                setSessionId(null);
+                setSessionId(selectedSessionId);
             }
             setShowIntro(true);
         }
@@ -27,23 +27,24 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
     useEffect(() => {
         if (!selectedSessionId && newChatTrigger > 0) {
             const newId = uuidv4();
-            const newSession = {
-                id: newId,
-                title: "New Chat",
-                createdAt: new Date(),
-                messages: []
-            };
-            const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-            stored.push(newSession);
-            localStorage.setItem("chatSessions", JSON.stringify(stored));
             setSessionId(newId);
             setMessages([]);
             setShowIntro(true);
         }
     }, [newChatTrigger]);
 
+    useEffect(() => {
+        if (!sessionId && selectedSessionId) {
+            setSessionId(selectedSessionId);
+        }
+    }, [sessionId, selectedSessionId]);
+
     const handleSend = async () => {
         if (!input.trim()) return;
+        if (!sessionId) {
+            console.warn("❗ sessionId가 아직 null입니다. 저장 중단");
+            return;
+        }
 
         const newMessages = [...messages, { id: Date.now(), sender: "user", text: input }];
         setMessages(newMessages);
@@ -67,17 +68,28 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
             setMessages(updated);
 
             const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-            const index = stored.findIndex((s) => s.id === sessionId);
-            if (index !== -1) {
-                stored[index].messages = updated;
-                localStorage.setItem("chatSessions", JSON.stringify(stored));
+            const sessionIndex = stored.findIndex((s) => s.id === sessionId);
+
+            if (sessionIndex !== -1) {
+                stored[sessionIndex].messages = updated;
+            } else {
+                stored.push({
+                    id: sessionId,
+                    title: newMessages[0]?.text?.slice(0, 30) || "New Chat",
+                    createdAt: new Date(),
+                    messages: updated
+                });
             }
+
+            localStorage.setItem("chatSessions", JSON.stringify(stored));
         } catch (e) {
-            console.error(e);
+            console.error("메시지 저장 중 오류:", e);
         } finally {
             setIsSending(false);
         }
     };
+
+    if (!sessionId) return <div className={styles.chatContainer}>채팅 세션을 초기화 중입니다...</div>;
 
     return (
         <div className={styles.chatContainer}>
@@ -115,14 +127,14 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.nativeEvent.isComposing && !isSending) {
+                            if (e.key === "Enter" && !e.nativeEvent.isComposing && !isSending && sessionId) {
                                 handleSend();
                             }
                         }}
-                        disabled={isSending}
+                        disabled={isSending || !sessionId}
                         className={styles.inputField}
                     />
-                    <button onClick={handleSend} disabled={isSending} className={styles.sendButton}>
+                    <button onClick={handleSend} disabled={isSending || !sessionId} className={styles.sendButton}>
                         <img src="/send.svg" alt="Send" className={styles.sendIcon} />
                     </button>
                 </div>
