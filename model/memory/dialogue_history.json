@@ -1,0 +1,39 @@
+{
+  "dialogue_history": [
+    {
+      "speaker": "Counselor",
+      "utterance": "How are you doing?",
+      "timestamp": "2025-04-25T02:55:35.102793"
+    },
+    {
+        "speaker": "Client",
+        "utterance": "Nobody likes me.",
+        "timestamp": "2025-04-25T02:55:40.102793"
+    },
+    {
+        "speaker": "Counselor",
+        "utterance": "What makes you think that?",
+        "timestamp": "2025-04-25T02:55:47.102793"
+    },
+    {
+        "speaker": "Client",
+        "utterance": "People often ignore me at work.",
+        "timestamp": "2025-04-25T02:55:55.102793"
+    },
+    {
+        "speaker": "Counselor",
+        "utterance": "Can you think of a recent example?",
+        "timestamp": "2025-04-25T02:56:12.102793"
+    },
+    {
+        "speaker": "Client",
+        "utterance": "Yesterday, no one responded when I said good morning.",
+        "timestamp": "2025-04-25T02:56:30.102793"
+    },
+    {
+        "speaker": "Counselor",
+        "utterance": "Is it possible they didn’t hear you or were distracted?",
+        "timestamp": "2025-04-25T02:56:59.102793"
+    }
+  ]
+}

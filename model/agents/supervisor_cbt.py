@@ -6,10 +6,10 @@ from utils.memory_management import load_memory, save_memory
 from utils.util import load_prompt, load_cbt_technique_info, call_llm, clean_json_response, normalize
 from utils.args import parse_args
 import datetime
-from sentence_transformers import SentenceTransformer, util as st_util
+from sentence_transformers import util as st_util
 import logging
 
-retriever = SentenceTransformer("all-MiniLM-L6-v2")
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -177,6 +177,8 @@ class SupervisorCBT:
         return guidance
         
 if __name__ == "__main__":
+    from openai import OpenAI
+    from sentence_transformers import SentenceTransformer
     import dotenv
     dotenv.load_dotenv()
     
@@ -187,11 +189,8 @@ if __name__ == "__main__":
     logging.info("Starting CBT supervisor agent...")
     
     args = parse_args()
-    
-    from openai import OpenAI
+
     llm = OpenAI(api_key=OPENAI_API_KEY)
-    
-    from sentence_transformers import SentenceTransformer, util
     retriever = SentenceTransformer("all-MiniLM-L6-v2")
     
     cbt_supervisor = SupervisorCBT(args, llm, retriever, model="gpt-4o-mini", temperature=0.7)
