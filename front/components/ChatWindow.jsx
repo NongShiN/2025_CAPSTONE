@@ -18,7 +18,7 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                 setSessionId(found.id);
             } else {
                 setMessages([]);
-                setSessionId(selectedSessionId);
+                setSessionId(selectedSessionId); // 세션이 없더라도 ID는 설정함
             }
             setShowIntro(true);
         }
@@ -57,7 +57,7 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
             const updated = [...newMessages, reply];
             setMessages(updated);
 
-            if (typeof window !== "undefined") {
+            if (sessionId) {
                 const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
                 const sessionIndex = stored.findIndex((s) => s.id === sessionId);
 
@@ -66,16 +66,18 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                 } else {
                     stored.push({
                         id: sessionId,
-                        title: newMessages[0]?.text.slice(0, 30) || "New Chat",
+                        title: newMessages[0]?.text?.slice(0, 30) || "New Chat",
                         createdAt: new Date(),
                         messages: updated
                     });
                 }
 
                 localStorage.setItem("chatSessions", JSON.stringify(stored));
+            } else {
+                console.warn("세션 ID가 없습니다. 대화 저장 불가.");
             }
         } catch (e) {
-            console.error(e);
+            console.error("메시지 저장 오류:", e);
         } finally {
             setIsSending(false);
         }
