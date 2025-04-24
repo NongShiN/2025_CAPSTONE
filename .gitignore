@@ -138,6 +138,3 @@ config.yaml
 *.toml
 
 !model/data/**
-
-
-node_modules/
