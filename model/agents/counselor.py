@@ -1,13 +1,14 @@
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from openai import OpenAI
 from agents.supervisor_empathic import SupervisorEmpathic
 from agents.supervisor_cbt import SupervisorCBT
 from agents.supervisor_act import SupervisorACT
 from agents.supervisor_dbt import SupervisorDBT
 from agents.supervisor_ifs import SupervisorIFS
 from agents.supervisor_ipt import SupervisorIPT
-from utils.util import call_llm, load_prompt, load_dialogue_history, str_to_json_data
+from utils.util import call_llm, load_prompt
 from utils.args import parse_args
 import logging
 
@@ -27,31 +28,26 @@ class CounselorAgent:
         self.temperature = args.temperature
         self.retriever = retriever
         self.static_prompt = load_prompt("prompts/static_prompt.txt")
-        self.dialogue_history = str_to_json_data(load_dialogue_history("memory/dialogue_history.json"))["dialogue_history"] # 형태 바뀔 수 있음. 수정 필요
-    
-    def update_dialogue_history(self, speaker, utterance, timestamp):
-        self.dialogue_history.append({
-            "speaker": speaker,
-            "utterance": utterance,
-            "timestamp": timestamp
-        })
-    
-    def select_supervisor(self, dialogue_history):
-        supervisor_selecting_prompt_templat = load_prompt("prompts/select_supervisor.txt")
-        supervisor_selecting_prompt = supervisor_selecting_prompt_templat.replace("[Dialogue history]", dialogue_history)
-        selected_supervisor = call_llm(supervisor_selecting_prompt, llm=self.llm, model=self.model, temperature=0)
-        return selected_supervisor
 
-    def request_for_guidance(self, args, counselor_utterance, client_utterance, timestamp):
-        self.update_dialogue_history(speaker="Client", utterance=client_utterance, timestamp=timestamp)
-        
-        selected_supervisor = self.select_supervisor(str(self.dialogue_history))
+    def select_supervisor_role(self, counselor_utterance, client_utterance):
+        prompt = (
+            "You are a mental health routing agent. Based on the following dialogue between the counselor and the client, "
+            "select the most appropriate therapeutic supervisor to consult from the following:"
+            " [Empathic, CBT, ACT, DBT, IFS, IPT]. If no therapeutic supervisor is needed, respond with 'None'.\n"
+            "Respond with one word only.\n\n"
+            f"Counselor: \"{counselor_utterance}\"\nClient: \"{client_utterance}\""
+        )
+        response = call_llm(prompt, llm=self.llm, model=self.model, temperature=0)
+        return response.strip()
+
+    def request_for_guidance(self, args, counselor_utterance, client_utterance, timestamp, dialogue_history):
+        selected_role = self.select_supervisor_role(counselor_utterance, client_utterance)
         # selected_role = "IPT"
         
-        if selected_supervisor == "None":
+        if selected_role == "None":
             # 특별한 상담 및 치료 기법 적용이 필요 없음
             dynamic_prompt = ""
-        elif selected_supervisor == "CBT":
+        elif selected_role == "CBT":
             supervisor = SupervisorCBT(self.args, self.llm, self.retriever, model=self.model, temperature=self.temperature)
             
             basic_info, cd_info = supervisor.extract_info_from_utterance(
@@ -62,35 +58,36 @@ class CounselorAgent:
                 timestamp
             )
             
-            supervisor.update_baisc_and_cd_memory(args, basic_info, cd_info)
+            supervisor.update_and_baisc_cd_memory(args, basic_info, cd_info)
             
-            dynamic_prompt = supervisor.compose_dynamic_prompt(self.args,
-                                                               counselor_utterance,
-                                                               client_utterance,
-                                                               f_llm=call_llm)
-        elif selected_supervisor == "ACT":
+            dynamic_prompt = supervisor.compose_dynamic_prompt(
+                self.args,
+                counselor_utterance,
+                client_utterance,
+                f_llm=call_llm,
+            )
+        elif selected_role == "ACT":
             supervisor = SupervisorACT(args, llm)
             
             supervisor.evaluate_pf_processes(dialogue_history)
             intervention_points = supervisor.decide_intervention_point(supervisor.pf_rating)
             dynamic_prompt = supervisor.generate_intervention_guidance(dialogue_history, supervisor.pf_rating, intervention_points)
-        elif selected_supervisor == "IPT":
+        elif selected_role == "IPT":
             supervisor = SupervisorIPT(args, llm)
-            
             dynamic_prompt = supervisor.generate_guidance(dialogue_history)
         return dynamic_prompt
             
-    def generate_response(self, args, counselor_utterance, client_utterance, timestamp):
-        dynamic_prompt = self.request_for_guidance(args, counselor_utterance, client_utterance, timestamp)
+    def generate_response(self, args, counselor_utterance, client_utterance, timestamp, dialogue_history):
+        dynamic_prompt = self.request_for_guidance(args, counselor_utterance, client_utterance, timestamp, dialogue_history)
         final_prompt = self.static_prompt + "\n" + dynamic_prompt
 
         return call_llm(final_prompt, llm=self.llm, model=self.model, temperature=self.temperature)
 
 
 if __name__ == "__main__":
-    from openai import OpenAI
     import dotenv
     dotenv.load_dotenv()
+    
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     if not OPENAI_API_KEY:
         raise EnvironmentError("OPENAI_API_KEY not found. Check your .env file.")
