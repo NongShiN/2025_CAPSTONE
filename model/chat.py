@@ -1,79 +1,86 @@
 import os
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+import json
 import logging
 import datetime
-from openai import OpenAI
-from sentence_transformers import SentenceTransformer
-from model.utils.args import parse_args
-from model.mascc import MASCC
+from model.model import (
+    load_memory,
+    save_memory,
+    extract_memory_from_utterance,
+    compose_prompt,
+    call_llm,
+    load_prompt
+)
 from dotenv import load_dotenv
 
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise EnvironmentError("OPENAI_API_KEY not found. Check your .env file.")
 
 # === Logging Configuration ===
 logging.basicConfig(
+    filename="chat_history.log",
     level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler("mascc.log", encoding='utf-8'),
-        logging.StreamHandler()
-    ]
+    format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
+# ✅ 기본값을 반환하는 클래스
 class DefaultArgs:
-    insight_prompt_name='prompts/cbt/extract_insight.txt'
-    dynamic_prompt_name='prompts/cbt/dynamic_prompt.txt'
-    cd_prompt_name='prompts/cbt/detect_cognitive_distortion.txt'
-    model='gpt-4o-mini'
-    temperature=0.7
-    basic_memory_path='memory/basic_memory.json'
-    cd_memory_path='memory/cd_memory.json'
-    cbt_log_path='data/cbt_log.json'
-    cbt_info_path='data/cbt_info.json'
-    top_k=5
-    
+    final_prompt_name = 'final_prompt.txt'
+    cd_prompt_name = 'detect_cognitive_distortion.txt'
+    insight_prompt_name = 'extract_insight.txt'
+    model = 'gpt-4o-mini'
+    temperature = 0.7
+    basic_memory_path = 'basic_memory.json'
+    cd_memory_path = 'cd_memory.json'
+    cbt_log_name = 'cbt_log.json'
+    top_k = 5
+    cbt_info_name = 'cbt_info.json'
 
-# initialize arguments
-# args = parse_args()
-args = DefaultArgs()
+# ✅ 메모리 파일 없으면 자동 생성
+def ensure_memory_file(path):
+    if not os.path.exists(path):
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump([], f)
 
-# generate instance
-llm = OpenAI(api_key=OPENAI_API_KEY)
-retriever = SentenceTransformer("all-MiniLM-L6-v2")
-mascc = MASCC(args, llm, retriever)
+# ✅ FastAPI용 함수
+def chat_with_model(user_input: str, last_counselor: str = "Hello, how can I help you?") -> str:
+    args = DefaultArgs()
 
-def chat_with_mascc(user_input: str, last_counselor: str = "Hello, how can I help you?") -> str:
-    global mascc
+    ensure_memory_file(args.basic_memory_path)
+    ensure_memory_file(args.cd_memory_path)
+
     timestamp = datetime.datetime.now().isoformat()
 
-    response = mascc.generate(
+    basic_memory = load_memory(args.basic_memory_path)
+    cd_memory = load_memory(args.cd_memory_path)
+
+    cd_prompt_template = load_prompt(args.cd_prompt_name)
+    insight_prompt_template = load_prompt(args.insight_prompt_name)
+
+    basic_entry, cd_entry = extract_memory_from_utterance(
+        user_input,
+        call_llm,
+        args.model,
+        args.temperature,
+        cd_prompt_template,
+        insight_prompt_template,
+        timestamp
+    )
+    basic_memory.append(basic_entry)
+    if cd_entry:
+        cd_memory.append(cd_entry)
+
+    save_memory(basic_memory, args.basic_memory_path)
+    save_memory(cd_memory, args.cd_memory_path)
+
+    prompt = compose_prompt(
         args,
         counselor_utterance=last_counselor,
         client_utterance=user_input,
-        timestamp=timestamp
-        )
-    logging.info(f"\n[Counselor Response]: {response}")
+        basic_memory=basic_memory,
+        cd_memory=cd_memory,
+        f_llm=call_llm,
+        model=args.model,
+        temperature=args.temperature
+    )
 
+    response = call_llm(prompt, model=args.model, temperature=args.temperature)
     return response
-
-if __name__ == "__main__":
-
-    print("Welcome to the MASCC chatbot. Type 'exit' or 'quit' to end the conversation.\n")
-
-    last_counselor = "Hello, how can I help you?"
-    print(f"Counselor: {last_counselor}")
-
-    while True:
-        user_input = input("You: ")
-
-        if user_input.lower() in ["exit", "quit"]:
-            print("Ending the chat. Take care!")
-            break
-
-        response = chat_with_mascc(user_input, last_counselor)
-        print(f"Counselor: {response}")
-        last_counselor = response
