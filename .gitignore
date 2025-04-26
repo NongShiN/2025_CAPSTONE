@@ -138,6 +138,6 @@ config.yaml
 *.toml
 
 !model/data/**
-
+!database/*.png
 
 node_modules/
