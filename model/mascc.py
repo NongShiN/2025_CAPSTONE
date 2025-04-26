@@ -3,11 +3,23 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from openai import OpenAI
-from model.utils.args import parse_args
-from model.agents.counselor import CounselorAgent
+from agents.counselor import CounselorAgent
 import datetime
 import logging
 
+
+class DefaultArgs:
+    insight_prompt_name='prompts/cbt/extract_insight.txt'
+    dynamic_prompt_name='prompts/cbt/dynamic_prompt.txt'
+    cd_prompt_name='prompts/cbt/detect_cognitive_distortion.txt'
+    model='gpt-4o-mini'
+    temperature=0.7
+    basic_memory_path='memory/basic_memory.json'
+    cd_memory_path='memory/cd_memory.json'
+    cbt_log_path='data/cbt_log.json'
+    cbt_info_path='data/cbt_info.json'
+    top_k=5
+    
 class MASCC:
     def __init__(self, args, llm, retriever):
         self.args = args
@@ -39,7 +51,7 @@ if __name__ == "__main__":
     llm = OpenAI(api_key=OPENAI_API_KEY)
     retriever = SentenceTransformer("all-MiniLM-L6-v2")
     
-    args = parse_args()
+    args = DefaultArgs()
 
     llm = OpenAI(api_key=OPENAI_API_KEY)
     mascc = MASCC(args, llm, retriever)

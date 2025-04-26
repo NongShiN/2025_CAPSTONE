@@ -1,14 +1,13 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from agents.supervisor_empathic import SupervisorEmpathic
-from agents.supervisor_cbt import SupervisorCBT
-from agents.supervisor_act import SupervisorACT
-from agents.supervisor_dbt import SupervisorDBT
-from agents.supervisor_ifs import SupervisorIFS
-from agents.supervisor_ipt import SupervisorIPT
-from utils.util import call_llm, load_prompt, load_dialogue_history, str_to_json_data
-from utils.args import parse_args
+from .supervisor_empathic import SupervisorEmpathic
+from .supervisor_cbt import SupervisorCBT
+from .supervisor_act import SupervisorACT
+from .supervisor_dbt import SupervisorDBT
+from .supervisor_ifs import SupervisorIFS
+from .supervisor_ipt import SupervisorIPT
+from .utils.util import call_llm, load_prompt, load_dialogue_history, str_to_json_data
+from .utils.args import parse_args
 import logging
 
 logging.basicConfig(

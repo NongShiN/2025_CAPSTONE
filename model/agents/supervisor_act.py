@@ -1,9 +1,8 @@
 import json
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from utils.util import call_llm, load_prompt, clean_json_response
-from utils.args import parse_args
+from .utils.util import call_llm, load_prompt, clean_json_response
+from .utils.args import parse_args
 import logging
 
 logging.basicConfig(

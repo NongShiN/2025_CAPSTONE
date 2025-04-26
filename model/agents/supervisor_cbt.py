@@ -1,10 +1,9 @@
 import json
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from utils.memory_management import load_memory, save_memory
-from utils.util import load_prompt, load_cbt_technique_info, call_llm, clean_json_response, normalize
-from utils.args import parse_args
+from .utils.memory_management import load_memory, save_memory
+from .utils.util import load_prompt, load_cbt_technique_info, call_llm, clean_json_response, normalize
+from .utils.args import parse_args
 import datetime
 from sentence_transformers import util as st_util
 import logging
