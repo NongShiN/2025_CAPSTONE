@@ -1,12 +1,10 @@
 import os
 import sys
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 import logging
 import datetime
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
-from model.utils.args import parse_args
-from model.mascc import MASCC
+from mascc import MASCC
 from dotenv import load_dotenv
 
 load_dotenv()
