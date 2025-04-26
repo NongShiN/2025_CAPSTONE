@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from model.chat import chat_with_model  # ✅ 정상 import 가능
+from model.chat import chat_with_mascc  # ✅ 정상 import 가능
 
 app = FastAPI()
 
@@ -16,7 +16,7 @@ app.add_middleware(
 @app.get("/gen")
 def generate(user_input: str = Query(...)):
     try:
-        result = chat_with_model(user_input)
+        result = chat_with_mascc(user_input)
         return {"response": result}
     except Exception as e:
         return {"error": str(e)}
