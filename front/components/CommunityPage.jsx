@@ -8,11 +8,9 @@ export default function CommunityPage() {
     const [posts, setPosts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const router = useRouter();
-
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         setIsGuest(!!storedUser?.guest);
-
         const likedIds = JSON.parse(localStorage.getItem("likedPosts") || "[]");
         const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
         const mapped = storedPosts.map(post => ({
@@ -85,6 +83,7 @@ export default function CommunityPage() {
                     >
                         Create Post
                     </button>
+
                 </div>
 
                 <div className={styles.postList}>
