@@ -36,8 +36,8 @@ class CounselorAgent:
         })
     
     def select_supervisor(self, dialogue_history):
-        supervisor_selecting_prompt_templat = load_prompt("prompts/select_supervisor.txt")
-        supervisor_selecting_prompt = supervisor_selecting_prompt_templat.replace("[Dialogue history]", dialogue_history)
+        supervisor_selecting_prompt_template = load_prompt("prompts/select_supervisor.txt")
+        supervisor_selecting_prompt = supervisor_selecting_prompt_template.replace("[Dialogue history]", dialogue_history)
         selected_supervisor = call_llm(supervisor_selecting_prompt, llm=self.llm, model=self.model, temperature=0)
         return selected_supervisor
 
@@ -45,10 +45,8 @@ class CounselorAgent:
         self.update_dialogue_history(speaker="Client", utterance=client_utterance, timestamp=timestamp)
         
         selected_supervisor = self.select_supervisor(str(self.dialogue_history))
-        # selected_role = "IPT"
         
         if selected_supervisor == "None":
-            # 특별한 상담 및 치료 기법 적용이 필요 없음
             dynamic_prompt = ""
         elif selected_supervisor == "CBT":
             supervisor = SupervisorCBT(self.args, self.llm, self.retriever, model=self.model, temperature=self.temperature)
@@ -68,15 +66,15 @@ class CounselorAgent:
                                                                client_utterance,
                                                                f_llm=call_llm)
         elif selected_supervisor == "ACT":
-            supervisor = SupervisorACT(args, llm)
+            supervisor = SupervisorACT(args, self.llm)
             
-            supervisor.evaluate_pf_processes(dialogue_history)
+            supervisor.evaluate_pf_processes(self.dialogue_history)
             intervention_points = supervisor.decide_intervention_point(supervisor.pf_rating)
-            dynamic_prompt = supervisor.generate_intervention_guidance(dialogue_history, supervisor.pf_rating, intervention_points)
+            dynamic_prompt = supervisor.generate_intervention_guidance(self.dialogue_history, supervisor.pf_rating, intervention_points)
         elif selected_supervisor == "IPT":
-            supervisor = SupervisorIPT(args, llm)
+            supervisor = SupervisorIPT(args, self.llm)
             
-            dynamic_prompt = supervisor.generate_guidance(dialogue_history)
+            dynamic_prompt = supervisor.generate_guidance(self.dialogue_history)
         return dynamic_prompt
             
     def generate_response(self, args, counselor_utterance, client_utterance, timestamp):
@@ -121,7 +119,4 @@ if __name__ == "__main__":
     timestamp = datetime.datetime.now().isoformat()
     
     print("=========================================================================\n")
-    print(counselor.request_for_guidance(args, counselor_utterance, client_utterance, timestamp, dialogue_history))
-    # response = counselor.generate_response(args, counselor_utterance, client_utterance, timestamp, dialogue_history)
-    # print("Counselor Response:")
-    # print(response)
+    print(counselor.request_for_guidance(args, counselor_utterance, client_utterance, timestamp))
