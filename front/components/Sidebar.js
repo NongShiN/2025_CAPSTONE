@@ -26,7 +26,6 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
 
     const handleLogout = () => {
         localStorage.removeItem("user");
-        localStorage.removeItem("chatSessions");
         router.push("/login");
     };
 
