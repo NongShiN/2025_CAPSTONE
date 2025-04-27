@@ -71,10 +71,12 @@ class CounselorAgent:
             supervisor.evaluate_pf_processes(self.dialogue_history)
             intervention_points = supervisor.decide_intervention_point(supervisor.pf_rating)
             dynamic_prompt = supervisor.generate_intervention_guidance(self.dialogue_history, supervisor.pf_rating, intervention_points)
-        elif selected_supervisor == "IPT":
-            supervisor = SupervisorIPT(args, self.llm)
+        #elif selected_supervisor == "IPT":
+        #    supervisor = SupervisorIPT(args, self.llm)
+        #    dynamic_prompt = supervisor.generate_guidance(self.dialogue_history)
+        else:
+            dynamic_prompt = ""
             
-            dynamic_prompt = supervisor.generate_guidance(self.dialogue_history)
         return dynamic_prompt
             
     def generate_response(self, args, counselor_utterance, client_utterance, timestamp):
