@@ -76,5 +76,11 @@
     "type": "Negative Feeling or Emotion",
     "severity": 1,
     "timestamp": "2025-04-26T23:35:10.029360"
+  },
+  {
+    "utterance": "I'm being ostracized by my friends at school these days",
+    "type": "Mind Reading",
+    "severity": 4,
+    "timestamp": "2025-04-27T14:27:29.117365"
   }
 ]

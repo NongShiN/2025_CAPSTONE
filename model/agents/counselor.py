@@ -46,8 +46,8 @@ class CounselorAgent:
         self.update_dialogue_history(speaker="Client", utterance=client_utterance, timestamp=timestamp)
         
         selected_supervisor = self.select_supervisor(str(self.dialogue_history))
-        print(f"================== {selected_supervisor} ==================")
         self.selected_supervisor = selected_supervisor
+        
         if selected_supervisor == "None":
             dynamic_prompt = ""
         elif selected_supervisor == "CBT":
@@ -70,13 +70,13 @@ class CounselorAgent:
         elif selected_supervisor == "ACT":
             supervisor = SupervisorACT(args, self.llm)
             
-            supervisor.evaluate_pf_processes(self.dialogue_history)
+            supervisor.evaluate_pf_processes(str(self.dialogue_history))
             intervention_points = supervisor.decide_intervention_point(supervisor.pf_rating)
-            dynamic_prompt = supervisor.generate_intervention_guidance(self.dialogue_history, supervisor.pf_rating, intervention_points)
-        #elif selected_supervisor == "IPT":
-        #    supervisor = SupervisorIPT(args, self.llm)
-        #    
-        #    dynamic_prompt = supervisor.generate_guidance(self.dialogue_history)
+            dynamic_prompt = supervisor.generate_intervention_guidance(str(self.dialogue_history), supervisor.pf_rating, intervention_points)
+        elif selected_supervisor == "IPT":
+            supervisor = SupervisorIPT(args, self.llm)
+            
+            dynamic_prompt = supervisor.generate_guidance(str(self.dialogue_history))
         else:
             dynamic_prompt = ""
         return dynamic_prompt
