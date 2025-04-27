@@ -27,7 +27,8 @@ class CounselorAgent:
         self.retriever = retriever
         self.static_prompt = load_prompt("prompts/static_prompt.txt")
         self.dialogue_history = str_to_json_data(load_dialogue_history("memory/dialogue_history.json"))["dialogue_history"] # 형태 바뀔 수 있음. 수정 필요
-    
+        self.selected_supervisor = None
+        
     def update_dialogue_history(self, speaker, utterance, timestamp):
         self.dialogue_history.append({
             "speaker": speaker,
@@ -45,7 +46,8 @@ class CounselorAgent:
         self.update_dialogue_history(speaker="Client", utterance=client_utterance, timestamp=timestamp)
         
         selected_supervisor = self.select_supervisor(str(self.dialogue_history))
-        
+        print(f"================== {selected_supervisor} ==================")
+        self.selected_supervisor = selected_supervisor
         if selected_supervisor == "None":
             dynamic_prompt = ""
         elif selected_supervisor == "CBT":
@@ -73,17 +75,17 @@ class CounselorAgent:
             dynamic_prompt = supervisor.generate_intervention_guidance(self.dialogue_history, supervisor.pf_rating, intervention_points)
         #elif selected_supervisor == "IPT":
         #    supervisor = SupervisorIPT(args, self.llm)
+        #    
         #    dynamic_prompt = supervisor.generate_guidance(self.dialogue_history)
         else:
             dynamic_prompt = ""
-            
         return dynamic_prompt
             
     def generate_response(self, args, counselor_utterance, client_utterance, timestamp):
         dynamic_prompt = self.request_for_guidance(args, counselor_utterance, client_utterance, timestamp)
         final_prompt = self.static_prompt + "\n" + dynamic_prompt
 
-        return call_llm(final_prompt, llm=self.llm, model=self.model, temperature=self.temperature)
+        return call_llm(final_prompt, llm=self.llm, model=self.model, temperature=self.temperature) + " <" + self.selected_supervisor + ">"
 
 
 if __name__ == "__main__":
