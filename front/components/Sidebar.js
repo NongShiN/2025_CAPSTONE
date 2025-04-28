@@ -25,17 +25,17 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
     }, [newChatTrigger, refreshSessionList]);
 
     const handleLogout = () => {
+        const userTheme = localStorage.getItem("theme");
+        if (userTheme) {
+            localStorage.setItem("theme", userTheme);
+        }
         localStorage.removeItem("user");
-        localStorage.removeItem("chatSessions");
         router.push("/login");
     };
 
     const handleNewChat = () => {
         if (!isGuest && onNewChat) {
             onNewChat();
-            if (router.pathname === "/community") {
-                router.push("/chat");
-            }
         }
     };
 
@@ -64,20 +64,16 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
         setEditingId(null);
     };
 
-    const filteredSessions = chatSessions
-        .filter((s) => s.id && s.title && s.title.trim() !== "")
-        .filter((session) =>
-            session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            session.messages?.some((msg) =>
-                msg.text?.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-        );
+    const filteredSessions = chatSessions.filter((session) =>
+        session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        session.messages?.some(msg => msg.text?.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
     return (
         <aside className={styles.sidebar}>
             <div>
                 <div onClick={() => window.location.reload()} className={styles.logo}>
-                    <img src="/logo.png" alt="Sound of Mind Logo" className={styles.logoImage} />
+                    <img src="/logotext.png" alt="Sound of Mind Logo" className={styles.logoImage} />
                 </div>
 
                 <div className={styles.actionRow}>
