@@ -187,9 +187,9 @@
 
 .postActions {
     display: flex;
-    flex-wrap: wrap; /* 줄바꿈 대응 */
-    justify-content: center; /* 가운데 정렬 */
-    gap: 1rem; /* 버튼 간격 */
+    justify-content: flex-start; /* ← 왼쪽 정렬 */
+    align-items: center;          /* ← 세로 중앙정렬 */
+    gap: 1rem;                    /* 버튼 간격 */
     margin-top: 2rem;
 }
 
