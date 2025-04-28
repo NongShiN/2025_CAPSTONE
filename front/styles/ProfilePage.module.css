@@ -1,35 +1,41 @@
 .pageWrapper {
-    height: 100vh;
     display: flex;
-    align-items: center;
+    height: 100vh;
+    gap: 20px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.mainContent {
+    flex: 1;
+    display: flex;
     justify-content: center;
-    font-family: 'Segoe UI', sans-serif;
-    transition: background 0.3s ease;
-}
-
-.pageWrapper.blue {
-    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
-}
-
-.pageWrapper.purple {
-    background: linear-gradient(to right, #d4aaff, #c2c2ff);
-}
-
-.pageWrapper.pink {
-    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+    align-items: flex-start;
+    overflow-y: auto;
 }
 
 .profileCard {
     background: white;
     padding: 40px;
-    border-radius: 20px;
+    border-radius: 1.5rem;
     text-align: center;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
-    max-width: 360px;
-    width: 100%;
-    animation: fadeInUp 0.6s ease-out;
+    margin-top: 2rem;
+    width: 360px;
 }
 
+/* 테마별 배경 */
+.blue {
+    background: linear-gradient(to bottom right, #d0eaff, #e0f3ff);
+}
+.purple {
+    background: linear-gradient(to right, #d4aaff, #c2c2ff);
+}
+.pink {
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+}
+
+/* 아바타 스타일 */
 .avatar {
     width: 72px;
     height: 72px;
@@ -37,12 +43,14 @@
     margin-bottom: 16px;
 }
 
+/* 기본 타이틀 */
 .profileCard h2 {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 16px;
 }
 
+/* Label, Input, Select */
 .label {
     display: block;
     font-size: 14px;
@@ -64,8 +72,9 @@
     box-sizing: border-box;
 }
 
+/* Save/Back 버튼 */
 .saveBtn, .backBtn {
-    margin-top: 16px;
+    margin-top: 12px;
     padding: 10px 20px;
     border-radius: 12px;
     border: none;
@@ -93,6 +102,73 @@
     background: #ddd;
 }
 
+/* 활동 통계 스타일 */
+.statsSection {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.statsGrid {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+}
+
+.statBox {
+    flex: 1;
+    background: #f8f8f8;
+    border-radius: 12px;
+    margin: 0 6px;
+    padding: 12px 0;
+}
+
+.statNumber {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #555;
+}
+
+/* 계정 설정 버튼 스타일 */
+.accountSettings {
+    margin-top: 40px;
+}
+
+.secondaryBtn, .dangerBtn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.secondaryBtn {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.secondaryBtn:hover {
+    background: #ddd;
+}
+
+.dangerBtn {
+    background: #ff6b6b;
+    color: white;
+}
+
+.dangerBtn:hover {
+    background: #ff4c4c;
+}
+
+/* 등장 애니메이션 */
 @keyframes fadeInUp {
     from {
         transform: translateY(20px);

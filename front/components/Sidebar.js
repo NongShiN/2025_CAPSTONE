@@ -26,7 +26,6 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
 
     const handleLogout = () => {
         localStorage.removeItem("user");
-        localStorage.removeItem("chatSessions");
         router.push("/login");
     };
 
@@ -77,7 +76,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
         <aside className={styles.sidebar}>
             <div>
                 <div onClick={() => window.location.reload()} className={styles.logo}>
-                    <img src="/logo.png" alt="Sound of Mind Logo" className={styles.logoImage} />
+                    <img src="/logotext.png" alt="Sound of Mind Logo" className={styles.logoImage} />
                 </div>
 
                 <div className={styles.actionRow}>

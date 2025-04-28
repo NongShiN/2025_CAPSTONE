@@ -17,10 +17,11 @@
   text-align: center;
   margin-bottom: 1rem;
   cursor: pointer;
+  scale: 1.40;
 }
 
 .logoImage {
-  width: 160px;
+  width: 900px;
   height: auto;
   display: block;
   margin: 0 auto;

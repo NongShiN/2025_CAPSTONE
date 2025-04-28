@@ -16,8 +16,8 @@ class DefaultArgs:
     temperature=0.7
     basic_memory_path='memory/basic_memory.json'
     cd_memory_path='memory/cd_memory.json'
-    cbt_log_path='data/cbt_log.json'
-    cbt_info_path='data/cbt_info.json'
+    cbt_log_path='agents/data/cbt_log.json'
+    cbt_info_path='agents/data/cbt_info.json'
     top_k=5
     
 class MASCC:
