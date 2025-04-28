@@ -10,16 +10,49 @@ const SignupPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSignup = () => {
-        if (password !== confirmPassword) {
-            alert("Passwords do not match.");
-            return;
+     //handleSinup 수정
+     const handleSignup = async (e) => {
+      e.preventDefault();
+    
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+    
+      setIsLoading(true);
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+        const res = await fetch(`${apiUrl}/api/auth/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            username: name,
+            email: email,
+            password: password 
+          })
+        });
+    
+        const data = await res.json().catch(() => ({ message: 'Signup failed' }));
+    
+        if (!res.ok) {
+          alert(data.message || 'Signup failed'); 
+          return;
         }
-
+    
         alert("Welcome, " + name + "! 🎉");
         router.push("/chat");
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message || 'Signup failed. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     };
+    
 
     return (
         <div className={styles.container}>
