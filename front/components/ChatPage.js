@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import Sidebar from "@/components/Sidebar";
-import ChatWindow from "@/components/ChatWindow.jsx";
+import ChatWindow from "@/components/ChatWindow";
 import styles from "@/styles/ChatPage.module.css";
 import { v4 as uuidv4 } from "uuid";
 
@@ -57,6 +57,7 @@ export default function ChatPage() {
     };
 
     if (!isClient || status === "loading" || !selectedSessionId) return <div>Loading chat session...</div>;
+
 
     return (
         <div className={`${styles.chatPage} ${styles[theme + "Theme"]}`}>

@@ -67,6 +67,7 @@ export default function CommunityPage() {
                     >
                         Create Post
                     </button>
+
                 </div>
 
                 <div className={styles.postList}>
