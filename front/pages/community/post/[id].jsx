@@ -8,10 +8,14 @@ export default function PostDetailPage() {
     const [isGuest, setIsGuest] = useState(false);
     const router = useRouter();
     const { id } = router.query;
+    const [theme, setTheme] = useState(null);
 
     useEffect(() => {
         if (!router.isReady) return;
-
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) {
+            setTheme(storedUser.theme || "blue");
+        }
         const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
         const target = storedPosts.find((p) => p.id === id);
         if (!target) return;
@@ -66,9 +70,9 @@ export default function PostDetailPage() {
     };
 
     if (!post) return <div className={styles.communityPage}>Loading...</div>;
-
+    if (!theme) return null;
     return (
-        <div className={`${styles.communityPage} ${styles.blueTheme}`}>
+        <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
             <Sidebar isGuest={isGuest} />
 
             <main className={styles.mainContent}>
@@ -132,11 +136,11 @@ export default function PostDetailPage() {
                     </ul>
                 </div>
                 <div className={styles.sectionBox}>
-                    <h4>💖 Most Liked This Week</h4>
+                    <h4>💖 Introduce Our Supervisors</h4>
                     <ul className={styles.sideList}>
-                        <li>Happiness & Productivity Solo</li>
-                        <li>Bootstrapping Mental Health</li>
-                        <li>Community is the New Product</li>
+                        <li>ACT - Accept pain, commit to meaningful life.</li>
+                        <li>CBT - Change your thoughts, change your life.</li>
+                        <li>IPT - Heal emotions through better relationships.</li>
                     </ul>
                 </div>
             </aside>

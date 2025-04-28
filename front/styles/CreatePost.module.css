@@ -5,10 +5,19 @@
     padding: 16px;
     gap: 16px;
     width: 100%;
-    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
     box-sizing: border-box;
 }
+.blueTheme {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+}
 
+.purpleTheme {
+    background: linear-gradient(to right, #d4aaff, #c2c2ff);
+}
+
+.pinkTheme {
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+}
 .sidebarWrapper {
     margin: 0;
     height: 100%;

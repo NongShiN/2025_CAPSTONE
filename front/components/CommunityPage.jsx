@@ -8,11 +8,14 @@ export default function CommunityPage() {
     const [posts, setPosts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const router = useRouter();
+    const [theme, setTheme] = useState(null);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         setIsGuest(!!storedUser?.guest);
-
+        if (storedUser) {
+            setTheme(storedUser.theme || "blue");
+        }
         const likedIds = JSON.parse(localStorage.getItem("likedPosts") || "[]");
         const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
         const mapped = storedPosts.map(post => ({
@@ -21,27 +24,6 @@ export default function CommunityPage() {
         }));
         setPosts(mapped);
     }, []);
-
-    const handleLike = (postId) => {
-        const updated = posts.map(post =>
-            post.id === postId
-                ? {
-                    ...post,
-                    likes: post.liked ? post.likes - 1 : post.likes + 1,
-                    liked: !post.liked
-                }
-                : post
-        );
-        setPosts(updated);
-        localStorage.setItem("posts", JSON.stringify(updated));
-
-        const likedIds = JSON.parse(localStorage.getItem("likedPosts") || "[]");
-        const newLiked = updated.find(p => p.id === postId)?.liked;
-        const newList = newLiked
-            ? [...new Set([...likedIds, postId])]
-            : likedIds.filter(id => id !== postId);
-        localStorage.setItem("likedPosts", JSON.stringify(newList));
-    };
 
     const formatTimeAgo = (timestamp) => {
         const now = Date.now();
@@ -59,9 +41,9 @@ export default function CommunityPage() {
             (post.tags || []).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
         )
         .sort((a, b) => b.createdAt - a.createdAt);
-
+    if (!theme) return null;
     return (
-        <div className={`${styles.communityPage} ${styles.blueTheme}`}>
+        <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
             <Sidebar isGuest={isGuest} />
             <main className={styles.mainContent}>
                 <div className={styles.topBarWrapper}>
@@ -125,11 +107,11 @@ export default function CommunityPage() {
                     </ul>
                 </div>
                 <div className={styles.sectionBox}>
-                    <h4>💖 Most Liked This Week</h4>
+                    <h4>💖 Introduce Our Supervisors</h4>
                     <ul className={styles.sideList}>
-                        <li>Happiness & Productivity Solo</li>
-                        <li>Bootstrapping Mental Health</li>
-                        <li>Community is the New Product</li>
+                        <li>ACT - Accept pain, commit to meaningful life.</li>
+                        <li>CBT - Change your thoughts, change your life.</li>
+                        <li>IPT - Heal emotions through better relationships.</li>
                     </ul>
                 </div>
             </aside>
