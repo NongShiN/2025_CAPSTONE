@@ -1,12 +1,13 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from chat import chat_with_mascc
+from model.chat import chat_with_mascc  # ✅ 정상 import 가능
 
 app = FastAPI()
 
+# ✅ CORS 설정 추가
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # 개발 중에는 * 사용, 배포 시에는 도메인으로 제한
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

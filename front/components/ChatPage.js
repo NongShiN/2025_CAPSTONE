@@ -9,13 +9,11 @@ import { v4 as uuidv4 } from "uuid";
 export default function ChatPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const { id } = router.query; // ✅ URL에서 id 읽기
-
     const [isClient, setIsClient] = useState(false);
     const [isGuest, setIsGuest] = useState(false);
     const [theme, setTheme] = useState("blue");
     const [newChatTrigger, setNewChatTrigger] = useState(0);
-    const [selectedSessionId, setSelectedSessionId] = useState(id || null);
+    const [selectedSessionId, setSelectedSessionId] = useState(null);
 
     useEffect(() => {
         setIsClient(true);
@@ -40,24 +38,11 @@ export default function ChatPage() {
         }
     }, [isClient, session, status, router]);
 
-    useEffect(() => {
-        // ✅ 진입 시 무조건 세션 자동 생성
-        if (isClient && !id) {
-            const newId = uuidv4();
-            router.replace(`/chat/${newId}`); // URL에 새 ID 넣기
-        } else if (isClient && id) {
-            setSelectedSessionId(id);
-            setNewChatTrigger((prev) => prev + 1);
-        }
-    }, [isClient, id, router]);
-
     const handleNewChat = () => {
         const newId = uuidv4();
-        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
+        setSelectedSessionId(newId);
+        setNewChatTrigger((prev) => prev + 1);
     };
-
-    if (!isClient || status === "loading" || !selectedSessionId) return <div>Loading chat session...</div>;
-
 
     return (
         <div className={`${styles.chatPage} ${styles[theme + "Theme"]}`}>
@@ -65,7 +50,7 @@ export default function ChatPage() {
                 isGuest={isGuest}
                 onNewChat={handleNewChat}
                 newChatTrigger={newChatTrigger}
-                onSelectChat={(id) => router.push(`/chat/${id}`)} // ✅ 대화 선택 시 URL 이동
+                onSelectChat={(id) => setSelectedSessionId(id)}
             />
             <ChatWindow
                 isGuest={isGuest}
