@@ -8,15 +8,36 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (email === "test@example.com" && password === "1234") {
-      const user = { email };
-      localStorage.setItem("user", JSON.stringify(user));
-      window.location.href = "/chat";
-    } else {
-      alert("로그인 정보가 올바르지 않습니다.");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include'
+      });
+  
+      const data = await res.json(); 
+  
+    
+    if (!res.ok) {
+
+      alert(data.message || 'Login failed');
+      return;
+    }
+  
+      localStorage.setItem("user", JSON.stringify(data));
+      router.push("/chat");
+    } catch (error) {
+      console.error('Error:', error);
+      alert(error.message || "로그인 정보가 올바르지 않습니다.");
     }
   };
+  
 
   const handleGuestLogin = () => {
     const guestUser = { guest: true };
