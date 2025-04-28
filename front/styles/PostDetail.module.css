@@ -1,0 +1,229 @@
+.communityPage {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    padding: 16px;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.blueTheme {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+}
+
+.purpleTheme {
+    background: linear-gradient(to right, #d4aaff, #c2c2ff);
+}
+
+.pinkTheme {
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+}
+
+.sidebar {
+    width: 260px;
+    background-color: white;
+    border-radius: 1.5rem;
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box;
+    overflow: hidden;
+    margin-bottom: 20px;
+    height: calc(100vh - 32px);
+    flex-shrink: 0;
+}
+
+.mainContent {
+    flex: 1;
+    min-width: 0;
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.mainContent::-webkit-scrollbar {
+    width: 8px;
+}
+.mainContent::-webkit-scrollbar-track {
+    background: transparent;
+}
+.mainContent::-webkit-scrollbar-thumb {
+    background: rgba(90, 93, 255, 0.4);
+    border-radius: 9999px;
+}
+.mainContent::-webkit-scrollbar-thumb:hover {
+    background: rgba(90, 93, 255, 0.7);
+}
+
+.rightSidebar {
+    width: 240px;
+    padding: 2rem 1rem;
+    background: transparent;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.sectionBox {
+    background: white;
+    padding: 1rem 1rem 1.25rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.sectionBox h4 {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sideList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.sideList li {
+    font-size: 0.875rem;
+    color: #444;
+    background: #f5f7fa;
+    padding: 0.6rem 0.9rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.sideList li:hover {
+    background: #e9efff;
+}
+
+.postCard {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+    flex-direction: column;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.postContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.postTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.tagGroup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    background: #eaeefc;
+    color: #3b3f6c;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+}
+
+.postMeta {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.postStats {
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.inlineLikeBtn {
+    font-size: 0.95rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.inlineLikeBtn:hover {
+    color: #f87171;
+}
+
+.dot {
+    font-size: 1.1rem;
+    color: #999;
+}
+
+.actionsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.postActions {
+    display: flex;
+    justify-content: flex-start; /* ← 왼쪽 정렬 */
+    align-items: center;          /* ← 세로 중앙정렬 */
+    gap: 1rem;                    /* 버튼 간격 */
+    margin-top: 2rem;
+}
+
+.backLink,
+.deleteBtn,
+.editBtn {
+    font-size: 0.95rem;
+    padding: 0.6rem 1.5rem;
+    border-radius: 2rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    min-width: 100px; /* 버튼 크기 통일감 */
+    text-align: center;
+}
+.backLink {
+    background: transparent;
+    color: #444;
+}
+
+.deleteBtn {
+    background-color: #f87171;
+    color: white;
+}
+
+.deleteBtn:hover {
+    background-color: #ef4444;
+}
+
+.editBtn {
+    background-color: #60a5fa;
+    color: white;
+}
+
+.editBtn:hover {
+    background-color: #3b82f6;
+}

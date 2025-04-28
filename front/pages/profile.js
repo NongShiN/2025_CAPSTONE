@@ -43,11 +43,7 @@ export default function ProfilePage() {
         const date = new Date(timestamp);
         return date.toLocaleString(); // 예시: '2025. 4. 28. 오후 8:25:38'
     };
-    const handleThemeChange = (userTheme) => {
-        setTheme(userTheme);
-        // 테마가 변경될 때마다 localStorage에 저장
-        localStorage.setItem("theme", userTheme);
-    };
+
     if (!user) return null;
 
     return (
