@@ -2,13 +2,17 @@ import { useState, useEffect } from "react";
 import styles from "../styles/ChatWindow.module.css";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 
-export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
+export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId, theme, isNewChat, setIsNewChat }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
     const [sessionId, setSessionId] = useState(null);
     const [showIntro, setShowIntro] = useState(true); // 💖 Intro 보여줄지 여부
+    const [showInputBox, setShowInputBox] = useState(false);
+    const [introClicked, setIntroClicked] = useState(false);
+    const [introVisible, setIntroVisible] = useState(true);
 
     useEffect(() => {
         if (selectedSessionId && typeof window !== "undefined") {
@@ -27,11 +31,12 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
     }, [selectedSessionId]);
 
     useEffect(() => {
-        if (!selectedSessionId && newChatTrigger > 0) {
-            const newId = uuidv4();
-            setSessionId(newId);
+        if (newChatTrigger > 0 && isNewChat) {
             setMessages([]);
             setShowIntro(true);
+            setIntroClicked(false);
+            setIntroVisible(true);
+            setIsNewChat(false);  // ✅ 초기화 끝났으면 다시 false로
         }
     }, [newChatTrigger]);
 
@@ -52,16 +57,22 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                 };
                 setMessages([greeting]);
                 setShowIntro(false); // ✅ Intro 화면 끄기
+                setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
             }
         } catch (error) {
             console.error("초기 인사말 불러오기 실패:", error);
             setMessages([]);
             setShowIntro(false);
+            setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
         }
     };
 
     const handleIntroClick = () => {
         fetchGreeting(); // ✅ "Let me hear your heart" 클릭 시 서버 호출
+        setIntroClicked(true); // 클릭했으니까 애니메이션 시작
+        setTimeout(() => {
+            setIntroVisible(false); // 0.5초 뒤에 실제로 IntroBox 제거
+        }, 500); // fadeOutUp 애니메이션 시간과 맞춰야 함
     };
 
     const handleSend = async () => {
@@ -117,53 +128,84 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
     if (!sessionId) return <div className={styles.chatContainer}>채팅 세션을 초기화 중입니다...</div>;
 
     return (
-        <div className={styles.chatContainer}>
-            {messages.length === 0 && showIntro && (
-                <div className={styles.emptyMessageBox} onClick={handleIntroClick} style={{ cursor: "pointer" }}>
-                    <div className={styles.heartEmoji}>💖</div>
-                    <h2 className={styles.emptyTitle}>Let me hear your heart</h2>
-                    <p className={styles.emptyDescription}>
-                        마음속 이야기를 나눠보세요.<br />제가 경청하고 위로해드릴게요.
-                    </p>
-                </div>
-            )}
+        <div className={`${styles.chatContainer} ${styles[theme]}`}>
+            <AnimatePresence>
+                {messages.length === 0 && showIntro && introVisible && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 10 }}
+                        exit={{ opacity: 0, y: -30}}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                        className={`${styles.emptyMessageBox} ${introClicked ? styles.fadeOutUp : ''}`}
+                        onClick={() => {
+                            handleIntroClick();
+                            setIntroClicked(true);
+                        }}
+                        style={{ cursor: "pointer" }}
+                    >
+                        <div className={styles.heartEmoji}>💖</div>
+                        <h2 className={styles.emptyTitle}>Let me hear your heart</h2>
+                        <p className={styles.emptyDescription}>
+                            마음속 이야기를 나눠보세요.<br />제가 경청하고 위로해드릴게요.
+                        </p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className={styles.messageList}>
                 {messages.map((msg) => (
-                    <div
+                    <motion.div
                         key={msg.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 1, ease: "easeInOut" }}
                         className={`${styles.messageBubble} ${msg.sender === "user" ? styles.userMessage : styles.botMessage}`}
                     >
                         {msg.text}
-                    </div>
+                    </motion.div>
                 ))}
             </div>
 
-            <div className={styles.inputWrapper}>
-                <div className={styles.inputBox}>
-                    <img
-                        src="/sound_of_mind.svg"
-                        alt="Sound of Mind"
-                        className={styles.inputIcon}
-                    />
-                    <input
-                        type="text"
-                        placeholder="마음의 소리를 들려주세요"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.nativeEvent.isComposing && !isSending && sessionId) {
-                                handleSend();
-                            }
-                        }}
-                        disabled={isSending || !sessionId}
-                        className={styles.inputField}
-                    />
-                    <button onClick={handleSend} disabled={isSending || !sessionId} className={styles.sendButton}>
-                        <img src="/send.svg" alt="Send" className={styles.sendIcon} />
-                    </button>
-                </div>
-            </div>
+
+            <AnimatePresence>
+                {(messages.length > 0 || introClicked) && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 150,x: "-30%" }}
+                        animate={{ opacity: 1, y: 0, x: "-30%" }}
+                        exit={{ opacity: 0, y: 150, x: "-30%" }}
+                        transition={{ duration: 1, ease: "easeInOut" }}
+                        className={`${styles.inputWrapper} ${introClicked && messages.length === 0 ? styles.slideUp : messages.length === 0 ? styles.hidden : ''}`}
+                    >
+                        <div className={styles.inputBox}>
+                            <img
+                                src="/sound_of_mind.svg"
+                                alt="Sound of Mind"
+                                className={styles.inputIcon}
+                            />
+                            <input
+                                type="text"
+                                placeholder="마음의 소리를 들려주세요"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.nativeEvent.isComposing && !isSending && sessionId) {
+                                        handleSend();
+                                    }
+                                }}
+                                disabled={isSending || !sessionId}
+                                className={styles.inputField}
+                            />
+                            <button
+                                onClick={handleSend}
+                                disabled={isSending || !sessionId}
+                                className={styles.sendButton}
+                            >
+                                <img src="/send.svg" alt="Send" className={styles.sendIcon} />
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
