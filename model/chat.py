@@ -33,33 +33,34 @@ class DefaultArgs:
     cbt_log_path='data/cbt_log.json'
     cbt_info_path='data/cbt_info.json'
     top_k=5
-    
 
-# initialize arguments
-# args = parse_args()
-args = DefaultArgs()
+# ✅ MASCC 인스턴스를 명시적으로 초기화하는 함수
+def load_mascc():
+    args = DefaultArgs()
+    llm = OpenAI(api_key=OPENAI_API_KEY)
+    retriever = SentenceTransformer("all-MiniLM-L6-v2")
+    mascc = MASCC(args, llm, retriever)
+    return mascc
 
-# generate instance
-llm = OpenAI(api_key=OPENAI_API_KEY)
-retriever = SentenceTransformer("all-MiniLM-L6-v2")
-mascc = MASCC(args, llm, retriever)
-
-def chat_with_mascc(user_input: str, last_counselor: str = "Hello, how can I help you?") -> str:
-    global mascc
+# ✅ mascc 인스턴스를 인자로 받는 버전
+def chat_with_mascc(user_input: str, mascc_instance, last_counselor: str = "Hello, how can I help you?") -> str:
     timestamp = datetime.datetime.now().isoformat()
 
-    response = mascc.generate(
-        args,
+    response = mascc_instance.generate(
+        mascc_instance.args,
         counselor_utterance=last_counselor,
         client_utterance=user_input,
         timestamp=timestamp
-        )
+    )
     logging.info(f"\n[Counselor Response]: {response}")
 
     return response
 
-if __name__ == "__main__":
+# ❌ 글로벌 mascc 삭제
+# mascc = MASCC(args, llm, retriever) (삭제)
 
+if __name__ == "__main__":
+    mascc_instance = load_mascc()
     print("Welcome to the MASCC chatbot. Type 'exit' or 'quit' to end the conversation.\n")
 
     last_counselor = "Hello, how can I help you?"
@@ -72,6 +73,6 @@ if __name__ == "__main__":
             print("Ending the chat. Take care!")
             break
 
-        response = chat_with_mascc(user_input, last_counselor)
+        response = chat_with_mascc(user_input, mascc_instance, last_counselor)
         print(f"Counselor: {response}")
         last_counselor = response

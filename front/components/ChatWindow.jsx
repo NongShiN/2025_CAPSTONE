@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/ChatWindow.module.css";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
     const [sessionId, setSessionId] = useState(null);
-    const [showIntro, setShowIntro] = useState(true);
+    const [showIntro, setShowIntro] = useState(true); // 💖 Intro 보여줄지 여부
 
     useEffect(() => {
         if (selectedSessionId && typeof window !== "undefined") {
@@ -16,11 +17,12 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
             if (found) {
                 setMessages(found.messages || []);
                 setSessionId(found.id);
+                setShowIntro(found.messages.length === 0); // ✅ 메시지가 없으면 Intro 보여주기
             } else {
                 setMessages([]);
                 setSessionId(selectedSessionId);
+                setShowIntro(true); // ✅ 새 세션은 Intro부터 보여주기
             }
-            setShowIntro(true);
         }
     }, [selectedSessionId]);
 
@@ -38,6 +40,29 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
             setSessionId(selectedSessionId);
         }
     }, [sessionId, selectedSessionId]);
+
+    const fetchGreeting = async () => {
+        try {
+            const response = await axios.get("https://model-server-281506025529.asia-northeast3.run.app/gen");
+            if (response.data.response) {
+                const greeting = {
+                    id: Date.now(),
+                    sender: "bot",
+                    text: response.data.response,
+                };
+                setMessages([greeting]);
+                setShowIntro(false); // ✅ Intro 화면 끄기
+            }
+        } catch (error) {
+            console.error("초기 인사말 불러오기 실패:", error);
+            setMessages([]);
+            setShowIntro(false);
+        }
+    };
+
+    const handleIntroClick = () => {
+        fetchGreeting(); // ✅ "Let me hear your heart" 클릭 시 서버 호출
+    };
 
     const handleSend = async () => {
         if (!input.trim()) return;
@@ -94,7 +119,7 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
     return (
         <div className={styles.chatContainer}>
             {messages.length === 0 && showIntro && (
-                <div className={styles.emptyMessageBox}>
+                <div className={styles.emptyMessageBox} onClick={handleIntroClick} style={{ cursor: "pointer" }}>
                     <div className={styles.heartEmoji}>💖</div>
                     <h2 className={styles.emptyTitle}>Let me hear your heart</h2>
                     <p className={styles.emptyDescription}>
