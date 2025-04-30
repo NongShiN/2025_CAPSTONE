@@ -287,3 +287,12 @@
 .deleteBtn:hover {
     background-color: #ef4444;
 }
+.clickableListItem {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.clickableListItem:hover {
+    color: #5a5dff;
+    text-decoration: underline;
+}

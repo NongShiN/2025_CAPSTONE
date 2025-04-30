@@ -15,6 +15,7 @@ export default function CreatePost() {
     const [chatSessions, setChatSessions] = useState([]);
     const [selectedSessionId, setSelectedSessionId] = useState("");
     const [selectedMessages, setSelectedMessages] = useState([]);
+    const [isNewChat, setIsNewChat] = useState(false);
 
     useEffect(() => {
         const id = localStorage.getItem("editingPostId");
@@ -46,6 +47,14 @@ export default function CreatePost() {
             setSelectedMessages([]);
         }
     }, [selectedSessionId, chatSessions]);
+
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        setIsNewChat(true);
+        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
+    };
+    const handleSelectChat = (id) => {
+        router.push(`/chat/${id}`)}
 
     const handleSummarize = () => {
         const userTexts = selectedMessages.filter(m => m.sender === "user").map(m => m.text);
@@ -102,7 +111,11 @@ export default function CreatePost() {
     return (
         <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
         <div className={styles.createPostPage}>
-            <Sidebar />
+            <Sidebar
+                onNewChat={handleNewChat}
+                onSelectChat={handleSelectChat}
+                theme={theme}
+                 />
             <main className={styles.mainContent}>
                 <div className={styles.container}>
                     <h2 className={styles.heading}>{isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}</h2>

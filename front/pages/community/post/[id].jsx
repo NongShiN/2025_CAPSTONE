@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../../../styles/PostDetail.module.css";
+import { v4 as uuidv4 } from "uuid";
 
 export default function PostDetailPage() {
     const [post, setPost] = useState(null);
@@ -9,6 +10,48 @@ export default function PostDetailPage() {
     const router = useRouter();
     const { id } = router.query;
     const [theme, setTheme] = useState(null);
+    const [isNewChat, setIsNewChat] = useState(false);
+    const [storedPosts, setStoredPosts] = useState([]);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const posts = JSON.parse(localStorage.getItem("posts")) || [];
+        setStoredPosts(posts);
+    }, []);
+
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) {
+            setUser(storedUser);
+        }
+        setIsGuest(!!storedUser?.guest);
+    }, [router.isReady, id]);
+
+    const getHotPosts = (posts) => {
+        const now = Date.now();
+
+        const corrected = posts.map((post) => {
+            const isTooFar = typeof post.createdAt === "number" && post.createdAt - now > 86400000;
+            const finalCreatedAt = isTooFar ? now - 5 * 60 * 1000 : post.createdAt;
+            return {
+                ...post,
+                createdAt: finalCreatedAt,
+            };
+        });
+
+
+        const hotPosts = corrected
+            .filter((post) => {
+                const diffInSeconds = Math.floor((now - post.createdAt) / 1000);
+                return typeof post.createdAt === "number" && diffInSeconds <= 60 * 60 * 24 * 7;
+            })
+            .sort((a, b) => b.likes - a.likes)
+            .slice(0, 3);
+
+        return hotPosts;
+    };
 
     useEffect(() => {
         if (!router.isReady) return;
@@ -28,6 +71,13 @@ export default function PostDetailPage() {
         localStorage.setItem("posts", JSON.stringify(updatedPosts));
         setPost({ ...target, views: (target.views || 0) + 1 });
     }, [router.isReady, id]);
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        setIsNewChat(true);
+        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
+    };
+    const handleSelectChat = (id) => {
+        router.push(`/chat/${id}`)}
 
     const formatTimeAgo = (timestamp) => {
         const now = Date.now();
@@ -73,7 +123,12 @@ export default function PostDetailPage() {
     if (!theme) return null;
     return (
         <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
-            <Sidebar isGuest={isGuest} />
+            <Sidebar
+                onNewChat={handleNewChat}
+                onSelectChat={handleSelectChat}
+                isGuest={isGuest}
+                theme={theme}
+            />
 
             <main className={styles.mainContent}>
                 <div className={styles.postCard}>
@@ -101,26 +156,29 @@ export default function PostDetailPage() {
                                     {post.liked ? "❤️" : "🤍"}
                                 </button>{post.likes?.toLocaleString()} likes • 👁 {post.views?.toLocaleString()} views
                             </div>
-                            <div className={styles.postActions}>
-                                <button
-                                    onClick={() => router.push("/community")}
-                                    className={styles.cancelBtn}
-                                >
-                                    ← 돌아가기
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className={styles.deleteBtn}
-                                >
-                                    🗑 삭제하기
-                                </button>
-                                <button
-                                    onClick={handleEdit}
-                                    className={styles.editBtn}
-                                >
-                                    ✏ 수정하기
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => router.push("/community")}
+                                className={styles.cancelBtn}
+                            >
+                                ← 돌아가기
+                            </button>
+                            {!isGuest && user?.email === post.saveauthor && (
+                                <div className={styles.postActions}>
+
+                                    <button
+                                        onClick={handleDelete}
+                                        className={styles.deleteBtn}
+                                    >
+                                        🗑 삭제하기
+                                    </button>
+                                    <button
+                                        onClick={handleEdit}
+                                        className={styles.editBtn}
+                                    >
+                                        ✏ 수정하기
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -130,9 +188,15 @@ export default function PostDetailPage() {
                 <div className={styles.sectionBox}>
                     <h4>🔥 Hot Post</h4>
                     <ul className={styles.sideList}>
-                        <li>Scaling a Business Amidst Tragedy</li>
-                        <li>Mental Health as a Founder</li>
-                        <li>Growing to $5k MRR in 1 year</li>
+                        {storedPosts.length > 0 && getHotPosts(storedPosts).map((post) => (
+                            <li
+                                key={post.id}
+                                onClick={() => router.push(`/community/post/${post.id}`)}
+                                className={styles.clickableListItem}
+                            >
+                                {post.title}
+                            </li>
+                        ))}
                     </ul>
                 </div>
                 <div className={styles.sectionBox}>

@@ -122,7 +122,12 @@
   word-wrap: break-word;
   background-color: #f4f4f4;
 }
-
+.timeStamp {
+  font-size: 0.7rem;
+  color: #bcb6b6;
+  margin-top: 4px;
+  text-align: right;
+}
 .userMessage {
   align-self: flex-end;
   margin-left: auto;

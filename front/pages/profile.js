@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "@/styles/ProfilePage.module.css";
+import { v4 as uuidv4 } from "uuid";
 
 export default function ProfilePage() {
     const router = useRouter();
@@ -11,6 +12,7 @@ export default function ProfilePage() {
     const [postCount, setPostCount] = useState(0);
     const [likeCount, setLikeCount] = useState(0);
     const [myPosts, setMyPosts] = useState([]);
+    const [isNewChat, setIsNewChat] = useState(false);
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -31,6 +33,13 @@ export default function ProfilePage() {
         const totalLikes = storedPosts.reduce((sum, post) => sum + (post.likes || 0), 0);
         setLikeCount(totalLikes);
     }, [router]);
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        setIsNewChat(true);
+        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
+    };
+    const handleSelectChat = (id) => {
+        router.push(`/chat/${id}`)}
     const handlePostClick = (postId) => {
         router.push(`community/post/${postId}`); // 포스트 ID를 이용한 라우팅
     };
@@ -48,7 +57,12 @@ export default function ProfilePage() {
 
     return (
         <div className={`${styles.pageWrapper} ${styles[theme]}`}>
-            <Sidebar isGuest={user.guest} />
+            <Sidebar
+                onNewChat={handleNewChat}
+                onSelectChat={handleSelectChat}
+                isGuest={user.Guest}
+                theme={theme}
+            />
             <main className={styles.mainContent}>
                 <div className={styles.profileCard}>
                     <h2>My Profile</h2>
@@ -87,13 +101,19 @@ export default function ProfilePage() {
                     <div className={styles.myPostsSection}>
                         <h3>My Posts</h3>
                         {myPosts.length > 0 ? (
-                            <ul>
-                                {myPosts.map((post) => (
-                                    <li key={post.id} onClick={() => handlePostClick(post.id)} className={styles.postItem}>
-                                        {post.title} • {formatDate(post.createdAt)}
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className={styles.postListScrollArea}>
+                                <ul>
+                                    {myPosts.map((post) => (
+                                        <li
+                                            key={post.id}
+                                            onClick={() => handlePostClick(post.id)}
+                                            className={styles.postItem}
+                                        >
+                                            {post.title} • {formatDate(post.createdAt)}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         ) : (
                             <p>작성한 글이 없습니다.</p>
                         )}

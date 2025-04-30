@@ -13,6 +13,61 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
     const [showInputBox, setShowInputBox] = useState(false);
     const [introClicked, setIntroClicked] = useState(false);
     const [introVisible, setIntroVisible] = useState(true);
+    const [isBotTyping, setIsBotTyping] = useState(false);
+    const [typingDots, setTypingDots] = useState("");
+    const [botTypingText, setBotTypingText] = useState(""); // 점점 찍힐 텍스트
+
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const formattedTime = `${hours < 12 ? '오전' : '오후'} ${hours % 12 || 12}:${minutes.toString().padStart(2, '0')}`;
+
+    const calcDelay = (word) => {
+        const base = 100;            // 기본 지연 시간 (ms)
+        const extraPerChar = 20;     // 글자 하나당 추가 지연 시간
+
+        return base + word.length * extraPerChar;
+    };
+
+    const typeText = async (reply) => {
+        setTypingDots("");           // 점 멈춤
+        setBotTypingText("");        // 텍스트 초기화
+
+        const words = reply.text.split(" ");
+        let index = 0;
+
+        await new Promise((resolve) => {
+            const interval = setInterval(() => {
+                if (index >= words.length) {
+                    clearInterval(interval);
+                    resolve();
+                    return;
+                }
+
+                setBotTypingText((prev) => prev + (index > 0 ? " " : "") + words[index]);
+                index++;
+            }, calcDelay(words[index]));
+        });
+
+        setMessages((prev) => [...prev, reply]);  // 메시지 확정
+        setIsBotTyping(false);                    // 상태 종료
+    };
+
+    useEffect(() => {
+        if (!isBotTyping) {
+            setTypingDots("");
+            return;
+        }
+
+        const dotInterval = setInterval(() => {
+            setTypingDots((prev) => {
+                if (prev.length >= 3) return "";
+                return prev + ".";
+            });
+        }, 500); // 0.5초마다 점 추가
+
+        return () => clearInterval(dotInterval);
+    }, [isBotTyping]);
 
     useEffect(() => {
         if (selectedSessionId && typeof window !== "undefined") {
@@ -82,13 +137,17 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
             return;
         }
 
-        const newMessages = [...messages, { id: Date.now(), sender: "user", text: input }];
+        const newMessages = [...messages, { id: Date.now(), sender: "user", text: input,time: formattedTime }];
         setMessages(newMessages);
         setInput("");
         setShowIntro(false);
         setIsSending(true);
+        setIsBotTyping(true);
+
+        setTimeout(() => setIsBotTyping(true), 1000);
 
         try {
+
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -100,6 +159,9 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
                 sender: "bot",
                 text: data.message || "답변을 불러오지 못했어요."
             };
+
+            await typeText(reply);
+
             const updated = [...newMessages, reply];
             setMessages(updated);
 
@@ -121,6 +183,7 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {
+            setIsBotTyping(false);
             setIsSending(false);
         }
     };
@@ -161,9 +224,25 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
                         transition={{ duration: 1, ease: "easeInOut" }}
                         className={`${styles.messageBubble} ${msg.sender === "user" ? styles.userMessage : styles.botMessage}`}
                     >
-                        {msg.text}
+                        <div>{msg.text}</div>
+                        {msg.sender === "user" && msg.time && (
+                            <div className={styles.timeStamp}>{msg.time}</div>
+                        )}
                     </motion.div>
                 ))}
+                {isBotTyping && (
+                    <motion.div
+                        key="typing"
+                        className={`${styles.messageBubble} ${styles.botMessage}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 2 }}
+                    >
+                        {botTypingText
+                            ? botTypingText
+                            : `상담사가 입력 중입니다${typingDots}`} {/* 점 찍히는 중이면 이거 보여줌 */}
+                    </motion.div>
+                    )}
             </div>
 
 
