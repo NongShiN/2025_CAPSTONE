@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/ChatWindow.module.css";
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId, theme, isNewChat, setIsNewChat }) {
+export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, isNewChat, setIsNewChat }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
