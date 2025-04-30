@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../styles/CommunityPage.module.css";
+import { v4 as uuidv4 } from "uuid";
 
 export default function CommunityPage() {
     const [isGuest, setIsGuest] = useState(false);
@@ -24,7 +25,18 @@ export default function CommunityPage() {
         }));
         setPosts(mapped);
     }, []);
+    const [newChatTrigger, setNewChatTrigger] = useState(0);
+    const [refreshSessionList, setRefreshSessionList] = useState(0);
+    const handleSelectChat = (sessionId) => {
+        router.push(`/chat/${sessionId}`); // ✅ 기존 세션으로 이동
+    };
 
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        router.push(`/chat/${newId}`);
+        setNewChatTrigger(prev => prev + 1);
+        setRefreshSessionList(prev => prev + 1);
+    };
     const formatTimeAgo = (timestamp) => {
         const now = Date.now();
         const diff = Math.floor((now - timestamp) / 1000);
@@ -44,7 +56,13 @@ export default function CommunityPage() {
     if (!theme) return null;
     return (
         <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
-            <Sidebar isGuest={isGuest} />
+            <Sidebar
+                isGuest={isGuest}
+                onSelectChat={handleSelectChat}
+                onNewChat={handleNewChat}
+                newChatTrigger={newChatTrigger}
+                refreshSessionList={refreshSessionList}
+            />
             <main className={styles.mainContent}>
                 <div className={styles.topBarWrapper}>
                     <div className={styles.inputSearchBox}>
