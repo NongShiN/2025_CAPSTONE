@@ -137,7 +137,7 @@ export default function CommunityPage() {
                                         ))}
                                     </div>
                                     <div className={styles.postMeta}>{post.author} • {formatTimeAgo(post.createdAt)}</div>
-                                    <div className={styles.postStats}>{post.views?.toLocaleString()} views • {post.likes?.toLocaleString()} likes • {post.comments} comments</div>
+                                    <div className={styles.postStats}> {post.likes?.toLocaleString()} BPM • {post.views?.toLocaleString()} views • {Array.isArray(post.comments) ? post.comments.length : 0} comments</div>
                                 </div>
                             </div>
                         </div>

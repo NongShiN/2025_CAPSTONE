@@ -70,7 +70,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
     );
 
     return (
-        <aside className={styles.sidebar}>
+        <aside className={`${styles.sidebar} theme-${theme}`}>
             <div>
                 <div onClick={() => window.location.reload()} className={styles.logo}>
                     <img
@@ -82,7 +82,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                 <div className={styles.actionRow}>
                     <button
                         onClick={handleNewChat}
-                        className={`${styles.newChatBtn} ${isGuest ? styles.disabled : ""}`}
+                        className={`${styles.newChatBtn} ${styles[theme]} ${isGuest ? styles.disabled : ""}`}
                         disabled={isGuest}
                     >
                         + New chat

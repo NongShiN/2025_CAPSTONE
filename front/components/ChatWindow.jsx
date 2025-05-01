@@ -21,35 +21,29 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
     const minutes = now.getMinutes();
     const formattedTime = `${hours < 12 ? '오전' : '오후'} ${hours % 12 || 12}:${minutes.toString().padStart(2, '0')}`;
 
-    const calcDelay = (word) => {
-        const base = 100;            // 기본 지연 시간 (ms)
-        const extraPerChar = 20;     // 글자 하나당 추가 지연 시간
+    const calcDelay = (char) => {
+        const base = 40;
+        const punctuationPause = /[.,!?]/.test(char) ? 300 : 0;
 
-        return base + word.length * extraPerChar;
+        return base + punctuationPause;
     };
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     const typeText = async (reply) => {
-        setTypingDots("");           // 점 멈춤
-        setBotTypingText("");        // 텍스트 초기화
+        setTypingDots("");
+        setBotTypingText("");
+        setIsBotTyping(true);
 
-        const words = reply.text.split(" ");
-        let index = 0;
+        const chars = reply.text.split(""); // 한 글자 단위 분리
 
-        await new Promise((resolve) => {
-            const interval = setInterval(() => {
-                if (index >= words.length) {
-                    clearInterval(interval);
-                    resolve();
-                    return;
-                }
+        for (let i = 0; i < chars.length; i++) {
+            const char = chars[i];
+            setBotTypingText((prev) => prev + char);
+            await sleep(calcDelay(char)); // 글자 길이 기반 속도 적용 가능
+        }
 
-                setBotTypingText((prev) => prev + (index > 0 ? " " : "") + words[index]);
-                index++;
-            }, calcDelay(words[index]));
-        });
-
-        setMessages((prev) => [...prev, reply]);  // 메시지 확정
-        setIsBotTyping(false);                    // 상태 종료
+        setMessages((prev) => [...prev, reply]);
+        setIsBotTyping(false);
     };
 
     useEffect(() => {
@@ -126,7 +120,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
         setIntroClicked(true); // 클릭했으니까 애니메이션 시작
         setTimeout(() => {
             setIntroVisible(false); // 0.5초 뒤에 실제로 IntroBox 제거
-        }, 500); // fadeOutUp 애니메이션 시간과 맞춰야 함
+        }, 800); // fadeOutUp 애니메이션 시간과 맞춰야 함
     };
 
     const handleSend = async () => {
