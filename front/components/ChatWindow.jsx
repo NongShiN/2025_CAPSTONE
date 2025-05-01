@@ -23,7 +23,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
 
     const calcDelay = (char) => {
         const base = 40;
-        const punctuationPause = /[.,!?]/.test(char) ? 300 : 0;
+        const punctuationPause = /[.,!?]/.test(char) ? 100 : 0;
 
         return base + punctuationPause;
     };
@@ -155,20 +155,18 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
 
             await typeText(reply);
 
-            const updated = [...newMessages, reply];
-            setMessages(updated);
 
             const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
             const sessionIndex = stored.findIndex((s) => s.id === sessionId);
 
             if (sessionIndex !== -1) {
-                stored[sessionIndex].messages = updated;
+                stored[sessionIndex].messages = messages;
             } else {
                 stored.push({
                     id: sessionId,
                     title: newMessages[0]?.text?.slice(0, 30) || "New Chat",
                     createdAt: new Date(),
-                    messages: updated
+                    messages: messages
                 });
             }
 
