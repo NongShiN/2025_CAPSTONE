@@ -14,16 +14,19 @@
 .chatContainer.blue .userMessage {
   background-color: #5A5DFF;
   color: white;
+  margin-right: 6px;
 }
 
 .chatContainer.purple .userMessage {
   background-color: #7B61FF;
   color: white;
+  margin-right: 6px;
 }
 
 .chatContainer.pink .userMessage {
   background-color: #FF69B4;
   color: white;
+  margin-right: 6px;
 }
 
 .chatContainer.blue .botMessage {
@@ -49,7 +52,36 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+.messageList::-webkit-scrollbar {
+  margin: 5px;
+  width: 8px;
+}
+.messageList::-webkit-scrollbar-track {
+  background: transparent;
+}
+/* 기본 blue */
+.chatContainer.blue .messageList::-webkit-scrollbar-thumb {
+  background: rgba(90, 93, 255, 0.4);
+}
+.chatContainer.blue .messageList::-webkit-scrollbar-thumb:hover {
+  background: rgba(90, 93, 255, 0.7);
+}
 
+/* purple 테마 */
+.chatContainer.purple .messageList::-webkit-scrollbar-thumb {
+  background: rgba(123, 97, 255, 0.4);
+}
+.chatContainer.purple .messageList::-webkit-scrollbar-thumb:hover {
+  background: rgba(123, 97, 255, 0.7);
+}
+
+/* pink 테마 */
+.chatContainer.pink .messageList::-webkit-scrollbar-thumb {
+  background: rgba(255, 105, 180, 0.4);
+}
+.chatContainer.pink .messageList::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 105, 180, 0.7);
+}
 .emptyMessageBox {
   position: absolute;
   bottom: 25rem;
@@ -122,7 +154,12 @@
   word-wrap: break-word;
   background-color: #f4f4f4;
 }
-
+.timeStamp {
+  font-size: 0.7rem;
+  color: #bcb6b6;
+  margin-top: 4px;
+  text-align: right;
+}
 .userMessage {
   align-self: flex-end;
   margin-left: auto;

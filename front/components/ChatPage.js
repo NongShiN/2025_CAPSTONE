@@ -66,6 +66,7 @@ export default function ChatPage() {
                 onNewChat={handleNewChat}
                 newChatTrigger={newChatTrigger}
                 onSelectChat={(id) => router.push(`/chat/${id}`)} // ✅ 대화 선택 시 URL 이동
+                theme={theme}
             />
             <ChatWindow
                 isGuest={isGuest}

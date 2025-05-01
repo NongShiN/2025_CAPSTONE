@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import styles from "../styles/ChatWindow.module.css";
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId, theme, isNewChat, setIsNewChat }) {
+export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, isNewChat, setIsNewChat }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
@@ -13,6 +12,55 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
     const [showInputBox, setShowInputBox] = useState(false);
     const [introClicked, setIntroClicked] = useState(false);
     const [introVisible, setIntroVisible] = useState(true);
+    const [isBotTyping, setIsBotTyping] = useState(false);
+    const [typingDots, setTypingDots] = useState("");
+    const [botTypingText, setBotTypingText] = useState(""); // 점점 찍힐 텍스트
+
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const formattedTime = `${hours < 12 ? '오전' : '오후'} ${hours % 12 || 12}:${minutes.toString().padStart(2, '0')}`;
+
+    const calcDelay = (char) => {
+        const base = 40;
+        const punctuationPause = /[.,!?]/.test(char) ? 100 : 0;
+
+        return base + punctuationPause;
+    };
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    const typeText = async (reply) => {
+        setTypingDots("");
+        setBotTypingText("");
+        setIsBotTyping(true);
+
+        const chars = reply.text.split(""); // 한 글자 단위 분리
+
+        for (let i = 0; i < chars.length; i++) {
+            const char = chars[i];
+            setBotTypingText((prev) => prev + char);
+            await sleep(calcDelay(char)); // 글자 길이 기반 속도 적용 가능
+        }
+
+        setMessages((prev) => [...prev, reply]);
+        setIsBotTyping(false);
+    };
+
+    useEffect(() => {
+        if (!isBotTyping) {
+            setTypingDots("");
+            return;
+        }
+
+        const dotInterval = setInterval(() => {
+            setTypingDots((prev) => {
+                if (prev.length >= 3) return "";
+                return prev + ".";
+            });
+        }, 500); // 0.5초마다 점 추가
+
+        return () => clearInterval(dotInterval);
+    }, [isBotTyping]);
 
     useEffect(() => {
         if (selectedSessionId && typeof window !== "undefined") {
@@ -72,7 +120,7 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
         setIntroClicked(true); // 클릭했으니까 애니메이션 시작
         setTimeout(() => {
             setIntroVisible(false); // 0.5초 뒤에 실제로 IntroBox 제거
-        }, 500); // fadeOutUp 애니메이션 시간과 맞춰야 함
+        }, 800); // fadeOutUp 애니메이션 시간과 맞춰야 함
     };
 
     const handleSend = async () => {
@@ -82,13 +130,17 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
             return;
         }
 
-        const newMessages = [...messages, { id: Date.now(), sender: "user", text: input }];
+        const newMessages = [...messages, { id: Date.now(), sender: "user", text: input,time: formattedTime }];
         setMessages(newMessages);
         setInput("");
         setShowIntro(false);
         setIsSending(true);
+        setIsBotTyping(true);
+
+        setTimeout(() => setIsBotTyping(true), 1000);
 
         try {
+
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -100,20 +152,21 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
                 sender: "bot",
                 text: data.message || "답변을 불러오지 못했어요."
             };
-            const updated = [...newMessages, reply];
-            setMessages(updated);
+
+            await typeText(reply);
+
 
             const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
             const sessionIndex = stored.findIndex((s) => s.id === sessionId);
 
             if (sessionIndex !== -1) {
-                stored[sessionIndex].messages = updated;
+                stored[sessionIndex].messages = messages;
             } else {
                 stored.push({
                     id: sessionId,
                     title: newMessages[0]?.text?.slice(0, 30) || "New Chat",
                     createdAt: new Date(),
-                    messages: updated
+                    messages: messages
                 });
             }
 
@@ -121,6 +174,7 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {
+            setIsBotTyping(false);
             setIsSending(false);
         }
     };
@@ -161,9 +215,25 @@ export default function ChatWindow({ isGuest, newChatTrigger, selectedSessionId,
                         transition={{ duration: 1, ease: "easeInOut" }}
                         className={`${styles.messageBubble} ${msg.sender === "user" ? styles.userMessage : styles.botMessage}`}
                     >
-                        {msg.text}
+                        <div>{msg.text}</div>
+                        {msg.sender === "user" && msg.time && (
+                            <div className={styles.timeStamp}>{msg.time}</div>
+                        )}
                     </motion.div>
                 ))}
+                {isBotTyping && (
+                    <motion.div
+                        key="typing"
+                        className={`${styles.messageBubble} ${styles.botMessage}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 2 }}
+                    >
+                        {botTypingText
+                            ? botTypingText
+                            : `상담사가 입력 중입니다${typingDots}`} {/* 점 찍히는 중이면 이거 보여줌 */}
+                    </motion.div>
+                    )}
             </div>
 
 
