@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from openai import OpenAI
-from agents.counselor import CounselorAgent
+from .agents.counselor import CounselorAgent
 import datetime
 import logging
 

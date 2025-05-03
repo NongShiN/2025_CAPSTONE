@@ -11,7 +11,7 @@ mascc_instance = load_mascc()
 
 # ✅ 서버 부팅 시 더미 입력으로 모델 prewarm
 def prewarm_model():
-    dummy_input = "Hello, how can I help you?"
+    dummy_input = None
     try:
         _ = chat_with_mascc(dummy_input, mascc_instance)
         print("✅ 모델 prewarm 완료")

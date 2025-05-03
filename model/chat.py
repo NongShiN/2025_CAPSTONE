@@ -4,7 +4,7 @@ import logging
 import datetime
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
-from mascc import MASCC
+from .mascc import MASCC
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -44,6 +44,9 @@ def load_mascc():
 
 # ✅ mascc 인스턴스를 인자로 받는 버전
 def chat_with_mascc(user_input: str, mascc_instance, last_counselor: str = "Hello, how can I help you?") -> str:
+    if user_input == None:
+        return None
+    
     timestamp = datetime.datetime.now().isoformat()
 
     response = mascc_instance.generate(
