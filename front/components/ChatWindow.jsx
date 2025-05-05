@@ -22,7 +22,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
     const formattedTime = `${hours < 12 ? '오전' : '오후'} ${hours % 12 || 12}:${minutes.toString().padStart(2, '0')}`;
 
     const calcDelay = (char) => {
-        const base = 40;
+        const base = 30;
         const punctuationPause = /[.,!?]/.test(char) ? 100 : 0;
 
         return base + punctuationPause;
@@ -30,20 +30,25 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     const typeText = async (reply) => {
-        setTypingDots("");
         setBotTypingText("");
         setIsBotTyping(true);
 
-        const chars = reply.text.split(""); // 한 글자 단위 분리
-
+        const chars = reply.text.split("");
         for (let i = 0; i < chars.length; i++) {
             const char = chars[i];
             setBotTypingText((prev) => prev + char);
-            await sleep(calcDelay(char)); // 글자 길이 기반 속도 적용 가능
+            await sleep(calcDelay(char));
         }
 
-        setMessages((prev) => [...prev, reply]);
+        // 최종 메시지만 messages에 저장
+        const botMessage = {
+            id: Date.now(),
+            sender: "bot",
+            text: reply.text,
+        };
+        setMessages((prev) => [...prev, botMessage]);
         setIsBotTyping(false);
+        setBotTypingText(""); // 깔끔하게 정리
     };
 
     useEffect(() => {
@@ -122,51 +127,73 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
             setIntroVisible(false); // 0.5초 뒤에 실제로 IntroBox 제거
         }, 800); // fadeOutUp 애니메이션 시간과 맞춰야 함
     };
+    async function fetchTitleFromLLM(fullMessages) {
+        try {
+            const chatText = fullMessages
+                .map((m) => `${m.sender === "user" ? "사용자" : "상담사"}: ${m.text}`)
+                .join("\n");
 
-    const handleSend = async () => {
-        if (!input.trim()) return;
-        if (!sessionId) {
-            console.warn("❗ sessionId가 아직 null입니다. 저장 중단");
-            return;
+            const res = await fetch("/api/title", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: chatText }),
+            });
+
+            const data = await res.json();
+            return data.title;
+        } catch (e) {
+            console.error("제목 생성 실패:", e);
+            return "";
         }
+    }
+    const handleSend = async () => {
+        if (!input.trim() || !sessionId) return;
 
-        const newMessages = [...messages, { id: Date.now(), sender: "user", text: input,time: formattedTime }];
-        setMessages(newMessages);
+        const userMessage = {
+            id: Date.now(),
+            sender: "user",
+            text: input,
+            time: formattedTime,
+        };
+
+        setMessages((prev) => [...prev, userMessage]);
         setInput("");
+        setBotTypingText("");
+        setIsBotTyping(true);
         setShowIntro(false);
         setIsSending(true);
-        setIsBotTyping(true);
-
-        setTimeout(() => setIsBotTyping(true), 1000);
 
         try {
-
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: input })
+                body: JSON.stringify({ message: input }),
             });
+
             const data = await res.json();
-            const reply = {
+            const botMessage = {
                 id: Date.now() + 1,
                 sender: "bot",
-                text: data.message || "답변을 불러오지 못했어요."
+                text: data.message || "답변을 불러오지 못했어요.",
             };
 
-            await typeText(reply);
+            await typeText(botMessage);
+// 🔹 전체 메시지 모아주기
+            const updatedMessages = [...messages, userMessage, botMessage];
 
-
+// 🔹 제목 생성 요청
+            const generatedTitle = await fetchTitleFromLLM(updatedMessages);
             const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
             const sessionIndex = stored.findIndex((s) => s.id === sessionId);
 
             if (sessionIndex !== -1) {
-                stored[sessionIndex].messages = messages;
+                stored[sessionIndex].messages = updatedMessages;
             } else {
                 stored.push({
                     id: sessionId,
-                    title: newMessages[0]?.text?.slice(0, 30) || "New Chat",
+                    title: generatedTitle || userMessage.text.slice(0, 30) || "New Chat", // ✅ LLM 제목 사용
                     createdAt: new Date(),
-                    messages: messages
+                    messages: updatedMessages,
                 });
             }
 
@@ -207,35 +234,54 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
             </AnimatePresence>
 
             <div className={styles.messageList}>
-                {messages.map((msg) => (
-                    <motion.div
-                        key={msg.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: "easeInOut" }}
-                        className={`${styles.messageBubble} ${msg.sender === "user" ? styles.userMessage : styles.botMessage}`}
-                    >
-                        <div>{msg.text}</div>
-                        {msg.sender === "user" && msg.time && (
-                            <div className={styles.timeStamp}>{msg.time}</div>
-                        )}
-                    </motion.div>
-                ))}
-                {isBotTyping && (
+                {messages.map((msg) => {
+                    // 사용자 메시지는 무조건 보여주고, bot 메시지만 빈 텍스트 필터링
+                    if (msg.sender === "bot" && !msg.text?.trim()) return null;
+
+                    return (
+                        <motion.div
+                            key={msg.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 1, ease: "easeInOut" }}
+                            className={`${styles.messageBubble} ${
+                                msg.sender === "user" ? styles.userMessage : styles.botMessage
+                            }`}
+                        >
+                            <div>{msg.text || " "}</div>
+                            {msg.sender === "user" && msg.time && (
+                                <div className={styles.timeStamp}>{msg.time}</div>
+                            )}
+                        </motion.div>
+                    );
+                })}
+
+                {/* 상담사 입력 중 표시 */}
+                {isBotTyping && !botTypingText && (
                     <motion.div
                         key="typing"
                         className={`${styles.messageBubble} ${styles.botMessage}`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 2 }}
+                        transition={{ duration: 1.5 }}
                     >
-                        {botTypingText
-                            ? botTypingText
-                            : `상담사가 입력 중입니다${typingDots}`} {/* 점 찍히는 중이면 이거 보여줌 */}
+                        상담사가 입력 중입니다{typingDots}
                     </motion.div>
-                    )}
-            </div>
+                )}
 
+                {/* 답변 텍스트 점점 출력 */}
+                {isBotTyping && botTypingText && (
+                    <motion.div
+                        key="botReplyTyping"
+                        className={`${styles.messageBubble} ${styles.botMessage}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1 }}
+                    >
+                        {botTypingText}
+                    </motion.div>
+                )}
+            </div>
 
             <AnimatePresence>
                 {(messages.length > 0 || introClicked) && (

@@ -56,20 +56,22 @@ export default function CreatePost() {
     const handleSelectChat = (id) => {
         router.push(`/chat/${id}`)}
 
-    const handleSummarize = () => {
-        const userTexts = selectedMessages.filter(m => m.sender === "user").map(m => m.text);
-        const botTexts = selectedMessages.filter(m => m.sender === "bot").map(m => m.text);
-        const summary = botTexts.slice(-2).join(" ");
-        const titleText = userTexts[0]?.slice(0, 30) || "대화 요약";
-        setTitle(titleText);
-        setContent(summary);
-    };
+    const handleSummarize = async () => {
+        try {
+            const res = await fetch('/api/gemini/generate-post-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: selectedMessages })
+            });
 
-    const generateTags = () => {
-        const combinedText = selectedMessages.map(m => m.text).join(" ");
-        const keywords = ["GPT", "감정", "불안", "위로", "상담", "스트레스", "위기"];
-        const found = keywords.filter(k => combinedText.includes(k));
-        return found.length > 0 ? found : ["상담", "GPT"];
+            const data = await res.json();
+            setTitle(data.title || "제목 없음");
+            setContent(data.summary || "");
+            setTags(data.tag || "기타"); // 자동 태그 반영
+        } catch (err) {
+            console.error('요약 실패:', err);
+            alert("요약 생성에 실패했습니다.");
+        }
     };
 
     const handleSubmit = () => {
@@ -86,7 +88,7 @@ export default function CreatePost() {
             const updatedList = storedPosts.map(p => p.id === editingPostId ? updated : p);
             localStorage.setItem("posts", JSON.stringify(updatedList));
         } else {
-            const autoTags = tags.trim() === "" ? generateTags() : tags.split(",").map(t => t.trim());
+            const autoTags = tags.split(",").map(t => t.trim());
 
             const newPost = {
                 id: uuidv4(),
