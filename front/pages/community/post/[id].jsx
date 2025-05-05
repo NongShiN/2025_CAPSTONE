@@ -46,7 +46,7 @@ export default function PostDetailPage() {
         );
 
         localStorage.setItem("posts", JSON.stringify(updatedPosts));
-        setPost({ ...target, views: (target.views || 0) + 1 });
+        setPost(target); // 👈 여기서는 조회수 증가시키지 않음
     }, [router.isReady, id]);
 
     const getHotPosts = (posts) => {
