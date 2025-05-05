@@ -4,77 +4,83 @@ import com.capstone.dto.ModelRequestDTO;
 import com.capstone.dto.ModelResponseDTO;
 import com.capstone.dto.ChatHistoryDTO;
 import com.capstone.entity.ChatHistory;
+import com.capstone.entity.User;
 import com.capstone.repository.ChatHistoryRepository;
-import org.springframework.stereotype.Service;
+import com.capstone.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ModelService {
     private final ChatHistoryRepository chatHistoryRepository;
+    private final UserRepository userRepository;
+
+    public ChatHistory saveChatHistory(String userId, String message, String response) {
+        User user = userRepository.findById(Long.parseLong(userId))
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        ChatHistory chatHistory = ChatHistory.builder()
+                .user(user)
+                .message(message)
+                .response(response)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return chatHistoryRepository.save(chatHistory);
+    }
+
+    public List<ChatHistory> getChatHistory(String userId) {
+        return chatHistoryRepository.findByUser_IdOrderByTimestampDesc(Long.parseLong(userId));
+    }
 
     public ModelResponseDTO processChat(ModelRequestDTO request) {
-        try {
-            // Python 스크립트 실행
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                "python3",
-                "model/chat.py",
-                request.getMessage(),
-                request.getUserId()
-            );
-            
-            Process process = processBuilder.start();
-            
-            // 결과 읽기
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            List<String> output = new ArrayList<>();
-            
-            while ((line = reader.readLine()) != null) {
-                output.add(line);
-            }
-            
-            // 응답 생성
-            ModelResponseDTO response = new ModelResponseDTO();
-            if (output.size() >= 4) {
-                response.setResponse(output.get(0));
-                response.setInsight(output.get(1));
-                response.setCognitiveDistortion(output.get(2));
-                response.setSeverity(Integer.parseInt(output.get(3)));
-            }
-            
-            return response;
-        } catch (Exception e) {
-            throw new RuntimeException("Error processing chat request", e);
-        }
+        // TODO: 실제 모델 처리 로직 구현
+        return ModelResponseDTO.builder()
+                .response("Sample response")
+                .insight("Sample insight")
+                .cognitiveDistortion("Sample distortion")
+                .severity(1)
+                .build();
     }
 
     public void saveChatHistory(ChatHistoryDTO chatHistoryDTO) {
-        ChatHistory chatHistory = new ChatHistory();
-        chatHistory.setUserId(chatHistoryDTO.getUserId());
-        chatHistory.setMessage(chatHistoryDTO.getMessage());
-        chatHistory.setResponse(chatHistoryDTO.getResponse());
-        chatHistory.setTimestamp(LocalDateTime.now());
-        
+        User user = userRepository.findById(Long.parseLong(chatHistoryDTO.getUserId()))
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        ChatHistory chatHistory = ChatHistory.builder()
+                .user(user)
+                .message(chatHistoryDTO.getMessage())
+                .response(chatHistoryDTO.getResponse())
+                .timestamp(LocalDateTime.now())
+                .insight(chatHistoryDTO.getInsight())
+                .cognitiveDistortion(chatHistoryDTO.getCognitiveDistortion())
+                .severity(chatHistoryDTO.getSeverity())
+                .build();
+
         chatHistoryRepository.save(chatHistory);
     }
 
     public List<ChatHistoryDTO> loadChatHistory(String userId) {
-        List<ChatHistory> histories = chatHistoryRepository.findByUserIdOrderByTimestampAsc(userId);
-        return histories.stream()
-            .map(history -> {
-                ChatHistoryDTO dto = new ChatHistoryDTO();
-                dto.setUserId(history.getUserId());
-                dto.setMessage(history.getMessage());
-                dto.setResponse(history.getResponse());
-                dto.setTimestamp(history.getTimestamp());
-                return dto;
-            })
-            .toList();
+        User user = userRepository.findById(Long.parseLong(userId))
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        return chatHistoryRepository.findByUser_IdOrderByTimestampDesc(user.getId()).stream()
+                .map(history -> ChatHistoryDTO.builder()
+                        .userId(history.getUser().getId().toString())
+                        .message(history.getMessage())
+                        .response(history.getResponse())
+                        .timestamp(history.getTimestamp())
+                        .insight(history.getInsight())
+                        .cognitiveDistortion(history.getCognitiveDistortion())
+                        .severity(history.getSeverity())
+                        .build())
+                .collect(Collectors.toList());
     }
 } 
