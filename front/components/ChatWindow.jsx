@@ -22,7 +22,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
     const formattedTime = `${hours < 12 ? '오전' : '오후'} ${hours % 12 || 12}:${minutes.toString().padStart(2, '0')}`;
 
     const calcDelay = (char) => {
-        const base = 40;
+        const base = 30;
         const punctuationPause = /[.,!?]/.test(char) ? 100 : 0;
 
         return base + punctuationPause;
@@ -127,7 +127,25 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
             setIntroVisible(false); // 0.5초 뒤에 실제로 IntroBox 제거
         }, 800); // fadeOutUp 애니메이션 시간과 맞춰야 함
     };
+    async function fetchTitleFromLLM(fullMessages) {
+        try {
+            const chatText = fullMessages
+                .map((m) => `${m.sender === "user" ? "사용자" : "상담사"}: ${m.text}`)
+                .join("\n");
 
+            const res = await fetch("/api/title", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: chatText }),
+            });
+
+            const data = await res.json();
+            return data.title;
+        } catch (e) {
+            console.error("제목 생성 실패:", e);
+            return "";
+        }
+    }
     const handleSend = async () => {
         if (!input.trim() || !sessionId) return;
 
@@ -160,17 +178,20 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
             };
 
             await typeText(botMessage);
+// 🔹 전체 메시지 모아주기
+            const updatedMessages = [...messages, userMessage, botMessage];
 
+// 🔹 제목 생성 요청
+            const generatedTitle = await fetchTitleFromLLM(updatedMessages);
             const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
             const sessionIndex = stored.findIndex((s) => s.id === sessionId);
-            const updatedMessages = [...messages, userMessage, botMessage];
 
             if (sessionIndex !== -1) {
                 stored[sessionIndex].messages = updatedMessages;
             } else {
                 stored.push({
                     id: sessionId,
-                    title: userMessage.text.slice(0, 30) || "New Chat",
+                    title: generatedTitle || userMessage.text.slice(0, 30) || "New Chat", // ✅ LLM 제목 사용
                     createdAt: new Date(),
                     messages: updatedMessages,
                 });
@@ -242,7 +263,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
                         className={`${styles.messageBubble} ${styles.botMessage}`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 1.5 }}
                     >
                         상담사가 입력 중입니다{typingDots}
                     </motion.div>

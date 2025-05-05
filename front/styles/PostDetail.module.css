@@ -319,3 +319,7 @@
 .editCommentBox button:hover {
     background: #4346e0;
 }
+
+.postBody {
+    white-space: pre-wrap;
+}

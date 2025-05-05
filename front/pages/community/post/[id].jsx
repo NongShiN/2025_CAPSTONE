@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../../../styles/PostDetail.module.css";
 import { v4 as uuidv4 } from "uuid";
+import { useRef } from "react";
 
 export default function PostDetailPage() {
     const [post, setPost] = useState(null);
@@ -12,7 +13,7 @@ export default function PostDetailPage() {
     const [theme, setTheme] = useState(null);
     const [storedPosts, setStoredPosts] = useState([]);
     const [user, setUser] = useState(null);
-
+    const hasUpdated = useRef(false);
     // 댓글 상태
     const [commentInput, setCommentInput] = useState("");
     const [editingCommentId, setEditingCommentId] = useState(null);
@@ -28,7 +29,7 @@ export default function PostDetailPage() {
     }, []);
 
     useEffect(() => {
-        if (!router.isReady) return;
+        if (!router.isReady || hasUpdated.current) return;
 
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
@@ -44,9 +45,10 @@ export default function PostDetailPage() {
         const updatedPosts = storedPosts.map((p) =>
             p.id === id ? { ...p, views: (p.views || 0) + 1 } : p
         );
-
         localStorage.setItem("posts", JSON.stringify(updatedPosts));
-        setPost(target); // 👈 여기서는 조회수 증가시키지 않음
+        setPost({ ...target, views: (target.views || 0) + 1 });
+
+        hasUpdated.current = true; // ✅ 더 이상 실행되지 않도록 설정
     }, [router.isReady, id]);
 
     const getHotPosts = (posts) => {
