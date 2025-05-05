@@ -18,9 +18,7 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                 setSessionId(found.id);
             } else {
                 setMessages([]);
-
                 setSessionId(selectedSessionId);
-
             }
             setShowIntro(true);
         }
@@ -81,14 +79,11 @@ export default function ChatWindow({ selectedSessionId, newChatTrigger }) {
                     createdAt: new Date(),
                     messages: updated
                 });
-
             }
 
             localStorage.setItem("chatSessions", JSON.stringify(stored));
         } catch (e) {
-
             console.error("메시지 저장 중 오류:", e);
-
         } finally {
             setIsSending(false);
         }

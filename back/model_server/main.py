@@ -20,3 +20,4 @@ def generate(user_input: str = Query(...)):
         return {"response": result}
     except Exception as e:
         return {"error": str(e)}
+

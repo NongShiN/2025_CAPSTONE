@@ -5,10 +5,19 @@
     padding: 16px;
     gap: 16px;
     width: 100%;
-    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
     box-sizing: border-box;
 }
+.blueTheme {
+    background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+}
 
+.purpleTheme {
+    background: linear-gradient(to right, #d4aaff, #c2c2ff);
+}
+
+.pinkTheme {
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+}
 .sidebarWrapper {
     margin: 0;
     height: 100%;
@@ -17,11 +26,12 @@
 
 .mainContent {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
     padding: 1.5rem;
     box-sizing: border-box;
     height: auto;
     max-height: 100%;
+
 }
 
 .container {
@@ -73,13 +83,19 @@
     flex-direction: column;
 }
 
-.input, .textarea {
+.input{
     padding: 0.75rem;
     border-radius: 0.5rem;
     border: 1px solid #ccc;
     font-size: 1rem;
 }
-
+.textarea {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    height: 150px;
+}
 .label {
     font-weight: 600;
     margin-bottom: 0.25rem;

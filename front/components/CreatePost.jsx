@@ -11,7 +11,7 @@ export default function CreatePost() {
     const [content, setContent] = useState("");
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingPostId, setEditingPostId] = useState(null);
-
+    const [theme, setTheme] = useState(null);
     const [chatSessions, setChatSessions] = useState([]);
     const [selectedSessionId, setSelectedSessionId] = useState("");
     const [selectedMessages, setSelectedMessages] = useState([]);
@@ -21,7 +21,10 @@ export default function CreatePost() {
         const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
         const chats = JSON.parse(localStorage.getItem("chatSessions") || "[]");
         setChatSessions(chats);
-
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser) {
+            setTheme(storedUser.theme || "blue");
+        }
         if (id) {
             const target = storedPosts.find(p => String(p.id) === id);
             if (target) {
@@ -62,7 +65,7 @@ export default function CreatePost() {
 
     const handleSubmit = () => {
         const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-
+        const storedUser = JSON.parse(localStorage.getItem("user"));
         if (isEditMode) {
             const existing = storedPosts.find(p => p.id === editingPostId);
             const updated = {
@@ -86,7 +89,8 @@ export default function CreatePost() {
                 views: 0,
                 comments: 0,
                 liked: false,
-                author: "anonym",
+                saveauthor: storedUser.email || "anonym",
+                author: "익명",
                 timeAgo: "방금 전",
             };
             localStorage.setItem("posts", JSON.stringify([...storedPosts, newPost]));
@@ -94,8 +98,9 @@ export default function CreatePost() {
 
         router.push("/community");
     };
-
+    if (!theme) return null;
     return (
+        <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
         <div className={styles.createPostPage}>
             <Sidebar />
             <main className={styles.mainContent}>
@@ -165,6 +170,7 @@ export default function CreatePost() {
                     </div>
                 </div>
             </main>
+        </div>
         </div>
     );
 }

@@ -1,0 +1,330 @@
+{
+  "Guided Discovery": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Explore client’s automatic thoughts through open-ended questions."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Identify underlying assumptions and beliefs."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Guide client to alternative explanations and balanced thinking."
+      }
+    ],
+    "example": "Client: 'Nobody likes me.'\nCounselor: 'What makes you think that?'\nClient: 'People often ignore me at work.'\nCounselor: 'Can you think of a recent example?'\nClient: 'Yesterday, no one responded when I said good morning.'\nCounselor: 'Is it possible they didn’t hear you or were distracted?'"
+  },
+  "Efficiency Evaluation": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Record time and energy spent on daily tasks."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Identify areas of inefficiency or overcommitment."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Optimize schedule by prioritizing high-value activities."
+      }
+    ],
+    "example": "Counselor: 'You mentioned feeling exhausted. Let's look at how your time is distributed during the week.'"
+  },
+  "Pie Chart Technique": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "List factors contributing to a belief or concern."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Assign percentage values to each factor in a pie chart."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Discuss and challenge weight given to each factor."
+      }
+    ],
+    "example": "Counselor: 'You feel worthless. Let's break down where that belief comes from using a pie chart.'"
+  },
+  "Alternative Perspective": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Help client identify the rigid thought."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Ask the client to adopt a third-person view or imagine giving advice to a friend."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Encourage balanced re-evaluation."
+      }
+    ],
+    "example": "Counselor: 'If a friend were in your shoes, would you tell them the same negative conclusion you're telling yourself?'"
+  },
+  "Decatastrophizing": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Define the feared event clearly."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Estimate the likelihood of the worst-case scenario."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Plan responses and explore best-case and realistic outcomes."
+      }
+    ],
+    "example": "Client: 'If I fail this test, my life is over.'\nCounselor: 'Let’s talk through what failure would actually mean.'"
+  },
+  "Scaling Questions": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Rate feelings or beliefs on a scale from 0 to 10."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Explore what would shift rating by one or two points."
+      }
+    ],
+    "example": "Counselor: 'On a scale from 1 to 10, how anxious are you right now? What would make it a 5 instead of a 7?'"
+  },
+  "Socratic Questioning": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Clarify client’s belief or statement."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Examine evidence for and against the belief."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Explore implications and alternatives."
+      },
+      {
+        "stage": "Stage 4",
+        "description": "Encourage more balanced thinking."
+      }
+    ],
+    "example": "Client: 'I’m a complete failure.'\nCounselor: 'What makes you say that?'\nClient: 'I was rejected from a job again.'\nCounselor: 'Does one rejection mean you're a failure at everything?'\nClient: 'No, but it feels that way.'\nCounselor: 'What would you tell a friend who said this about themselves?'"
+  },
+  "Pros and Cons Analysis": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "List advantages and disadvantages of a specific thought or behavior."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Evaluate long-term and short-term consequences."
+      }
+    ],
+    "example": "Counselor: 'What are the benefits and costs of avoiding this situation?'"
+  },
+  "Thought Experiment": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Ask client to imagine a hypothetical situation where their belief is tested."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Discuss likely outcomes of the imagined event."
+      }
+    ],
+    "example": "Counselor: 'Imagine you give a presentation and people don’t clap. What would that mean to you?'"
+  },
+  "Evidence-Based Questioning": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Identify the belief or assumption."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Find factual support and contradictions."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Reframe based on evidence."
+      }
+    ],
+    "example": "Counselor: 'What real evidence supports the idea that you’re incompetent? What contradicts it?'"
+  },
+  "Reality Testing": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Identify the belief that needs testing."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Compare belief with factual evidence."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Adjust belief to better match reality."
+      }
+    ],
+    "example": "Counselor: 'Let’s test the idea that your coworkers dislike you. What evidence supports that?'"
+  },
+  "Continuum Technique": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Ask client to place themselves on a scale regarding their concern."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Discuss why they chose that rating and how it might change."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Explore grey areas instead of black-and-white thinking."
+      }
+    ],
+    "example": "Counselor: 'Instead of saying you're a complete failure, where would you rate yourself from 0 to 100?'"
+  },
+  "Changing Rules to Wishes": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Identify rigid 'should', 'must', or 'ought to' beliefs."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Reframe beliefs into flexible preferences or wishes."
+      }
+    ],
+    "example": "Counselor: 'You say, 'I must succeed.' How would it sound if we changed it to 'I’d like to succeed'?'"
+  },
+  "Activity Scheduling": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Brainstorm enjoyable and meaningful activities."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Create a daily or weekly activity plan."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Review impact of activities on mood and behavior."
+      }
+    ],
+    "example": "Counselor: 'Let’s schedule at least one pleasant activity each day and track how you feel after.'"
+  },
+  "Problem-Solving Skills Training": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Clearly define the problem."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Generate multiple solutions."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Evaluate pros/cons and choose a solution."
+      },
+      {
+        "stage": "Stage 4",
+        "description": "Implement and review results."
+      }
+    ],
+    "example": "Client: 'I’m overwhelmed with my job.'\nCounselor: 'What’s the core problem?'\nClient: 'I can’t keep up with emails.'\nCounselor: 'Let’s brainstorm possible ways to manage your inbox more efficiently.'"
+  },
+  "Self-Assertiveness Training": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Understand situations where assertiveness is lacking."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Learn differences between passive, assertive, and aggressive behavior."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Practice assertive statements."
+      }
+    ],
+    "example": "Counselor: 'When someone disagrees with you, how do you typically respond? Let’s explore an assertive response.'"
+  },
+  "Role-playing and Simulation": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Set the scene and roles for simulation."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Act out the scenario with guidance."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Reflect on performance and emotions."
+      }
+    ],
+    "example": "Client: 'I’m afraid to confront my roommate about the noise.'\nCounselor: 'Let’s role-play that conversation. I’ll be your roommate.'\nClient: 'Okay. Hey, I wanted to talk about the volume last night...'\nCounselor: 'How did that feel? Want to try rephrasing anything?'"
+  },
+  "Practice of Assertive Conversation Skills": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Introduce assertive communication techniques (e.g. 'I' statements)."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Practice in real or imagined interactions."
+      }
+    ],
+    "example": "Counselor: 'Try saying: I feel overwhelmed when I get too many tasks without notice.'"
+  },
+  "Systematic Exposure": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Create a hierarchy of feared situations."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Start with low-anxiety situations and gradually face them."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Repeat exposures until anxiety reduces."
+      }
+    ],
+    "example": "Client: 'I panic in crowded places.'\nCounselor: 'Let’s start small. What’s a manageable first step?'\nClient: 'Maybe going into a small café.'\nCounselor: 'Perfect. Let’s try that, then work up to bigger locations.'"
+  },
+  "Safety Behaviors Elimination": {
+    "stages": [
+      {
+        "stage": "Stage 1",
+        "description": "Identify safety behaviors that prevent full exposure."
+      },
+      {
+        "stage": "Stage 2",
+        "description": "Test eliminating or reducing safety behaviors in situations."
+      },
+      {
+        "stage": "Stage 3",
+        "description": "Evaluate impact on anxiety and confidence."
+      }
+    ],
+    "example": "Counselor: 'Instead of bringing your phone as a distraction, let’s try entering the room without it.'"
+  }
+}
