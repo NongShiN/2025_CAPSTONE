@@ -14,6 +14,7 @@ export default function PostDetailPage() {
     const [storedPosts, setStoredPosts] = useState([]);
     const [user, setUser] = useState(null);
     const hasUpdated = useRef(false);
+
     // 댓글 상태
     const [commentInput, setCommentInput] = useState("");
     const [editingCommentId, setEditingCommentId] = useState(null);
@@ -29,7 +30,7 @@ export default function PostDetailPage() {
     }, []);
 
     useEffect(() => {
-        if (!router.isReady || hasUpdated.current) return;
+        if (!router.isReady || !id) return;
 
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
@@ -42,14 +43,17 @@ export default function PostDetailPage() {
         const target = storedPosts.find((p) => p.id === id);
         if (!target) return;
 
-        const updatedPosts = storedPosts.map((p) =>
-            p.id === id ? { ...p, views: (p.views || 0) + 1 } : p
-        );
-        localStorage.setItem("posts", JSON.stringify(updatedPosts));
-        setPost({ ...target, views: (target.views || 0) + 1 });
+        // ✅ setTimeout으로 React Strict Mode의 useEffect 2번 실행 방지
+        const timeout = setTimeout(() => {
+            const updatedPosts = storedPosts.map((p) =>
+                p.id === id ? { ...p, views: (p.views || 0) + 1 } : p
+            );
+            localStorage.setItem("posts", JSON.stringify(updatedPosts));
+            setPost({ ...target, views: (target.views || 0) + 1 });
+        }, 50); // 아주 짧게 지연
 
-        hasUpdated.current = true; // ✅ 더 이상 실행되지 않도록 설정
-    }, [router.isReady, id]);
+        return () => clearTimeout(timeout); // cleanup
+    }, [id, router.isReady]);
 
     const getHotPosts = (posts) => {
         const now = Date.now();
