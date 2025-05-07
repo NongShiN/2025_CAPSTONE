@@ -70,16 +70,13 @@ export default function CommunityPage() {
                 createdAt: finalCreatedAt,
             };
         });
-
-        const hotPosts = corrected
+        return corrected
             .filter((post) => {
                 const diffInSeconds = Math.floor((now - post.createdAt) / 1000);
                 return typeof post.createdAt === "number" && diffInSeconds <= 60 * 60 * 24 * 7;
             })
             .sort((a, b) => b.likes - a.likes)
             .slice(0, 3);
-
-        return hotPosts;
     };
 
     if (!theme) return null;
