@@ -29,26 +29,37 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
     };
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    const typeText = async (reply) => {
+    const typeText = async (fullReplyText) => {
         setBotTypingText("");
         setIsBotTyping(true);
 
-        const chars = reply.text.split("");
-        for (let i = 0; i < chars.length; i++) {
-            const char = chars[i];
-            setBotTypingText((prev) => prev + char);
-            await sleep(calcDelay(char));
+        const sentences = fullReplyText.split(/(?<=[.!?])\s+/); // 문장 단위 분리
+
+        for (let i = 0; i < sentences.length; i++) {
+            const sentence = sentences[i].trim();
+            if (!sentence) continue;
+
+            const chars = sentence.split("");
+            let rendered = "";
+
+            for (let j = 0; j < chars.length; j++) {
+                rendered += chars[j];
+                setBotTypingText(rendered);
+                await sleep(calcDelay(chars[j]));
+            }
+
+            // 말풍선 추가
+            const botMessage = {
+                id: Date.now() + i,
+                sender: "bot",
+                text: sentence,
+            };
+            setMessages((prev) => [...prev, botMessage]);
+            setBotTypingText("");
+            await sleep(300); // 문장 간 딜레이
         }
 
-        // 최종 메시지만 messages에 저장
-        const botMessage = {
-            id: Date.now(),
-            sender: "bot",
-            text: reply.text,
-        };
-        setMessages((prev) => [...prev, botMessage]);
         setIsBotTyping(false);
-        setBotTypingText(""); // 깔끔하게 정리
     };
 
     useEffect(() => {
@@ -171,21 +182,29 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
             });
 
             const data = await res.json();
-            const botMessage = {
-                id: Date.now() + 1,
-                sender: "bot",
-                text: data.message || "답변을 불러오지 못했어요.",
-            };
+            const replyText = data.message || "답변을 불러오지 못했어요.";
 
-            await typeText(botMessage);
-// 🔹 전체 메시지 모아주기
-            const updatedMessages = [...messages, userMessage, botMessage];
+            await typeText(replyText);
 
-// 🔹 제목 생성 요청
-            const generatedTitle = await fetchTitleFromLLM(updatedMessages);
+            const botMessages = replyText
+                .split(/(?<=[.!?])\s+/)
+                .filter(Boolean)
+                .map((text, i) => ({
+                    id: Date.now() + i + 1,
+                    sender: "bot",
+                    text: text.trim(),
+                }));
+
             const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
             const sessionIndex = stored.findIndex((s) => s.id === sessionId);
-
+            const allMessages = [...messages, userMessage, botMessages];
+            // 현재 대화 내역 가져오기
+            const updatedMessages = [...messages, userMessage, ...replyText.split(/(?<=[.!?])\s+/).filter(Boolean).map((text, i) => ({
+                id: Date.now() + i + 1,
+                sender: "bot",
+                text: text.trim(),
+            }))];
+            const generatedTitle = await fetchTitleFromLLM(allMessages);
             if (sessionIndex !== -1) {
                 stored[sessionIndex].messages = updatedMessages;
             } else {
@@ -205,6 +224,7 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
             setIsSending(false);
         }
     };
+
 
     if (!sessionId) return <div className={styles.chatContainer}>채팅 세션을 초기화 중입니다...</div>;
 
@@ -241,8 +261,8 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
                     return (
                         <motion.div
                             key={msg.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: 1 }}
                             transition={{ duration: 1, ease: "easeInOut" }}
                             className={`${styles.messageBubble} ${
                                 msg.sender === "user" ? styles.userMessage : styles.botMessage

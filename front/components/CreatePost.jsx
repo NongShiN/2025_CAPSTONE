@@ -16,6 +16,7 @@ export default function CreatePost() {
     const [selectedSessionId, setSelectedSessionId] = useState("");
     const [selectedMessages, setSelectedMessages] = useState([]);
     const [isNewChat, setIsNewChat] = useState(false);
+    const [isSummarizing, setIsSummarizing] = useState(false);
 
     useEffect(() => {
         const id = localStorage.getItem("editingPostId");
@@ -57,6 +58,10 @@ export default function CreatePost() {
         router.push(`/chat/${id}`)}
 
     const handleSummarize = async () => {
+        if (!selectedSessionId || selectedMessages.length === 0) return;
+
+        setIsSummarizing(true); // ✅ 생성중 상태 ON
+
         try {
             const res = await fetch('/api/gemini/generate-post-summary', {
                 method: 'POST',
@@ -71,6 +76,8 @@ export default function CreatePost() {
         } catch (err) {
             console.error('요약 실패:', err);
             alert("요약 생성에 실패했습니다.");
+        } finally {
+            setIsSummarizing(false); // ✅ 완료 후 상태 OFF
         }
     };
 
@@ -119,30 +126,57 @@ export default function CreatePost() {
                 theme={theme}
                  />
             <main className={styles.mainContent}>
+                <div className={styles.scrollWrapper}>
                 <div className={styles.container}>
-                    <h2 className={styles.heading}>{isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}</h2>
+                    <h2 className={styles.heading}>
+                        {isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}
+                    </h2>
 
-                    <label className={styles.label}>🧠 대화 선택</label>
-                    <select
-                        className={styles.select}
-                        value={selectedSessionId || ""}
-                        onChange={(e) => setSelectedSessionId(e.target.value)}
-                    >
-                        <option value="">대화를 선택하세요</option>
-                        {chatSessions.map((s) => (
-                            <option key={s.id} value={s.id}>{s.title}</option>
-                        ))}
-                    </select>
+                    {/* 🔧 여기 flex 줄로 감쌈 */}
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", marginBottom: "12px" }}>
+                        <div style={{ flex: 1 }}>
+                            <label className={styles.label}>🧠 대화 선택</label>
+                            <select
+                                className={styles.select}
+                                value={selectedSessionId || ""}
+                                onChange={(e) => setSelectedSessionId(e.target.value)}
+                            >
+                                <option value="">대화를 선택하세요</option>
+                                {chatSessions.map((s) => (
+                                    <option key={s.id} value={s.id}>{s.title}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button
+                            className={styles.summarizeBtn}
+                            onClick={handleSummarize}
+                            disabled={!selectedSessionId || selectedMessages.length === 0}
+                            style={{
+                                height: "38px", // 드롭다운과 동일하게 맞춤
+                                alignSelf: "flex-end", // flex 정렬이 밀릴 때 아래로 붙게
+                                marginBottom: "5px",  // 라벨과 버튼 높이 맞추기
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {isSummarizing ? (
+                                <div className={styles.spinner}></div>
+                            ) : (
+                                "요약하여 제목/본문 넣기"
+                            )}
+                        </button>
+                    </div>
 
                     {selectedMessages.length > 0 && (
                         <div className={styles.chatPreview}>
                             <h4>💬 대화 미리보기</h4>
                             <div className={styles.chatBox}>
                                 {selectedMessages.map((m, idx) => (
-                                    <div key={idx}><b>{m.sender === "user" ? "🙋" : "🤖"}</b> {m.text}</div>
+                                    <div key={idx}>
+                                        <b>{m.sender === "user" ? "🙋" : "🤖"}</b> {m.text}
+                                    </div>
                                 ))}
                             </div>
-                            <button className={styles.summarizeBtn} onClick={handleSummarize}>📝 요약해서 제목/본문에 넣기</button>
                         </div>
                     )}
 
@@ -183,6 +217,7 @@ export default function CreatePost() {
                             취소
                         </button>
                     </div>
+                </div>
                 </div>
             </main>
         </div>

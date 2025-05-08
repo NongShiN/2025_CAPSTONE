@@ -70,16 +70,13 @@ export default function CommunityPage() {
                 createdAt: finalCreatedAt,
             };
         });
-
-        const hotPosts = corrected
+        return corrected
             .filter((post) => {
                 const diffInSeconds = Math.floor((now - post.createdAt) / 1000);
                 return typeof post.createdAt === "number" && diffInSeconds <= 60 * 60 * 24 * 7;
             })
             .sort((a, b) => b.likes - a.likes)
             .slice(0, 3);
-
-        return hotPosts;
     };
 
     if (!theme) return null;
@@ -163,15 +160,9 @@ export default function CommunityPage() {
                 <div className={styles.sectionBox}>
                     <h4>💖 Introduce Our Supervisors</h4>
                     <ul className={styles.sideList}>
-                        <li onClick={() => router.push("/supervisors")}>
-                            ACT - Accept pain, commit to meaningful life.
-                        </li>
-                        <li onClick={() => router.push("/supervisors")}>
-                            CBT - Change your thoughts, change your life.
-                        </li>
-                        <li onClick={() => router.push("/supervisors")}>
-                            IPT - Heal emotions through better relationships.
-                        </li>
+                        <li>ACT - Accept pain, commit to meaningful life.</li>
+                        <li>CBT - Change your thoughts, change your life.</li>
+                        <li>IPT - Heal emotions through better relationships.</li>
                     </ul>
                 </div>
             </aside>
