@@ -21,7 +21,7 @@ ${chatText}
 - 문체는 부드러운 구어체이며, 분석적 표현은 피해주세요.
 - 감정을 솔직하게 드러내되, 부담스럽지 않게 공감 가는 어조로 작성해주세요.
 - 문단을 나눠 가독성을 높여주세요.
-3. **태그**: 다음 중 하나만 선택해주세요 - \`["우울", "불안", "자존감", "대인관계", "진로", "기타"]\`
+3. **태그**: 다음 중 하나만 선택해주세요 - \`["우울", "불안", "자존감", "대인관계", "진로"]\`
 **결과는 아래 형식의 정확한 JSON 형태로 출력해주세요 (백틱 없이):**
 \`\`\`json
 "title": "제목",
@@ -32,7 +32,7 @@ ${chatText}
         // OpenAI API 호출
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo", // 또는 gpt-3.5-turbo 등 원하는 모델
+            model: "gpt-4o-mini", // 또는 gpt-3.5-turbo 등 원하는 모델
             messages: [
                 { role: "system", content: "You are a helpful assistant." },
                 { role: "user", content: prompt }
@@ -40,16 +40,18 @@ ${chatText}
             temperature: 0.7,
         });
 
-        const text = completion.choices[0]?.message?.content || "";
-        // 백틱 및 코드블록 제거
-        const cleanedText = text.replace(/``````/g, "").trim();
+        const raw = completion.choices[0]?.message?.content?.trim() || "";
+
+        // 코드블록 안의 JSON 추출
+        const jsonMatch = raw.match(/```json([\s\S]*?)```/) || raw.match(/({[\s\S]*})/);
+        const jsonText = jsonMatch ? jsonMatch[1].trim() : raw;
 
         try {
-            const parsed = JSON.parse(cleanedText);
+            const parsed = JSON.parse(jsonText);
             return res.status(200).json(parsed);
         } catch (error) {
-            console.error("❌ JSON 파싱 실패:", cleanedText);
-            return res.status(500).json({ error: "응답 파싱 실패", raw: cleanedText });
+            console.error("❌ JSON 파싱 실패:", jsonText);
+            return res.status(500).json({ error: "응답 파싱 실패", raw: jsonText });
         }
     } catch (error) {
         console.error("❌ OpenAI API 처리 중 오류:", error);

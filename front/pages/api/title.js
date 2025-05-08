@@ -13,6 +13,14 @@ export default async function handler(req, res) {
     }
 
     try {
+        // 대화 분리: 한 줄씩 자르고, '🤖 상담사'로 시작하는 첫 줄을 제거
+        const lines = content.trim().split("\n");
+
+        // 첫 번째 챗봇 메시지 찾기
+        const firstBotIndex = lines.findIndex(line => line.startsWith("🤖 상담사:"));
+        const cleanedLines = firstBotIndex !== -1 ? lines.slice(firstBotIndex + 1) : lines;
+
+        const cleanedContent = cleanedLines.join("\n");
         const openai = new OpenAI({
             apiKey: process.env.OPENAI_API_KEY,
         });
@@ -26,7 +34,7 @@ ${content}
 `;
 
         const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
+            model: "gpt-4o-mini",
             messages: [
                 {
                     role: "system",
