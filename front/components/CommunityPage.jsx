@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../styles/CommunityPage.module.css";
+import { v4 as uuidv4 } from "uuid";
 
 export default function CommunityPage() {
     const [isGuest, setIsGuest] = useState(false);
@@ -9,7 +10,12 @@ export default function CommunityPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const router = useRouter();
     const [theme, setTheme] = useState(null);
+    const [storedPosts, setStoredPosts] = useState([]);
 
+    useEffect(() => {
+        const posts = JSON.parse(localStorage.getItem("posts")) || [];
+        setStoredPosts(posts);
+    }, []);
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         setIsGuest(!!storedUser?.guest);
@@ -24,7 +30,18 @@ export default function CommunityPage() {
         }));
         setPosts(mapped);
     }, []);
+    const [newChatTrigger, setNewChatTrigger] = useState(0);
+    const [refreshSessionList, setRefreshSessionList] = useState(0);
+    const handleSelectChat = (sessionId) => {
+        router.push(`/chat/${sessionId}`); // ✅ 기존 세션으로 이동
+    };
 
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        router.push(`/chat/${newId}`);
+        setNewChatTrigger(prev => prev + 1);
+        setRefreshSessionList(prev => prev + 1);
+    };
     const formatTimeAgo = (timestamp) => {
         const now = Date.now();
         const diff = Math.floor((now - timestamp) / 1000);
@@ -41,10 +58,38 @@ export default function CommunityPage() {
             (post.tags || []).some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
         )
         .sort((a, b) => b.createdAt - a.createdAt);
+
+    const getHotPosts = (posts) => {
+        const now = Date.now();
+
+        const corrected = posts.map((post) => {
+            const isTooFar = typeof post.createdAt === "number" && post.createdAt - now > 86400000;
+            const finalCreatedAt = isTooFar ? now - 5 * 60 * 1000 : post.createdAt;
+            return {
+                ...post,
+                createdAt: finalCreatedAt,
+            };
+        });
+        return corrected
+            .filter((post) => {
+                const diffInSeconds = Math.floor((now - post.createdAt) / 1000);
+                return typeof post.createdAt === "number" && diffInSeconds <= 60 * 60 * 24 * 7;
+            })
+            .sort((a, b) => b.likes - a.likes)
+            .slice(0, 3);
+    };
+
     if (!theme) return null;
     return (
         <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
-            <Sidebar isGuest={isGuest} />
+            <Sidebar
+                isGuest={isGuest}
+                onSelectChat={handleSelectChat}
+                onNewChat={handleNewChat}
+                newChatTrigger={newChatTrigger}
+                refreshSessionList={refreshSessionList}
+                theme={theme}
+            />
             <main className={styles.mainContent}>
                 <div className={styles.topBarWrapper}>
                     <div className={styles.inputSearchBox}>
@@ -89,7 +134,7 @@ export default function CommunityPage() {
                                         ))}
                                     </div>
                                     <div className={styles.postMeta}>{post.author} • {formatTimeAgo(post.createdAt)}</div>
-                                    <div className={styles.postStats}>{post.views?.toLocaleString()} views • {post.likes?.toLocaleString()} likes • {post.comments} comments</div>
+                                    <div className={styles.postStats}> {post.likes?.toLocaleString()} BPM • {post.views?.toLocaleString()} views • {Array.isArray(post.comments) ? post.comments.length : 0} comments</div>
                                 </div>
                             </div>
                         </div>
@@ -101,9 +146,15 @@ export default function CommunityPage() {
                 <div className={styles.sectionBox}>
                     <h4>🔥 Hot Post</h4>
                     <ul className={styles.sideList}>
-                        <li>Scaling a Business Amidst Tragedy</li>
-                        <li>Mental Health as a Founder</li>
-                        <li>Growing to $5k MRR in 1 year</li>
+                        {storedPosts.length > 0 && getHotPosts(storedPosts).map((post) => (
+                            <li
+                                key={post.id}
+                                onClick={() => router.push(`/community/post/${post.id}`)}
+                                className={styles.clickableListItem}
+                            >
+                                {post.title}
+                            </li>
+                        ))}
                     </ul>
                 </div>
                 <div className={styles.sectionBox}>

@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from openai import OpenAI
-from agents.counselor import CounselorAgent
+from .agents.counselor import CounselorAgent
 import datetime
 import logging
 
@@ -35,10 +35,10 @@ class MASCC:
     #        self.counselor[user_id] = CounselorAgent(args, llm, retriever)
     #        return self.counselor[user_id]
 
-    def generate(self, args, counselor_utterance, client_utterance, timestamp):
+    def generate(self, args, client_utterance, timestamp):
         logging.info("Running single-turn interaction.")
         # return self.getCounselor(user_id=user_id).generate_response(args, counselor_utterance, client_utterance, timestamp)
-        return self.counselor.generate_response(args, counselor_utterance, client_utterance, timestamp)
+        return self.counselor.generate_response(args, client_utterance, timestamp)
 
 if __name__ == "__main__":
     from sentence_transformers import SentenceTransformer
@@ -60,6 +60,6 @@ if __name__ == "__main__":
     client_utterance = "I feel like no matter what I do, it's never enough."
     timestamp = datetime.datetime.now().isoformat()
     
-    response = mascc.generate(args, counselor_utterance, client_utterance, timestamp)
+    response = mascc.generate(args, client_utterance, timestamp)
     print("\n[Counselor Response]:")
     print(response)

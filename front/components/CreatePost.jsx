@@ -15,6 +15,8 @@ export default function CreatePost() {
     const [chatSessions, setChatSessions] = useState([]);
     const [selectedSessionId, setSelectedSessionId] = useState("");
     const [selectedMessages, setSelectedMessages] = useState([]);
+    const [isNewChat, setIsNewChat] = useState(false);
+    const [isSummarizing, setIsSummarizing] = useState(false);
 
     useEffect(() => {
         const id = localStorage.getItem("editingPostId");
@@ -47,20 +49,36 @@ export default function CreatePost() {
         }
     }, [selectedSessionId, chatSessions]);
 
-    const handleSummarize = () => {
-        const userTexts = selectedMessages.filter(m => m.sender === "user").map(m => m.text);
-        const botTexts = selectedMessages.filter(m => m.sender === "bot").map(m => m.text);
-        const summary = botTexts.slice(-2).join(" ");
-        const titleText = userTexts[0]?.slice(0, 30) || "대화 요약";
-        setTitle(titleText);
-        setContent(summary);
+    const handleNewChat = () => {
+        const newId = uuidv4();
+        setIsNewChat(true);
+        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
     };
+    const handleSelectChat = (id) => {
+        router.push(`/chat/${id}`)}
 
-    const generateTags = () => {
-        const combinedText = selectedMessages.map(m => m.text).join(" ");
-        const keywords = ["GPT", "감정", "불안", "위로", "상담", "스트레스", "위기"];
-        const found = keywords.filter(k => combinedText.includes(k));
-        return found.length > 0 ? found : ["상담", "GPT"];
+    const handleSummarize = async () => {
+        if (!selectedSessionId || selectedMessages.length === 0) return;
+
+        setIsSummarizing(true); // ✅ 생성중 상태 ON
+
+        try {
+            const res = await fetch('/api/gemini/generate-post-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: selectedMessages })
+            });
+
+            const data = await res.json();
+            setTitle(data.title || "제목 없음");
+            setContent(data.summary || "");
+            setTags(data.tag || "기타"); // 자동 태그 반영
+        } catch (err) {
+            console.error('요약 실패:', err);
+            alert("요약 생성에 실패했습니다.");
+        } finally {
+            setIsSummarizing(false); // ✅ 완료 후 상태 OFF
+        }
     };
 
     const handleSubmit = () => {
@@ -77,7 +95,7 @@ export default function CreatePost() {
             const updatedList = storedPosts.map(p => p.id === editingPostId ? updated : p);
             localStorage.setItem("posts", JSON.stringify(updatedList));
         } else {
-            const autoTags = tags.trim() === "" ? generateTags() : tags.split(",").map(t => t.trim());
+            const autoTags = tags.split(",").map(t => t.trim());
 
             const newPost = {
                 id: uuidv4(),
@@ -85,10 +103,10 @@ export default function CreatePost() {
                 tags: autoTags,
                 content,
                 createdAt: Date.now(),
+                likedBy: [],
                 likes: 0,
                 views: 0,
-                comments: 0,
-                liked: false,
+                comments: [],
                 saveauthor: storedUser.email || "anonym",
                 author: "익명",
                 timeAgo: "방금 전",
@@ -102,32 +120,63 @@ export default function CreatePost() {
     return (
         <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
         <div className={styles.createPostPage}>
-            <Sidebar />
+            <Sidebar
+                onNewChat={handleNewChat}
+                onSelectChat={handleSelectChat}
+                theme={theme}
+                 />
             <main className={styles.mainContent}>
+                <div className={styles.scrollWrapper}>
                 <div className={styles.container}>
-                    <h2 className={styles.heading}>{isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}</h2>
+                    <h2 className={styles.heading}>
+                        {isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}
+                    </h2>
 
-                    <label className={styles.label}>🧠 대화 선택</label>
-                    <select
-                        className={styles.select}
-                        value={selectedSessionId || ""}
-                        onChange={(e) => setSelectedSessionId(e.target.value)}
-                    >
-                        <option value="">대화를 선택하세요</option>
-                        {chatSessions.map((s) => (
-                            <option key={s.id} value={s.id}>{s.title}</option>
-                        ))}
-                    </select>
+                    {/* 🔧 여기 flex 줄로 감쌈 */}
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", marginBottom: "12px" }}>
+                        <div style={{ flex: 1 }}>
+                            <label className={styles.label}>🧠 대화 선택</label>
+                            <select
+                                className={styles.select}
+                                value={selectedSessionId || ""}
+                                onChange={(e) => setSelectedSessionId(e.target.value)}
+                            >
+                                <option value="">대화를 선택하세요</option>
+                                {chatSessions.map((s) => (
+                                    <option key={s.id} value={s.id}>{s.title}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <button
+                            className={styles.summarizeBtn}
+                            onClick={handleSummarize}
+                            disabled={!selectedSessionId || selectedMessages.length === 0}
+                            style={{
+                                height: "38px", // 드롭다운과 동일하게 맞춤
+                                alignSelf: "flex-end", // flex 정렬이 밀릴 때 아래로 붙게
+                                marginBottom: "5px",  // 라벨과 버튼 높이 맞추기
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {isSummarizing ? (
+                                <div className={styles.spinner}></div>
+                            ) : (
+                                "요약하여 제목/본문 넣기"
+                            )}
+                        </button>
+                    </div>
 
                     {selectedMessages.length > 0 && (
                         <div className={styles.chatPreview}>
                             <h4>💬 대화 미리보기</h4>
                             <div className={styles.chatBox}>
                                 {selectedMessages.map((m, idx) => (
-                                    <div key={idx}><b>{m.sender === "user" ? "🙋" : "🤖"}</b> {m.text}</div>
+                                    <div key={idx}>
+                                        <b>{m.sender === "user" ? "🙋" : "🤖"}</b> {m.text}
+                                    </div>
                                 ))}
                             </div>
-                            <button className={styles.summarizeBtn} onClick={handleSummarize}>📝 요약해서 제목/본문에 넣기</button>
                         </div>
                     )}
 
@@ -168,6 +217,7 @@ export default function CreatePost() {
                             취소
                         </button>
                     </div>
+                </div>
                 </div>
             </main>
         </div>
