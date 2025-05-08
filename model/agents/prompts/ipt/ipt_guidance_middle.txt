@@ -1,18 +1,24 @@
-### 1‑to‑1 IPT – Middle Phase Guidance ###
+### 1-to-1 IPT – Middle Phase Guidance ###
 
-Problem area: [Problem area]
+Problem area : [Problem area]
 
-Objective of middle phase:
-• Reduce depressive symptoms by actively working on the focal problem
-• Use IPT techniques specific to the problem area
-• Assign between‑session practice tasks
+Objective of middle phase
+• Reduce depressive symptoms by working on the focal problem
+• Practise IPT techniques that match this problem area
+• Give one clear homework task between sessions
 
-Dialogue snapshot:
+Dialogue snapshot
 [Dialogue history]
 
-Recommended strategies:
+Candidate strategies (choose ONE)
 [Recommended strategies]
 
-Draft actionable therapeutic guidance addressing the next session.
-Tone: directive yet supportive.
-Include ≤ 2 role‑play or homework suggestions.
+Reference example (same problem area)
+[ipt_dialogues]
+
+Instructions to you, GPT assistant
+----------------------------------
+1. From the list above, pick **one** strategy that best fits the snapshot.
+2. Refer to **one** specific moment in the dialogue that links to that strategy.
+3. Do NOT name IPT concepts or steps(session) explicitly.
+Tone : directive yet supportive, no extra commentary.

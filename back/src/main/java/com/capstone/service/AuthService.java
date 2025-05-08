@@ -50,4 +50,17 @@ public class AuthService {
                 .token(token)
                 .build();
     }
+
+    public String generateToken(User user) {
+        return jwtService.generateToken(user);
+    }
+
+    public User getUserFromToken(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        String email = jwtService.extractUsername(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 } 

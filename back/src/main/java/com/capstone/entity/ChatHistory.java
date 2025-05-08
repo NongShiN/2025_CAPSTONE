@@ -1,31 +1,46 @@
 package com.capstone.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "chat_history")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ChatHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(nullable = false, length = 1000)
+    @Column(name = "session_id", nullable = false)
+    private String sessionId;
+
+    @Column(columnDefinition = "TEXT")
     private String message;
 
-    @Column(nullable = false, length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String response;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime timestamp;
 
-    @PrePersist
-    protected void onCreate() {
-        timestamp = LocalDateTime.now();
-    }
+    @Column(columnDefinition = "TEXT")
+    private String insight;
+
+    @Column(columnDefinition = "TEXT")
+    private String cognitiveDistortion;
+
+    private Integer severity;
 } 

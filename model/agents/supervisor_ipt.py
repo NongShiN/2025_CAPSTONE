@@ -1,5 +1,4 @@
 import json, os, sys, logging
-from pathlib import Path
 from .utils.util import call_llm, load_prompt, clean_json_response
 from .utils.args import parse_args
 
@@ -22,7 +21,8 @@ class SupervisorIPT:
     classification prompts so the model can reference prior decisions.
     """
 
-    LOG_FILE = Path("data/ipt_log.json")
+    BASE_DIR = os.path.dirname(__file__)  # 이 파일 위치
+    LOG_FILE = os.path.join(BASE_DIR, "data", "ipt_log.json")
     _ALLOWED_STAGES = {"initial", "middle", "termination"}
 
     # ------------------------------------------------------------------ #
@@ -76,7 +76,74 @@ class SupervisorIPT:
                 "Role‑play conversation openers, sharing about oneself, and listening skills; gather feedback.",
                 "After each social attempt, discuss what went well and what could be tweaked next time.",
                 "Encourage joining regular community, hobby, or faith groups to build ongoing contact and routine."
+            ]
+        }
+
+        self.ipt_dialogues = {
+            "Grief": [
+                "Counselor: Aria, we spoke before about the sadness you’ve felt since your husband and daughter died. Could you tell me about your husband today?",
+                "Client: I don’t know what to say.",
+                "Counselor: Maybe start with his illness and what changed for you when he became sick.",
+                "Client: This is so hard. I get sad whenever I think about it.",
+                "Counselor: I hear how painful it is. Talking through the memories can help you carry the grief; I’ll listen and support you.",
+                "Client: I’ll try. My husband died first. He lived with TB for about a year.…",
+                "Counselor: How long has it been since he died?",
+                "Client: Last year during the rainy season.…",
+                "Counselor: I’m so sorry, Aria. I can see how much you loved him.",
+                "Client: I cry every day. Nothing makes me happy.…",
+                "Counselor: He was a good husband and you miss him deeply.",
+                "Client: Yes.",
+                "Counselor: How are you feeling right now?",
+                "Client: Terrible. I don’t know what to do…",
+                "Counselor: It feels overwhelming. Let’s explore what might help you feel less alone while you mourn.",
+                "Client: Talking with you helps, but I still miss him.",
+                "Counselor: I noticed you mentioned fewer depression symptoms this week—why do you think that is?",
+                "Client: I’m not crying as much, and I’ve started going to the market with my neighbours. I’m just not as sad."
             ],
+
+            "Disputes": [
+                "Counselor: Jasmine, last time you said you’ve been unhappy with your husband and arguing for almost a year. Could you tell me more about the disagreements?",
+                "Client: I go to care for my sick mother, and when I return he’s bought gifts for another woman.…",
+                "Counselor: That sounds hurtful and frustrating. What have you already tried to let him know how this affects you?",
+                "Client: I’ve told him I’m a good wife and he shouldn’t do it, but he says I ignore him.",
+                "Counselor: So he feels neglected while you support your mother. Let’s look at options to communicate your needs without giving up your caregiving role. What ideas come to mind?",
+                "Client: I don’t know. I don’t really want to leave him, but he isn’t being a good husband or father.",
+                "Counselor: It is a tough situation. Perhaps we can practice wording that shows him how his actions impact the family and explore who else could help care for your mother.",
+                "Client: Maybe asking my sister to visit more often could help.",
+                "Counselor: That’s a concrete step. How would you bring this up with your sister and your husband?",
+                "Client: I could explain that I’m exhausted and the children need stability.…",
+                "Counselor: Good. Let’s role-play that conversation so you feel prepared.",
+                "Client: All right, let’s try."
+            ],
+
+            "Role Transition": [
+                "Counselor: Hass, you shared that since learning you have HIV you’ve felt hopeless. Can we talk about what changed for you after the diagnosis?",
+                "Client: I’ve been sick a long time. When the clinic told me, I felt nothing matters—I’ll die soon.",
+                "Counselor: HIV is serious, but some hopelessness comes from depression. What advice has the nurse given you?",
+                "Client: She says to take care of my health and always use a condom, but I don’t.",
+                "Counselor: Part of you feels, “Why bother?” yet another part cares about your family. How does thinking of your wife and children affect you?",
+                "Client: When I imagine my daughter getting HIV, I feel angry and want to be careful.",
+                "Counselor: That wish to protect her shows hope. What strengths could help you act on that?",
+                "Client: I can still teach my children and be a good father even if I’m sick.",
+                "Counselor: Those are meaningful roles. Let’s plan small steps—like using condoms and sharing time with your children—that reinforce that purpose.",
+                "Client: I’ll try. Talking about it helps.",
+                "Counselor: We’ll keep working on actions that make life feel worth living, even with HIV."
+            ],
+
+            "Loneliness/Isolation": [
+                "Counselor: Barbara, how was your week?",
+                "Client: The same. I stayed home; didn’t feel like going out.",
+                "Counselor: I notice sadness in your eyes. Do you feel lonely?",
+                "Client: Yes. Since my mother died, no one visits.",
+                "Counselor: Earlier you mentioned relatives tried to visit but you couldn’t open the door then. Now you’d like more contact—this shows progress. Let’s think of ways to reconnect.",
+                "Client: I’m not sure how. Could you give me an idea?",
+                "Counselor: You enjoy cooking, right? There’s a community kitchen on Wednesdays that prepares meals for orphans. Volunteering there could help you meet others while doing something meaningful.",
+                "Client: My cousin goes there and likes it. Maybe I could try.",
+                "Counselor: Great. What would make it easier to go this Wednesday? Let’s plan the details together.",
+                "Client: I could ask my cousin to walk with me.",
+                "Counselor: Excellent idea. How do you feel about taking that step?",
+                "Client: Better—hopeful, actually. Thank you."
+            ]
         }
 
         self.session_log = self._load_log()
@@ -85,18 +152,25 @@ class SupervisorIPT:
     # LOG I/O
     # ------------------------------------------------------------------ #
     def _load_log(self):
-        if self.LOG_FILE.exists():
+        if os.path.isfile(self.LOG_FILE):
             try:
                 with open(self.LOG_FILE, "r", encoding="utf-8") as f:
                     return json.load(f)
             except Exception as e:
                 logging.warning(f"Failed to load IPT log: {e}")
-        return []  # 파일이 없거나 오류 시
+        return []  # 파일이 없거나 읽기 오류 → 빈 로그
 
     def _save_log(self):
-        self.LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.LOG_FILE, "w", encoding="utf-8") as f:
-            json.dump(self.session_log, f, ensure_ascii=False, indent=2)
+        # ‘data’ 디렉터리와 기존 로그 파일 모두 있을 때만 저장
+        if not os.path.isfile(self.LOG_FILE):
+            logging.debug("No existing log file – skip saving.")
+            return
+
+        try:
+            with open(self.LOG_FILE, "w", encoding="utf-8") as f:
+                json.dump(self.session_log, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logging.warning(f"Failed to save IPT log: {e}")
 
     def _log_header(self) -> str:
         """전체 로그를 문자열로 변환해 분류 프롬프트 앞에 붙인다."""
@@ -156,12 +230,14 @@ class SupervisorIPT:
 
         # ③ assemble prompt
         strategies = "\n- ".join(self.ipt_strategies[problem_area])
+        reference_dialog = "\n- ".join(self.ipt_dialogues[problem_area])
         template   = self.guidance_tmpl[stage]
         prompt     = (
             template
             .replace("[Problem area]",      problem_area)
             .replace("[Dialogue history]",  dialogue_history)
             .replace("[Recommended strategies]", f"- {strategies}")
+            .replace("[ipt_dialogues]", f"- {reference_dialog}")
         )
         return prompt
 

@@ -2,23 +2,18 @@ import random
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from model.chat import chat_with_mascc, load_mascc, load_counselor, select_session
+from model.chat import chat_with_mascc, load_mascc
 
 app = FastAPI()
 
 # ✅ 서버 시작할 때 MASCC 인스턴스 메모리에 미리 로딩
-mascc = load_mascc()
-load_counselor(mascc)
-
-# TODO: session 선택에 필요한 API 함수 구현 필요
-# 임시 dialogue history id 사용
-select_session(mascc, "dlg004")
+mascc_instance = load_mascc()
 
 # ✅ 서버 부팅 시 더미 입력으로 모델 prewarm
 def prewarm_model():
-    dummy_input = None
+    dummy_input = "Hello, how can I help you?"
     try:
-        _ = chat_with_mascc(dummy_input, mascc)
+        _ = chat_with_mascc(dummy_input, mascc_instance)
         print("✅ 모델 prewarm 완료")
     except Exception as e:
         print(f"⚠️ Prewarm 실패: {e}")
@@ -104,24 +99,10 @@ def generate(user_input: str = Query(None)):
         if not user_input:
             greeting = get_greeting_by_time()
             last_interaction_time = datetime.now()
-            
-            mascc.counselor.update_dialogue_history(
-                speaker="Counselor",
-                utterance=greeting,
-                timestamp=last_interaction_time
-            )
-            
             return {"response": greeting}
         
-        result = chat_with_mascc(user_input, mascc)
+        result = chat_with_mascc(user_input, mascc_instance)
         last_interaction_time = datetime.now()
-        
-        mascc.counselor.update_dialogue_history(
-            speaker="Counselor", 
-            utterance=result,
-            timestamp=last_interaction_time
-            )
-        
         return {"response": result}
     
     except Exception as e:
