@@ -15,7 +15,6 @@ class SupervisorEmpathic:
     Empathy-centric counseling supervisor (1-to-1)
     """
 
-    LOG_FILE = Path("agents/data/empathic_log.json")
     EMOTIONS = ["Anger","Anxiety","Hopelessness","Shame",
                 "Upset","Distress","Guilty","Boredom","Indifference"]
     ISSUES   = ["Studies","Family","Relationship","Finance","Work","Health"]
@@ -54,31 +53,9 @@ class SupervisorEmpathic:
             ],
         }
 
-        self.session_log = self._load_log()
-
-    # ------------------------ LOG I/O --------------------------- #
-    def _load_log(self):
-        if self.LOG_FILE.exists():
-            try:
-                return json.loads(self.LOG_FILE.read_text(encoding="utf-8"))
-            except Exception as e:
-                logging.warning(f"Fail load log → new: {e}")
-        return []
-
-    def _save_log(self):
-        self.LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        self.LOG_FILE.write_text(json.dumps(self.session_log, ensure_ascii=False, indent=2))
-
-    def _log_header(self):
-        if not self.session_log:
-            return ""
-        return "Previous decisions:\n" + "\n".join(
-            f"- Emotion: {e}, Issue: {i}, Level: {l}" for e,i,l in self.session_log
-        ) + "\n\n"
-
     # ------------------------ 1. Emotion ------------------------ #
     def classify_emotion(self, dialogue:str)->str:
-        prompt = (self._log_header() + self.emotion_cls_tmpl).replace("[Dialogue]", dialogue)
+        prompt = self.emotion_cls_tmpl.replace("[Dialogue]", dialogue)
         res = clean_json_response(call_llm(prompt, llm=self.llm, model=self.model, temperature=0))
         try:
             emo = json.loads(res)["emotion"]
@@ -89,7 +66,7 @@ class SupervisorEmpathic:
 
     # ------------------------ 2. Issue -------------------------- #
     def classify_issue(self, dialogue:str)->str:
-        prompt = (self._log_header() + self.issue_cls_tmpl).replace("[Dialogue]", dialogue)
+        prompt = self.issue_cls_tmpl.replace("[Dialogue]", dialogue)
         res = clean_json_response(call_llm(prompt, llm=self.llm, model=self.model, temperature=0))
         try:
             issue = json.loads(res)["issue"]
@@ -100,7 +77,7 @@ class SupervisorEmpathic:
 
     # ------------------------ 3. Level -------------------------- #
     def classify_level(self, dialogue:str)->int:
-        prompt = (self._log_header() + self.level_cls_tmpl).replace("[Dialogue]", dialogue)
+        prompt = self.level_cls_tmpl.replace("[Dialogue]", dialogue)
         res = clean_json_response(call_llm(prompt, llm=self.llm, model=self.model, temperature=0))
         try:
             lvl = int(json.loads(res)["level"])
@@ -126,10 +103,6 @@ class SupervisorEmpathic:
         emotion = self.classify_emotion(dialogue)
         issue   = self.classify_issue(dialogue)
         level   = forced_level if forced_level else self._choose_level(dialogue, emotion)
-
-        # 로그 기록
-        self.session_log.append((emotion, issue, level))
-        self._save_log()
 
         strategies = "\n- ".join(self.empathy_strategies[level])
         prompt = (
