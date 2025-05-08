@@ -38,12 +38,13 @@
     height: 100%;
     width: 100vw; /* ✅ 전체 너비 확보 */
     max-height: 100vh;
-
+    border-radius: 1rem;
 }
 .scrollWrapper {
     flex: 1;
-    overflow-y: auto; /* ✅ 여기만 스크롤 */
-    padding: 1.5rem;
+    overflow-y: hidden; /* ✅ 여기만 스크롤 */
+    background: transparent;
+    border-radius: 1rem;
 }
 
 /* 예시: blue 테마일 때만 적용되는 스크롤바 */
@@ -68,9 +69,11 @@
 .mainContent ::-webkit-scrollbar {
     width: 10px;
     background: transparent;
+    border-radius: 1rem;
 }
 .mainContent ::-webkit-scrollbar-track {
     background: transparent;
+    border-radius: 1rem;
 }
 /* blue 테마 */
 .blueTheme .mainContent ::-webkit-scrollbar-thumb {
