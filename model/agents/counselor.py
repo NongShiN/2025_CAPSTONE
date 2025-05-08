@@ -77,6 +77,10 @@ class CounselorAgent:
             supervisor = SupervisorIPT(args, self.llm)
             
             dynamic_prompt = supervisor.generate_guidance(str(self.dialogue_history))
+        elif selected_supervisor == "Empathic":
+            supervisor = SupervisorEmpathic(args, self.llm)
+
+            dynamic_prompt = supervisor.generate_guidance(str(self.dialogue_history))
         else:
             dynamic_prompt = ""
         return dynamic_prompt
