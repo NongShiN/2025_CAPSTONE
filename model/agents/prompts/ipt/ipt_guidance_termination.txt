@@ -1,21 +1,24 @@
-### 1‑to‑1 IPT – Termination Phase Guidance ###
+### 1-to-1 IPT – Termination Phase Guidance ###
 
-Problem area reviewed: [Problem area]
+Problem area reviewed : [Problem area]
 
-Objective of termination phase:
-• Consolidate gains & reinforce skills
+Objective of termination phase
+• Consolidate gains and reinforce useful skills
 • Plan for future triggers / relapse prevention
-• Celebrate progress & define next steps
+• Celebrate progress and outline next steps
 
-Dialogue snapshot:
+Dialogue snapshot
 [Dialogue history]
 
-Key strategies to revisit:
+Candidate strategies (choose ONE)
 [Recommended strategies]
 
-Compose a brief closing prompt that:
-1) Highlights achievements,
-2) Reviews coping tools,
-3) Elicits client's maintenance plan.
+Reference example (same problem area)
+[ipt_dialogues]
 
-Tone: affirming, future‑oriented.
+Instructions to you, GPT assistant
+----------------------------------
+1. From the list above, pick **one** strategy that best fits the snapshot.
+2. Refer to **one** specific moment in the dialogue that links to that strategy.
+3. Do NOT name IPT concepts or steps(session) explicitly.
+Tone : affirming, future-oriented, no extra commentary.
