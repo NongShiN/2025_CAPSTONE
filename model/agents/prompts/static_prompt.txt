@@ -8,14 +8,7 @@ Your tone should be warm, supportive, and human-like.
 Do not explicitly reference which technique you are using.
 Just sound like a compassionate, insightful counselor.
 
-# Your task:
+Your task:
 Write a single response as the counselor that supports the client in a psychologically informed and emotionally supportive way, without being overly technical or clinical.
 
-# Dialogue history:
-[Dialogue history]
-
-# Expert guidance:
-[Guidance]
-
-# Output
-Counselor:
+Here is the internal expert guidance:

@@ -50,28 +50,12 @@
 .mainContent::-webkit-scrollbar-track {
     background: transparent;
 }
-/* blue 테마 */
-.blueTheme .mainContent::-webkit-scrollbar-thumb {
+.mainContent::-webkit-scrollbar-thumb {
     background: rgba(90, 93, 255, 0.4);
+    border-radius: 9999px;
 }
-.blueTheme .mainContent::-webkit-scrollbar-thumb:hover {
+.mainContent::-webkit-scrollbar-thumb:hover {
     background: rgba(90, 93, 255, 0.7);
-}
-
-/* purple 테마 */
-.purpleTheme .mainContent::-webkit-scrollbar-thumb {
-    background: rgba(180, 102, 255, 0.4);
-}
-.purpleTheme .mainContent::-webkit-scrollbar-thumb:hover {
-    background: rgba(180, 102, 255, 0.7);
-}
-
-/* pink 테마 */
-.pinkTheme .mainContent::-webkit-scrollbar-thumb {
-    background: rgba(255, 105, 180, 0.4);
-}
-.pinkTheme .mainContent::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 105, 180, 0.7);
 }
 
 .rightSidebar {
@@ -302,30 +286,4 @@
 
 .deleteBtn:hover {
     background-color: #ef4444;
-}
-.clickableListItem {
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.clickableListItem:hover {
-    color: #5a5dff;
-    text-decoration: underline;
-}
-/* 파란 테마 */
-.blueTheme .searchBtn,
-.blueTheme .createPostButton {
-    background-color: #5A5DFF;
-}
-
-/* 보라 테마 */
-.purpleTheme .searchBtn,
-.purpleTheme .createPostButton {
-    background-color: #B466FF;
-}
-
-/* 핑크 테마 */
-.pinkTheme .searchBtn,
-.pinkTheme .createPostButton {
-    background-color: #FF69B4;
 }

@@ -10,7 +10,7 @@ export default function ChatPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const { id } = router.query; // ✅ URL에서 id 읽기
-    const [isNewChat, setIsNewChat] = useState(false);
+
     const [isClient, setIsClient] = useState(false);
     const [isGuest, setIsGuest] = useState(false);
     const [theme, setTheme] = useState("blue");
@@ -53,7 +53,6 @@ export default function ChatPage() {
 
     const handleNewChat = () => {
         const newId = uuidv4();
-        setIsNewChat(true);
         router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
     };
 
@@ -66,15 +65,12 @@ export default function ChatPage() {
                 onNewChat={handleNewChat}
                 newChatTrigger={newChatTrigger}
                 onSelectChat={(id) => router.push(`/chat/${id}`)} // ✅ 대화 선택 시 URL 이동
-                theme={theme}
             />
             <ChatWindow
                 isGuest={isGuest}
                 newChatTrigger={newChatTrigger}
                 selectedSessionId={selectedSessionId}
                 theme={theme}
-                isNewChat={isNewChat} // ✅ 추가!
-                setIsNewChat={setIsNewChat} // ✅ 상태 리셋을 위해 추가!
             />
         </div>
     );

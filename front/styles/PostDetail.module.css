@@ -50,28 +50,12 @@
 .mainContent::-webkit-scrollbar-track {
     background: transparent;
 }
-/* blue 테마 */
-.blueTheme .mainContent::-webkit-scrollbar-thumb {
+.mainContent::-webkit-scrollbar-thumb {
     background: rgba(90, 93, 255, 0.4);
+    border-radius: 9999px;
 }
-.blueTheme .mainContent::-webkit-scrollbar-thumb:hover {
+.mainContent::-webkit-scrollbar-thumb:hover {
     background: rgba(90, 93, 255, 0.7);
-}
-
-/* purple 테마 */
-.purpleTheme .mainContent::-webkit-scrollbar-thumb {
-    background: rgba(180, 102, 255, 0.4);
-}
-.purpleTheme .mainContent::-webkit-scrollbar-thumb:hover {
-    background: rgba(180, 102, 255, 0.7);
-}
-
-/* pink 테마 */
-.pinkTheme .mainContent::-webkit-scrollbar-thumb {
-    background: rgba(255, 105, 180, 0.4);
-}
-.pinkTheme .mainContent::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 105, 180, 0.7);
 }
 
 .rightSidebar {
@@ -242,84 +226,4 @@
 
 .editBtn:hover {
     background-color: #3b82f6;
-}
-.commentList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-}
-
-.commentItem {
-    width: 100%;
-    background: #fff;
-    padding: 1rem;
-    border-radius: 12px;
-}
-.commentMeta {
-    font-size: 0.85rem;
-    color: #555;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.replyList {
-    list-style: none;
-    padding-left: 1rem;
-    margin-top: 1rem;
-    border-left: 2px solid #eee;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.replyItem {
-    font-size: 0.875rem;
-    color: #444;
-    background: #f9fafb;
-    padding: 0.6rem 0.9rem;
-    border-radius: 10px;
-}
-
-.commentForm,
-.replyForm,
-.editCommentBox {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    width: 100%;
-}
-
-.commentForm input,
-.replyForm input,
-.editCommentBox input {
-    flex: 1;
-    padding: 0.6rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-}
-
-.commentForm button,
-.replyForm button,
-.editCommentBox button {
-    padding: 0.6rem 1rem;
-    border: none;
-    border-radius: 9999px;
-    background: #5a5dff;
-    color: white;
-    font-size: 0.875rem;
-    cursor: pointer;
-}
-
-.commentForm button:hover,
-.replyForm button:hover,
-.editCommentBox button:hover {
-    background: #4346e0;
-}
-
-.postBody {
-    white-space: pre-wrap;
 }

@@ -220,26 +220,3 @@
   transform: translateX(20px);
   transition: all 0.25s ease-out;
 }
-/* 테마: blue */
-.blue {
-  background-color: #5A5DFF;
-}
-.blue:hover:not(:disabled) {
-  background-color: #4e50e6;
-}
-
-/* 테마: purple */
-.purple {
-  background-color: #B466FF;
-}
-.purple:hover:not(:disabled) {
-  background-color: #9e4fe0;
-}
-
-/* 테마: pink */
-.pink{
-  background-color: #FF69B4;
-}
-.pink:hover:not(:disabled) {
-  background-color: #e2559d;
-}

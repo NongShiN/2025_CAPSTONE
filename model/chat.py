@@ -4,7 +4,7 @@ import logging
 import datetime
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
-from .mascc import MASCC
+from mascc import MASCC
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -33,82 +33,45 @@ class DefaultArgs:
     cbt_log_path='data/cbt_log.json'
     cbt_info_path='data/cbt_info.json'
     top_k=5
+    
 
+# initialize arguments
+# args = parse_args()
+args = DefaultArgs()
 
-# ✅ MASCC 인스턴스를 명시적으로 초기화하는 함수
-def load_mascc():
-    args = DefaultArgs()
-    llm = OpenAI(api_key=OPENAI_API_KEY)
-    retriever = SentenceTransformer("all-MiniLM-L6-v2")
-    mascc = MASCC(args, llm, retriever)
-    return mascc
+# generate instance
+llm = OpenAI(api_key=OPENAI_API_KEY)
+retriever = SentenceTransformer("all-MiniLM-L6-v2")
+mascc = MASCC(args, llm, retriever)
 
-
-# user가 log in 하면 counselor 에이전트 인스턴스 생성
-# 아직은 하나의 counselor에 대해서 구현
-# 이후에 user에 대한 전체 dialoue 다 받아와야함. 현재는 임시 대화 파일에서 불러옴
-def load_counselor(mascc):
-    mascc.counselor.load_dialogues()
-
-def select_session(mascc, dialogue_history_id):
-    mascc.counselor.load_diologue_history(dialogue_history_id)
-
-# ✅ mascc 인스턴스를 인자로 받는 버전
-def chat_with_mascc(user_input: str, mascc) -> str:
-    # 초기화 단계 처리
-    if user_input == None:
-        return None
-
+def chat_with_mascc(user_input: str, last_counselor: str = "Hello, how can I help you?") -> str:
+    global mascc
     timestamp = datetime.datetime.now().isoformat()
 
     response = mascc.generate(
-        mascc.args,
+        args,
+        counselor_utterance=last_counselor,
         client_utterance=user_input,
         timestamp=timestamp
-    )
+        )
     logging.info(f"\n[Counselor Response]: {response}")
 
     return response
 
-
 if __name__ == "__main__":
-    mascc = load_mascc()
-    load_counselor(mascc)
-    
+
     print("Welcome to the MASCC chatbot. Type 'exit' or 'quit' to end the conversation.\n")
-    
-    select_session(mascc, "dlg004")
-    
-    if mascc.counselor.dialogue_history == []:
-        last_counselor = "Hello, how can I help you?"
-        timestamp = datetime.datetime.now().isoformat()
 
-        mascc.counselor.update_dialogue_history(
-            "Counselor", 
-            last_counselor,
-            timestamp
-            )
+    last_counselor = "Hello, how can I help you?"
+    print(f"Counselor: {last_counselor}")
 
-        print(f"Counselor: {last_counselor}")
-
-    
     while True:
         user_input = input("You: ")
-        timestamp = datetime.datetime.now().isoformat()
 
         if user_input.lower() in ["exit", "quit"]:
             print("Ending the chat. Take care!")
             break
 
-        response = chat_with_mascc(user_input, mascc)
-        timestamp = datetime.datetime.now().isoformat()
-        mascc.counselor.update_dialogue_history(
-            "Counselor", 
-            response,
-            timestamp
-            )
+        response = chat_with_mascc(user_input, last_counselor)
         print(f"Counselor: {response}")
-
-    mascc.counselor.update_dialogues("dlg004")
-    print("========================= Session end =========================")
-    print(mascc.counselor.dialogues)
+        last_counselor = response

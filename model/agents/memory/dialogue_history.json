@@ -1,94 +1,39 @@
 {
-  "dlg001": {
-    "dialogue_history": [
-      {
-        "speaker": "Counselor",
-        "utterance": "How are you doing?",
-        "timestamp": "2025-04-25T02:55:35.102793"
-      },
-      {
+  "dialogue_history": [
+    {
+      "speaker": "Counselor",
+      "utterance": "How are you doing?",
+      "timestamp": "2025-04-25T02:55:35.102793"
+    },
+    {
         "speaker": "Client",
         "utterance": "Nobody likes me.",
         "timestamp": "2025-04-25T02:55:40.102793"
-      },
-      {
+    },
+    {
         "speaker": "Counselor",
         "utterance": "What makes you think that?",
         "timestamp": "2025-04-25T02:55:47.102793"
-      },
-      {
+    },
+    {
         "speaker": "Client",
         "utterance": "People often ignore me at work.",
         "timestamp": "2025-04-25T02:55:55.102793"
-      },
-      {
+    },
+    {
         "speaker": "Counselor",
         "utterance": "Can you think of a recent example?",
         "timestamp": "2025-04-25T02:56:12.102793"
-      },
-      {
+    },
+    {
         "speaker": "Client",
         "utterance": "Yesterday, no one responded when I said good morning.",
         "timestamp": "2025-04-25T02:56:30.102793"
-      },
-      {
+    },
+    {
         "speaker": "Counselor",
         "utterance": "Is it possible they didn’t hear you or were distracted?",
         "timestamp": "2025-04-25T02:56:59.102793"
-      }
-    ]
-  },
-  "dlg002": {
-    "dialogue_history": [
-      {
-        "speaker": "Counselor",
-        "utterance": "What brings you here today?",
-        "timestamp": "2025-04-20T10:12:00.000000"
-      },
-      {
-        "speaker": "Client",
-        "utterance": "I've been feeling very anxious lately.",
-        "timestamp": "2025-04-20T10:12:08.000000"
-      },
-      {
-        "speaker": "Counselor",
-        "utterance": "What situations tend to make you feel that way?",
-        "timestamp": "2025-04-20T10:12:20.000000"
-      },
-      {
-        "speaker": "Client",
-        "utterance": "Social events. I feel like everyone's judging me.",
-        "timestamp": "2025-04-20T10:12:35.000000"
-      }
-    ]
-  },
-  "dlg003": {
-    "dialogue_history": [
-      {
-        "speaker": "Counselor",
-        "utterance": "How have things been at home?",
-        "timestamp": "2025-04-22T15:03:10.000000"
-      },
-      {
-        "speaker": "Client",
-        "utterance": "Tense. My partner and I argue a lot.",
-        "timestamp": "2025-04-22T15:03:20.000000"
-      },
-      {
-        "speaker": "Counselor",
-        "utterance": "What do you usually argue about?",
-        "timestamp": "2025-04-22T15:03:32.000000"
-      },
-      {
-        "speaker": "Client",
-        "utterance": "Mostly small things, like chores or schedules.",
-        "timestamp": "2025-04-22T15:03:45.000000"
-      },
-      {
-        "speaker": "Counselor",
-        "utterance": "Do you feel those arguments reflect deeper issues?",
-        "timestamp": "2025-04-22T15:04:01.000000"
-      }
-    ]
-  }
+    }
+  ]
 }

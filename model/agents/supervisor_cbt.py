@@ -30,7 +30,7 @@ class SupervisorCBT:
         self.cd_prompt_template = load_prompt(args.cd_prompt_name)
         
     def update_cbt_usage_log(self, cbt_usage_log_path, technique, current_stage):
-        abs_path = os.path.join(os.path.dirname(__file__), cbt_usage_log_path)
+        abs_path = os.path.join(os.path.dirname(__file__), "..", cbt_usage_log_path)
         abs_path = os.path.abspath(abs_path)
         
         log = {}
