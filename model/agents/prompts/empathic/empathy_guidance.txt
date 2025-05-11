@@ -1,0 +1,20 @@
+### Empathic Reflection – Level [LEVEL] ###
+
+Emotion   : [EMOTION]
+Life focus: [ISSUE]
+
+Write an English counselor reply (≤120 words) that
+
+• Gently echoes the client’s own words to show you feel their [EMOTION].
+• Notes, in one sentence, how the [ISSUE] context might deepen that feeling.
+• Speaks from Rogers Level [LEVEL] while drawing on the cues below.
+• Offers one small, issue-related step or perspective that could help.
+• Ends with an open question inviting further sharing.
+
+Guidance cues
+[Recommended strategies]
+
+Dialogue
+[DIALOGUE]
+
+Tone: warm, accepting, client-centred, unconditional positive regard.

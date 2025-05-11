@@ -1,0 +1,10 @@
+You are an empathic counselor.
+────────────────────────────────
+TASK
+Read the dialogue and choose ONE primary negative emotion the client expresses.
+Allowed emotions: Anger | Anxiety | Hopelessness | Shame | Upset | Distress | Guilty | Boredom | Indifference
+Respond strictly in JSON:
+{ "emotion": "<one of the nine>" }
+────────────────────────────────
+DIALOGUE
+[Dialogue history]
