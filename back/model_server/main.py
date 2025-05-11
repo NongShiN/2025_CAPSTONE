@@ -2,18 +2,25 @@ import random
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+#from model.chat import chat_with_mascc, load_mascc, load_counselor, select_session
 from model.chat import chat_with_mascc, load_mascc
 
 app = FastAPI()
 
 # ✅ 서버 시작할 때 MASCC 인스턴스 메모리에 미리 로딩
-mascc_instance = load_mascc()
+mascc = load_mascc()
+#load_counselor(mascc)
+
+# TODO: session 선택에 필요한 API 함수 구현 필요
+# 임시 dialogue history id 사용
+#select_session(mascc, "dlg004")
 
 # ✅ 서버 부팅 시 더미 입력으로 모델 prewarm
 def prewarm_model():
-    dummy_input = "Hello, how can I help you?"
+    dummy_input = None
+    user_id = None
     try:
-        _ = chat_with_mascc(dummy_input, mascc_instance)
+        _ = chat_with_mascc(user_id, dummy_input, mascc)
         print("✅ 모델 prewarm 완료")
     except Exception as e:
         print(f"⚠️ Prewarm 실패: {e}")
@@ -53,7 +60,6 @@ EVENING_MESSAGES = [
     "오늘 자신에게 해주고 싶은 말이 있다면 무엇인가요?",
     "지금 마음이 가는 이야기를 하나 꺼내어 나눠보실래요?",
 ]
-
 # 리마인더 메시지 (시간 단계별)
 REMINDER_MESSAGES_10MIN = [
     "천천히 괜찮아요. 준비되었을 때 말씀해 주세요.",
@@ -92,17 +98,51 @@ def get_greeting_by_time():
         # 저녁
         return random.choice(EVENING_MESSAGES)
 
+
+@app.get("/load_counselor")
+def load_counselor(user_id: str):
+    mascc.get_counselor(user_id)
+    print(f"============== Loading Counselor Agent Complete. ==============")
+    print(mascc.counselor.keys())
+    
+    return {"user_id": user_id, "current_counselor_agent_list": str(mascc.counselor.keys())}
+
+    
+@app.get("/select_session")
+def select_session(user_id: str, dialogue_history_id: str):
+    mascc.select_session(user_id, dialogue_history_id)
+    print(f"============== Loading Session history Complete. ==============")
+    print(mascc.counselor[user_id].dialogue_history)
+    
+
 @app.get("/gen")
-def generate(user_input: str = Query(None)):
+def generate(user_id: str, user_input: str = Query(None)):
     global last_interaction_time
+    
+    counselor = mascc.get_counselor(user_id)
+    
     try:
         if not user_input:
             greeting = get_greeting_by_time()
             last_interaction_time = datetime.now()
+            
+            counselor.update_dialogue_history(
+                speaker="Counselor",
+                utterance=greeting,
+                timestamp=last_interaction_time
+            )
+            
             return {"response": greeting}
         
-        result = chat_with_mascc(user_input, mascc_instance)
+        result = chat_with_mascc(user_id, user_input, mascc)
         last_interaction_time = datetime.now()
+        
+        counselor.update_dialogue_history(
+            speaker="Counselor", 
+            utterance=result,
+            timestamp=last_interaction_time
+            )
+        print(counselor.dialogue_history)
         return {"response": result}
     
     except Exception as e:
