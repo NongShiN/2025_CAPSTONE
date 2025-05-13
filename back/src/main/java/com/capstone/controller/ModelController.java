@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/model")
@@ -31,5 +32,10 @@ public class ModelController {
     @GetMapping("/load-chat/{userId}")
     public ResponseEntity<List<ChatHistoryDTO>> loadChat(@PathVariable String userId) {
         return ResponseEntity.ok(modelService.loadChatHistory(userId));
+    }
+
+    @GetMapping("/modeling-data/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> getUserChatDataForModeling(@PathVariable String userId) {
+        return ResponseEntity.ok(modelService.getUserChatDataForModeling(userId));
     }
 } 

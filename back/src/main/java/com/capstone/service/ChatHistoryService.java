@@ -4,8 +4,10 @@ import com.capstone.entity.ChatHistory;
 import com.capstone.repository.ChatHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+
+
+
 
 @Service
 public class ChatHistoryService {
@@ -37,5 +39,19 @@ public class ChatHistoryService {
 
     public List<ChatHistory> findByUserId(Long userId) {
         return chatHistoryRepository.findByUser_IdOrderByTimestampDesc(userId);
+    }
+
+    public List<ChatHistory> findByUserIdAndSessionId(Long userId, String sessionId) {
+        return chatHistoryRepository.findByUser_IdAndSessionIdOrderByTimestampDesc(userId, sessionId);
+    }
+
+    public void deleteSession(Long userId, String sessionId) {
+        List<ChatHistory> chatHistories = findByUserIdAndSessionId(userId, sessionId);
+        if (chatHistories.isEmpty()) {
+            throw new RuntimeException("해당 세션을 찾을 수 없습니다.");
+        }
+        
+        // 세션의 모든 채팅 내역 삭제
+        chatHistoryRepository.deleteAll(chatHistories);
     }
 } 

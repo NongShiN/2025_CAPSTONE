@@ -13,19 +13,25 @@
   height: calc(100vh - 32px);
 }
 
-.logo {
-  text-align: center;
-  margin-bottom: 1rem;
-  cursor: pointer;
-  scale: 1.40;
+.logoImage {
+  width: 220px;
+  height: 60px;
+  margin: 0 auto 1rem auto; /* 위-가운데정렬-아래 여백 */
+  display: block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.logoBlue {
+  background-image: url("/logos/logo-blue.png");
 }
 
-.logoImage {
-  width: 160px;
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  transition: transform 0.2s ease;
+.logoPink {
+  background-image: url("/logos/logo-pink.png");
+}
+
+.logoPurple {
+  background-image: url("/logos/logo-purple.png");
 }
 .logoImage:hover {
   transform: scale(1.05);

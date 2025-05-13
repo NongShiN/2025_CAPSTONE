@@ -70,13 +70,17 @@ public class ChatHistoryController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<?> getAllChatHistories() {
+    public ResponseEntity<?> getAllChatHistories(@RequestParam(value = "sessionId", required = false) String sessionId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
-            
-            List<ChatHistory> chatHistories = chatHistoryService.findByUserId(user.getId());
+            List<ChatHistory> chatHistories;
+            if (sessionId != null && !sessionId.isEmpty()) {
+                chatHistories = chatHistoryService.findByUserIdAndSessionId(user.getId(), sessionId);
+            } else {
+                chatHistories = chatHistoryService.findByUserId(user.getId());
+            }
             List<ChatHistoryDTO> responseDTOs = chatHistories.stream()
                 .map(history -> ChatHistoryDTO.builder()
                     .userId(history.getUser().getId().toString())
@@ -89,8 +93,21 @@ public class ChatHistoryController {
                     .sessionId(history.getSessionId())
                     .build())
                 .collect(Collectors.toList());
-                
             return ResponseEntity.ok(responseDTOs);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/session/{sessionId}")
+    public ResponseEntity<?> deleteSession(@PathVariable String sessionId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            User user = userService.findByEmail(userEmail);
+            
+            chatHistoryService.deleteSession(user.getId(), sessionId);
+            return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

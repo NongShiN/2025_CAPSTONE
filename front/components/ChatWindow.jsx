@@ -3,7 +3,15 @@ import styles from "../styles/ChatWindow.module.css";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, isNewChat, setIsNewChat }) {
+export default function ChatWindow({
+                                       newChatTrigger,
+                                       selectedSessionId,
+                                       theme,
+                                       isNewChat,
+                                       setIsNewChat,
+                                       setRefreshSessionList,
+                                       isGuest
+                                   }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
@@ -79,19 +87,72 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
     }, [isBotTyping]);
 
     useEffect(() => {
-        if (selectedSessionId && typeof window !== "undefined") {
-            const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-            const found = stored.find((s) => s.id === selectedSessionId);
-            if (found) {
-                setMessages(found.messages || []);
-                setSessionId(found.id);
-                setShowIntro(found.messages.length === 0); // ✅ 메시지가 없으면 Intro 보여주기
-            } else {
-                setMessages([]);
-                setSessionId(selectedSessionId);
-                setShowIntro(true); // ✅ 새 세션은 Intro부터 보여주기
-            }
+        if (!selectedSessionId || isNewChat) return;
+        setMessages([]);
+        setSessionId(null); // 새 세션 초기화
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser || storedUser.guest) {
+            setMessages([]);
+            setSessionId(selectedSessionId);
+            setShowIntro(true);
+            return;
         }
+
+        const fetchMessages = async () => {
+            setSessionId(selectedSessionId);
+            try {
+                const res = await fetch(`http://localhost:8080/api/chat/history?sessionId=${selectedSessionId}`, {
+                    headers: {
+                        "Authorization": `Bearer ${storedUser.token}`
+                    }
+                });
+                console.log("🔎 요청 보낸 세션ID:", selectedSessionId);
+                const data = await res.json();
+                console.log("✅ 불러온 채팅 내역", data);
+                const parsed = [];
+                console.log("🔍 실제 받은 메시지들", parsed);
+
+                data.forEach(d => {
+                    if (d.sessionId !== selectedSessionId) {
+                        console.warn("❌ 다른 세션 ID 발견!", {
+                            expected: selectedSessionId,
+                            actual: d.sessionId,
+                            diff: selectedSessionId.split('').map((c, i) => c === d.sessionId[i] ? ' ' : '^').join('')
+                        });
+                    }
+                });
+                data.forEach((msg, index) => {
+                    parsed.push({
+                        id: msg.id ? `msg_${msg.id}` : `msg_${Date.now()}_${index}`,
+                        sender: "user",
+                        text: msg.message,
+                        timestamp: msg.timestamp,
+                        sessionId: msg.sessionId  // ✅ 추가
+                    });
+
+                    if (msg.response) {
+                        parsed.push({
+                            id: msg.id ? `resp_${msg.id}` : `resp_${Date.now()}_${index}`,
+                            sender: "bot",
+                            text: msg.response,
+                            timestamp: msg.timestamp,
+                            sessionId: msg.sessionId  // ✅ 추가
+                        });
+                    }
+                });
+                console.log("🔍 응답에 포함된 세션ID들:", parsed.map(m => m.sessionId));
+                parsed.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                setMessages(parsed);
+                setSessionId(selectedSessionId);
+                setShowIntro(parsed.length === 0);
+            } catch (error) {
+                console.error("채팅 기록 불러오기 실패:", error);
+                setMessages([]);
+                setShowIntro(true);
+            }
+        };
+
+        fetchMessages();
     }, [selectedSessionId]);
 
     useEffect(() => {
@@ -158,7 +219,8 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
         }
     }
     const handleSend = async () => {
-        if (!input.trim() || !sessionId) return;
+        const currentSessionId = selectedSessionId || sessionId;
+        if (!input.trim() || !currentSessionId) return;
 
         const userMessage = {
             id: Date.now(),
@@ -167,7 +229,9 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
             time: formattedTime,
         };
 
-        setMessages((prev) => [...prev, userMessage]);
+        const newMessages = [...messages, userMessage];
+
+        setMessages(newMessages);
         setInput("");
         setBotTypingText("");
         setIsBotTyping(true);
@@ -195,28 +259,31 @@ export default function ChatWindow({ newChatTrigger, selectedSessionId, theme, i
                     text: text.trim(),
                 }));
 
-            const stored = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-            const sessionIndex = stored.findIndex((s) => s.id === sessionId);
-            const allMessages = [...messages, userMessage, botMessages];
-            // 현재 대화 내역 가져오기
-            const updatedMessages = [...messages, userMessage, ...replyText.split(/(?<=[.!?])\s+/).filter(Boolean).map((text, i) => ({
-                id: Date.now() + i + 1,
-                sender: "bot",
-                text: text.trim(),
-            }))];
-            const generatedTitle = await fetchTitleFromLLM(allMessages);
-            if (sessionIndex !== -1) {
-                stored[sessionIndex].messages = updatedMessages;
-            } else {
-                stored.push({
-                    id: sessionId,
-                    title: generatedTitle || userMessage.text.slice(0, 30) || "New Chat", // ✅ LLM 제목 사용
-                    createdAt: new Date(),
-                    messages: updatedMessages,
-                });
-            }
+            const updatedMessages = [...newMessages, ...botMessages];
+            setMessages(updatedMessages);
 
-            localStorage.setItem("chatSessions", JSON.stringify(stored));
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            const allMessagesForTitle = updatedMessages;
+
+            const generatedTitle = await fetchTitleFromLLM(allMessagesForTitle);
+
+            await fetch("http://localhost:8080/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    message: userMessage.text,
+                    response: replyText,
+                    sessionId: currentSessionId,
+                    title: generatedTitle || userMessage.text.slice(0, 30),
+                    insight: data.insight || "",
+                    cognitiveDistortion: data.cognitiveDistortion || "",
+                    severity: data.severity || 0
+                })
+            });
+
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {

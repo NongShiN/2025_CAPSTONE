@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +83,26 @@ public class ModelService {
                         .cognitiveDistortion(history.getCognitiveDistortion())
                         .severity(history.getSeverity())
                         .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getUserChatDataForModeling(String userId) {
+        List<ChatHistory> chatHistories = chatHistoryRepository.findByUser_IdOrderByTimestampDesc(Long.parseLong(userId));
+        
+        return chatHistories.stream()
+                .map(history -> {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("id", history.getId());
+                    data.put("user_id", history.getUser().getId());
+                    data.put("message", history.getMessage());
+                    data.put("response", history.getResponse());
+                    data.put("timestamp", history.getTimestamp());
+                    data.put("cognitive_distortion", history.getCognitiveDistortion());
+                    data.put("insight", history.getInsight());
+                    data.put("session_id", history.getSessionId());
+                    data.put("severity", history.getSeverity());
+                    return data;
+                })
                 .collect(Collectors.toList());
     }
 } 
