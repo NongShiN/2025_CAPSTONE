@@ -101,7 +101,7 @@ export default function ChatWindow({
         const fetchMessages = async () => {
             setSessionId(selectedSessionId);
             try {
-                const res = await fetch(`http://localhost:8080/api/chat/history?sessionId=${selectedSessionId}`, {
+                const res = await fetch(`https://my-backend-281506025529.asia-northeast3.run.app/api/chat/history?sessionId=${selectedSessionId}`, {
                     headers: {
                         "Authorization": `Bearer ${storedUser.token}`
                     }
@@ -239,6 +239,7 @@ export default function ChatWindow({
         setIsSending(true);
 
         try {
+            // 1. 모델 응답 받기
             const res = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -250,6 +251,7 @@ export default function ChatWindow({
 
             await typeText(replyText);
 
+            // 2. 메시지 UI 구성
             const botMessages = replyText
                 .split(/(?<=[.!?])\s+/)
                 .filter(Boolean)
@@ -262,12 +264,14 @@ export default function ChatWindow({
             const updatedMessages = [...newMessages, ...botMessages];
             setMessages(updatedMessages);
 
+            // 3. title 생성
+            const generatedTitle = await fetchTitleFromLLM(updatedMessages);
+            console.log("🎯 생성된 제목:", generatedTitle);
+
+            // 4. 메시지 저장 (한 번만)
             const storedUser = JSON.parse(localStorage.getItem("user"));
-            const allMessagesForTitle = updatedMessages;
 
-            const generatedTitle = await fetchTitleFromLLM(allMessagesForTitle);
-
-            await fetch("http://localhost:8080/api/chat", {
+            await fetch("https://my-backend-281506025529.asia-northeast3.run.app/api/chat", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -283,7 +287,18 @@ export default function ChatWindow({
                     severity: data.severity || 0
                 })
             });
-
+            // 5. 타이틀 동기화 요청
+            await fetch("https://my-backend-281506025529.asia-northeast3.run.app/api/chat/title", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${storedUser.token}`,
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    title: generatedTitle,
+                }),
+            });
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {
@@ -291,7 +306,6 @@ export default function ChatWindow({
             setIsSending(false);
         }
     };
-
 
     if (!sessionId) return <div className={styles.chatContainer}>채팅 세션을 초기화 중입니다...</div>;
 

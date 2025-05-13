@@ -17,7 +17,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser && !storedUser.guest) {
             try {
-                const res = await fetch("http://localhost:8080/api/chat/history", {
+                const res = await fetch("https://my-backend-281506025529.asia-northeast3.run.app/api/chat/history", {
                     headers: {
                         "Authorization": `Bearer ${storedUser.token}`
                     }
@@ -36,7 +36,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                         sessionsMap[sid] = {
                             id: sid,
                             sessionId: sid,
-                            title: history.message?.slice(0, 30) || "New Chat",
+                            title: history.title || history.message?.slice(0, 30) || "New Chat",
                             createdAt: new Date(history.timestamp),
                             messages: []
                         };
@@ -120,7 +120,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
             
             // 로그인한 사용자인 경우 백엔드 DB에서도 삭제
             if (storedUser && !storedUser.guest) {
-                const response = await fetch(`http://localhost:8080/api/chat/session/${idToDelete}`, {
+                const response = await fetch(`https://my-backend-281506025529.asia-northeast3.run.app/api/chat/session/${idToDelete}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${storedUser.token}`,
