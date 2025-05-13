@@ -36,7 +36,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                         sessionsMap[sid] = {
                             id: sid,
                             sessionId: sid,
-                            title: history.message?.slice(0, 30) || "New Chat",
+                            title: history.title || history.message?.slice(0, 30) || "New Chat",
                             createdAt: new Date(history.timestamp),
                             messages: []
                         };

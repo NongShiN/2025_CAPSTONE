@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -35,6 +36,9 @@ public class ChatHistoryController {
             // Get the next available ID
             Long nextId = chatHistoryService.getNextId();
             
+            // 같은 session_id를 가진 첫 번째 메시지인지 확인
+            boolean isFirstMessage = chatHistoryService.findByUserIdAndSessionId(user.getId(), chatHistoryDTO.getSessionId()).isEmpty();
+            
             ChatHistory chatHistory = ChatHistory.builder()
                 .id(nextId)
                 .user(user)
@@ -48,6 +52,7 @@ public class ChatHistoryController {
                         ? chatHistoryDTO.getSessionId()
                         : UUID.randomUUID().toString()
                 )
+                .title(isFirstMessage ? chatHistoryDTO.getTitle() : null)  // 첫 번째 메시지일 때만 title 저장
                 .build();
             
             ChatHistory savedChatHistory = chatHistoryService.saveChatHistory(chatHistory);
@@ -61,6 +66,7 @@ public class ChatHistoryController {
                 .severity(savedChatHistory.getSeverity())
                 .timestamp(savedChatHistory.getTimestamp())
                 .sessionId(savedChatHistory.getSessionId())
+                .title(savedChatHistory.getTitle())
                 .build();
                 
             return ResponseEntity.ok(responseDTO);
@@ -91,6 +97,7 @@ public class ChatHistoryController {
                     .severity(history.getSeverity())
                     .timestamp(history.getTimestamp())
                     .sessionId(history.getSessionId())
+                    .title(history.getTitle())
                     .build())
                 .collect(Collectors.toList());
             return ResponseEntity.ok(responseDTOs);
@@ -107,6 +114,33 @@ public class ChatHistoryController {
             User user = userService.findByEmail(userEmail);
             
             chatHistoryService.deleteSession(user.getId(), sessionId);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/title")
+    public ResponseEntity<?> updateSessionTitle(@RequestBody Map<String, String> request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            User user = userService.findByEmail(userEmail);
+
+            String sessionId = request.get("sessionId");
+            String title = request.get("title");
+
+            if (sessionId == null || title == null) {
+                return ResponseEntity.badRequest().body("sessionId와 title이 필요합니다.");
+            }
+
+            // 해당 세션의 모든 메시지의 title을 업데이트
+            List<ChatHistory> chatHistories = chatHistoryService.findByUserIdAndSessionId(user.getId(), sessionId);
+            for (ChatHistory chatHistory : chatHistories) {
+                chatHistory.setTitle(title);
+                chatHistoryService.saveChatHistory(chatHistory);
+            }
+
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -26,6 +26,9 @@ public class ChatHistory {
     @Column(name = "session_id", nullable = false)
     private String sessionId;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String message;
 

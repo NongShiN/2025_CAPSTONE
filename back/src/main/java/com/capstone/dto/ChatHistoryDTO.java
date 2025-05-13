@@ -20,4 +20,5 @@ public class ChatHistoryDTO {
     private String cognitiveDistortion;
     private Integer severity;
     private String sessionId;
+    private String title;
 } 
