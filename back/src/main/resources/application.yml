@@ -1,62 +1,38 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   datasource:
-    url: jdbc:postgresql://34.64.69.195:5432/sound_of_mind  # ✅ GCP Cloud SQL 공개 IP 및 포트
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: 1111
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+
+  thymeleaf:
+    cache: false
   mvc:
     view:
       prefix: /templates/
       suffix: .html
-  thymeleaf:
-    cache: false
-    prefix: classpath:/templates/
-    suffix: .html
   web:
     resources:
       static-locations: classpath:/static/
 
 jwt:
   secret: your-secret-key-here-must-be-at-least-256-bits-long
-  expiration: 86400000 # 24 hours in milliseconds
+  expiration: 86400000 # 24 hours
 
 logging:
   level:
+    root: INFO
     org.springframework.security: DEBUG
     com.capstone: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: jdbc:postgresql://34.64.69.195:5432/sound_of_mind  # ✅ prod 환경도 동일하게 수정
-    username: postgres
-    password: 1111
-  jpa:
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: false
-  thymeleaf:
-    cache: true

@@ -23,7 +23,7 @@ const SignupPage = () => {
     
       setIsLoading(true);
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://my-backend-281506025529.asia-northeast3.run.app';
         const res = await fetch(`${apiUrl}/api/auth/signup`, {
           method: 'POST',
           headers: {
