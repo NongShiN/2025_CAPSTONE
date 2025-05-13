@@ -31,6 +31,8 @@ const LoginPage = () => {
     }
   
       localStorage.setItem("user", JSON.stringify(data));
+      //여기서 보낼 예정 userid
+
       router.push("/chat");
     } catch (error) {
       console.error('Error:', error);

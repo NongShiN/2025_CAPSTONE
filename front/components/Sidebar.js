@@ -212,14 +212,20 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
             </div>
 
             <ul className={styles.chatItemList}>
-                {filteredSessions.length === 0 ? (
-                    <div style={{ textAlign: "center", color: "#888", padding: "1rem 0" }}>No results</div>
+                {isGuest ? (
+                    <div style={{ textAlign: "center", color: "#888", padding: "1rem 0" }}>
+                        게스트 모드에서는 대화 목록을 사용할 수 없습니다.
+                    </div>
+                ) : filteredSessions.length === 0 ? (
+                    <div style={{ textAlign: "center", color: "#888", padding: "1rem 0" }}>
+                        No results
+                    </div>
                 ) : (
                     filteredSessions.map((session, index) => (
                         <li
                             key={`${session.id}-${index}`}
                             className={`${styles.chatItem} ${deletingId === session.id ? styles.deleting : ""}`}
-                            onClick={() => onSelectChat && onSelectChat(session.id)}
+                            onClick={() => onSelectChat && onSelectChat(session.id)} // mascc
                         >
                             <div className={styles.chatTitle}>
                                 <img src="/message.svg" alt="chat icon" style={{ width: "16px", height: "16px" }} />
