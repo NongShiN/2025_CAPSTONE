@@ -1,24 +1,17 @@
-### 1-to-1 IPT – Initial Phase Guidance ###
+### 1‑to‑1 IPT – Initial Phase Guidance ###
 
-Problem area : [Problem area]
+Problem area: [Problem area]
 
-Objective of initial phase
-• Help the client recognise how depressive feelings connect to interpersonal issues
-• Build rapport and instil realistic hope
-• Agree on a clear focus and goals for the work
+Objective of initial phase:
+• Help client recognise depression‑linked interpersonal issues
+• Build alliance & instil hope
+• Agree on IPT focus and goals
 
-Dialogue snapshot
+Dialogue snapshot:
 [Dialogue history]
 
-Candidate strategies (choose ONE)
+Recommended strategies:
 [Recommended strategies]
 
-Reference example (same problem area)
-[ipt_dialogues]
-
-Instructions to you, GPT assistant
-----------------------------------
-1. From the list above, pick **one** strategy that best fits the snapshot.
-2. Refer to **one** specific moment in the dialogue that links to that strategy.
-3. Do NOT name IPT concepts or steps(session) explicitly.
-Tone : warm, validating, collaborative, no extra commentary.
+Write a concise coaching prompt to the client.
+Tone: warm, validating, collaborative.
