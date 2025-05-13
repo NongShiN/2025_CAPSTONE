@@ -287,7 +287,7 @@ export default function ChatWindow({
                     severity: data.severity || 0
                 })
             });
-            // 5. 타이틀 동기화 요청
+// 5. 타이틀 동기화 요청
             await fetch("https://my-backend-281506025529.asia-northeast3.run.app/api/chat/title", {
                 method: "POST",
                 headers: {

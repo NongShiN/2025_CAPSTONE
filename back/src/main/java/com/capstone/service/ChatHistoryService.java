@@ -5,7 +5,7 @@ import com.capstone.repository.ChatHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 
@@ -28,7 +28,7 @@ public class ChatHistoryService {
             return 1L;
         }
     }
-
+    @Transactional
     public ChatHistory saveChatHistory(ChatHistory chatHistory) {
         return chatHistoryRepository.save(chatHistory);
     }
