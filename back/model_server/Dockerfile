@@ -8,7 +8,7 @@ COPY back/model_server ./model_server
 COPY back/model_server/requirements.txt ./requirements.txt
 
 # PYTHONPATH에 /app 추가해서 model.* import 가능하게
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/model
 
 # 패키지 설치
 RUN pip install --no-cache-dir -r requirements.txt
