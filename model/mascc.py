@@ -1,6 +1,7 @@
 # MASCC (Multi-Agent System for Counsel Chat)
 import os
 import sys
+import json
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from openai import OpenAI
 from .agents.counselor import CounselorAgent
@@ -34,16 +35,47 @@ class MASCC:
     def get_counselor(self, user_id):
         if user_id not in self.counselor.keys():
             self.counselor[user_id] = CounselorAgent(self.args, self.llm, self.retriever)
-            self.counselor[user_id].load_dialogues()
             
         return self.counselor[user_id]
         # TODO: 처음 생성되는 에이전트의 dialogues가 아무것도 없을 때 디폴트값이 필요함
 
+    
+    def transform_dialogue_history(self, data):
+        dialogue_history = []
 
+        for entry in data:
+            dialogue_history.append({
+                "speaker": "Client",
+                "utterance": entry["message"]
+            })
+            dialogue_history.append({
+                "speaker": "Counselor",
+                "utterance": entry["response"]
+            })
+
+        return dialogue_history
+    
+    
     # user_id의 전체 dialogues 중에서 dialogue_history_id에 해당하는 대화 내역을 counselor 에이전트 내부 변수에 저장 
-    def select_session(self, user_id, dialogue_history_id):
+    def select_session(self, user_id, dialogue_history_id, dialogue_history):
+        dialogue_history = json.loads(dialogue_history)
         counselor = self.get_counselor(user_id)
-        counselor.load_dialogue_history(dialogue_history_id)
+        
+        counselor.dialogue_history_id = dialogue_history_id
+        
+        transfromed_dialogue_history = []
+        for entry in dialogue_history:
+            transfromed_dialogue_history.append({
+                "speaker": "Client",
+                "utterance": entry["message"]
+            })
+            transfromed_dialogue_history.append({
+                "speaker": "Counselor",
+                "utterance": entry["response"]
+            })
+            
+        counselor.dialogue_history = transfromed_dialogue_history
+        #counselor.load_dialogue_history(dialogue_history_id)
     
     
     def generate(self, args, user_id, client_utterance, timestamp):

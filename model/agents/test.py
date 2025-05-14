@@ -1,5 +1,5 @@
-from .utils.util import str_to_json_data, format_dialogue_history
 import os
+import json
 
 def load_dialogues(dialogue_history_path="memory/dialogue_history.json"):
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), dialogue_history_path))
@@ -9,41 +9,49 @@ def load_dialogues(dialogue_history_path="memory/dialogue_history.json"):
     
     return str_to_json_data(data)
 
-def update_dialogues(dialogue_history_id):
-    dialogues[dialogue_history_id] = dialogue_history
-
 def update_dialogue_history(dialogue_history, speaker, utterance, timestamp):
     dialogue_history.append({
         "speaker": speaker,
         "utterance": utterance,
         "timestamp": timestamp
     })
-    
-def update_dialogues(dialogues, dialogue_history, dialogue_history_id):
-    dialogues[dialogue_history_id] = dialogue_history
-        
-dialogues = None
-dialogue_history = None
-    
-dialogues = load_dialogues(dialogue_history_path="memory/dialogue_history.json")
-print(dialogues)
 
-print("====================================")
 
-dialogue_history = dialogues["dlg001"]["dialogue_history"]
-print(dialogue_history)
+dialogue_history = """[
+  {
+    "id": 1,
+    "user_id": 1,
+    "message": "Hi",
+    "response": "Hello",
+    "timestamp": "2025-04-20T10:00:00.000000",
+    "cognitive_distortion": "",
+    "insight": "",
+    "session_id": "dlg001",
+    "severity": 0
+  },
+  {
+    "id": 2,
+    "user_id": 1,
+    "message": "I've been really anxious lately.",
+    "response": "Would you like to talk about what’s making you anxious?",
+    "timestamp": "2025-04-20T10:01:10.000000",
+    "cognitive_distortion": "",
+    "insight": "",
+    "session_id": "dlg001",
+    "severity": 0
+  }
+]
+"""
 
-print("====================================")
-
-update_dialogue_history(dialogue_history, "Client", "Hi", "2025-04-25T02:57:20.102793")
-print(dialogue_history)
-
-print("====================================")
-
-update_dialogues(dialogues, dialogue_history, "dlg001")
-print(dialogues)
-
-print("====================================")
-
-dh = format_dialogue_history(dialogue_history)
-print(dh)
+dialogue_history = json.loads(dialogue_history)
+transfromed_dialogue_history = []
+for entry in dialogue_history:
+    transfromed_dialogue_history.append({
+        "speaker": "Client",
+        "utterance": entry["message"]
+    })
+    transfromed_dialogue_history.append({
+        "speaker": "Counselor",
+        "utterance": entry["response"]
+    })
+print(transfromed_dialogue_history)

@@ -74,7 +74,7 @@ def call_llm(prompt, llm, model="gpt-4o-mini", temperature=0.7):
     return content
 
 
-def format_dialogue_history(dialogue_history):
+def generate_dialogue_history_input(dialogue_history):
     lines = []
     for turn in dialogue_history:
         speaker = turn["speaker"]

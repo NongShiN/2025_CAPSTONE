@@ -1,9 +1,11 @@
 import random
 from datetime import datetime, timedelta
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 #from model.chat import chat_with_mascc, load_mascc, load_counselor, select_session
 from model.chat import chat_with_mascc, load_mascc
+
+from back.model_server.models import dialog
 
 app = FastAPI()
 
@@ -108,16 +110,38 @@ def load_counselor(user_id: str):
     return {"user_id": user_id, "current_counselor_agent_list": str(mascc.counselor.keys())}
 
     
-@app.get("/select_session")
-def select_session(user_id: str, dialogue_history_id: str):
-    mascc.select_session(user_id, dialogue_history_id)
-    print(f"============== Loading Session history Complete. ==============")
-    print(mascc.counselor[user_id].dialogue_history)
+#@app.get("/select_session")
+#def select_session(user_id: str, dialogue_history_id: str, dialogue_history: str):
+#    mascc.select_session(user_id, dialogue_history_id, dialogue_history)
+#    print(f"============== Loading Session history Complete. ==============")
+#    print(mascc.counselor[user_id].dialogue_history_id)
+#    print(mascc.counselor[user_id].dialogue_history)
     
+@app.post("/select_session")
+async def select_session(user_info: dialog.UserInfo, session_info: dialog.SessionInfo, dialog_history: dialog.DialogHistory):
+    user_id = user_info.user_id
+    session_id = session_info.session_id
+    hist = dialog_history.history
+    counselor = mascc.get_counselor(user_id)
+    
+    transformed_dialogue_history = []
+    for entry in hist:
+        transformed_dialogue_history.append(
+            {"speaker": "Client", "utterance": entry.message, "timestamp": entry.timestamp}
+            )
+        transformed_dialogue_history.append(
+            {"speaker": "Counselor", "utterance": entry.response, "timestamp": entry.timestamp}
+            )
+    counselor.dialogue_history = transformed_dialogue_history
+    counselor.dialogue_history_id = session_id
 
-@app.get("/gen")
-def generate(user_id: str, user_input: str = Query(None)):
+    return transformed_dialogue_history
+
+@app.post("/gen")
+def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
     global last_interaction_time
+    user_id = user_info.user_id
+    user_input = query.user_input
     
     counselor = mascc.get_counselor(user_id)
     

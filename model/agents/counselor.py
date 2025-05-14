@@ -6,7 +6,7 @@ from .supervisor_act import SupervisorACT
 from .supervisor_dbt import SupervisorDBT
 from .supervisor_ifs import SupervisorIFS
 from .supervisor_ipt import SupervisorIPT
-from .utils.util import call_llm, load_prompt, str_to_json_data, format_dialogue_history
+from .utils.util import call_llm, load_prompt, str_to_json_data, generate_dialogue_history_input
 from .utils.args import parse_args
 import logging
 
@@ -36,17 +36,18 @@ class CounselorAgent:
 
 
     # 이후에 없어질 함수 (또는 수정)
-    def load_dialogues(self, dialogue_history_path="memory/dialogue_history.json"):
-        path = os.path.abspath(os.path.join(os.path.dirname(__file__), dialogue_history_path))
-
-        with open(path, 'r', encoding='utf-8') as f:
-            dialogues = f.read().strip()
-
-        self.dialogues = str_to_json_data(dialogues)
+    #def load_dialogues(self, dialogue_history_path="memory/dialogue_history.json"):
+    #    path = os.path.abspath(os.path.join(os.path.dirname(__file__), dialogue_history_path))
+    #
+    #    with open(path, 'r', encoding='utf-8') as f:
+    #        dialogues = f.read().strip()
+    #
+    #    self.dialogues = str_to_json_data(dialogues)
     
     
     def update_dialogues(self, dialogue_history_id):
         self.dialogues[dialogue_history_id] = self.dialogue_history
+    
     
     def load_dialogue_history(self, dialogue_history_id):
         self.dialogue_history_id = dialogue_history_id
@@ -55,6 +56,7 @@ class CounselorAgent:
             self.dialogue_history = self.dialogues[dialogue_history_id]["dialogue_history"]
         else:
             self.dialogue_history = []
+    
         
     def update_dialogue_history(self, speaker, utterance, timestamp):
         self.dialogue_history.append({
@@ -63,7 +65,7 @@ class CounselorAgent:
             "timestamp": timestamp
         })
         
-        print(f"dialogue history id : {self.dialogue_history_id}\ndialogue history :\n{format_dialogue_history(self.dialogue_history)}")
+        print(f"dialogue history id : {self.dialogue_history_id}\ndialogue history :\n{generate_dialogue_history_input(self.dialogue_history)}")
     
     
     def select_supervisor(self, dialogue_history):
@@ -119,7 +121,7 @@ class CounselorAgent:
             
     def generate_response(self, args, client_utterance, timestamp):
         dynamic_prompt = self.request_for_guidance(args, client_utterance, timestamp)
-        final_prompt = self.static_prompt.replace("[Dialogue history]", format_dialogue_history(self.dialogue_history)).replace("[Guidance]", dynamic_prompt)
+        final_prompt = self.static_prompt.replace("[Dialogue history]", generate_dialogue_history_input(self.dialogue_history)).replace("[Guidance]", dynamic_prompt)
         #print(final_prompt)
         return call_llm(final_prompt, llm=self.llm, model=self.model, temperature=self.temperature) + " <" + self.selected_supervisor + ">"
 
