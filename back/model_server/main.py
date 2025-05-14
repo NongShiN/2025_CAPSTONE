@@ -134,7 +134,10 @@ async def select_session(user_info: dialog.UserInfo, session_info: dialog.Sessio
             )
     counselor.dialogue_history = transformed_dialogue_history
     counselor.dialogue_history_id = session_id
-
+    
+    print(counselor.dialogue_history)
+    print(counselor.dialogue_history_id)
+    
     return transformed_dialogue_history
 
 @app.post("/gen")
@@ -147,7 +150,7 @@ def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
     counselor = mascc.get_counselor(user_id)
     
     try:
-        if not user_input:
+        if user_input == "<SOS>":
             greeting = get_greeting_by_time()
             last_interaction_time = datetime.now()
             
@@ -173,6 +176,7 @@ def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
     
     except Exception as e:
         return {"error": str(e)}
+
 
 @app.get("/reminder")
 def reminder_check():

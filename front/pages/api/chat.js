@@ -2,14 +2,36 @@ export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method Not Allowed" });
     }
+    
+    console.log(`Request Body: ${req.body}`);
 
-    const { message } = req.body;
+    const {
+        user_info: { user_id },
+        query: { user_input }
+    } = req.body;
+
+
+    
+    console.log(`user_id: ${user_id}, user_input: ${user_input}`);
 
     try {
         // ✅ 여기를 OpenAI → 너의 모델 서버로 변경
-        const response = await fetch(`https://model-server-281506025529.asia-northeast3.run.app/gen?user_input=${encodeURIComponent(message)}`);
+        const response = await fetch("https://model-server-281506025529.asia-northeast3.run.app/gen", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user_info: {
+                    user_id: user_id,
+                },
+                query: {
+                    user_input: user_input
+                }
+            })
+        });
         const data = await response.json();
-
+        console.log("🎯 모델 응답 결과:", data); // ✅ 여기에 로그 추가
         res.status(200).json({ message: data.response });
     } catch (error) {
         console.error("Model API error:", error);

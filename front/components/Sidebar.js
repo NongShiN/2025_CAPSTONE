@@ -212,14 +212,85 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
             </div>
 
             <ul className={styles.chatItemList}>
-                {filteredSessions.length === 0 ? (
-                    <div style={{ textAlign: "center", color: "#888", padding: "1rem 0" }}>No results</div>
+                {isGuest ? (
+                    <div style={{ textAlign: "center", color: "#888", padding: "1rem 0" }}>
+                        게스트 모드에서는 대화 목록을 사용할 수 없습니다.
+                    </div>
+                ) : filteredSessions.length === 0 ? (
+                    <div style={{ textAlign: "center", color: "#888", padding: "1rem 0" }}>
+                        No results
+                    </div>
                 ) : (
                     filteredSessions.map((session, index) => (
                         <li
                             key={`${session.id}-${index}`}
                             className={`${styles.chatItem} ${deletingId === session.id ? styles.deleting : ""}`}
-                            onClick={() => onSelectChat && onSelectChat(session.id)}
+                            onClick={async () => {
+                                if (onSelectChat) onSelectChat(session.id); // 기존 기능 유지
+
+                                const storedUser = JSON.parse(localStorage.getItem("user"));
+                                const userId = storedUser?.id;
+
+                                // 대화 내역 → message-response 묶음으로 구성
+                                const dialogueHistory = [];
+                                for (let i = 0; i < session.messages.length; i++) {
+                                    const userMsg = session.messages[i];
+
+                                    // user 메시지 다음에 bot 응답이 따라오는 경우만 처리
+                                    if (userMsg.sender === "user") {
+                                        const botMsg = session.messages[i + 1];
+                                        if (botMsg?.sender === "bot") {
+                                            dialogueHistory.push({
+                                                id: i + 1,
+                                                message: userMsg.text || "",
+                                                response: botMsg.text || "",
+                                                timestamp: new Date(userMsg.timestamp).toISOString(), // 또는 botMsg.timestamp
+                                            });
+                                            i++; // bot 메시지는 이미 사용했으므로 skip
+                                        }
+                                    }
+                                }
+
+                                try {
+                                    const res = await fetch("https://model-server-281506025529.asia-northeast3.run.app", {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            user_info: {
+                                                user_id: String(userId),
+                                            },
+                                            session_info: {
+                                                session_id: session.id,
+                                            },
+                                            dialog_history: {
+                                                history: session.messages.map((msg, index) => ({
+                                                    id: index + 1,
+                                                    message: msg.sender === "user" ? msg.text : "",
+                                                    response: msg.sender === "bot" ? msg.text : "",
+                                                    timestamp: new Date(msg.timestamp).toISOString(),
+                                                })),
+                                            },
+                                        }),
+                                    });
+                                    console.log(JSON.stringify({
+                                        user_info: {
+                                            user_id: String(userId),
+                                        },
+                                        session_info: {
+                                            session_id: session.id,
+                                        },
+                                        dialog_history: {
+                                            history: dialogueHistory,
+                                        },
+                                    }));
+                                    const result = await res.json();
+                                    console.log("✅ 모델 서버 응답:", result);
+                                } catch (error) {
+                                    console.error("❌ 모델 서버 호출 실패:", error);
+                                }
+                            }}
                         >
                             <div className={styles.chatTitle}>
                                 <img src="/message.svg" alt="chat icon" style={{ width: "16px", height: "16px" }} />

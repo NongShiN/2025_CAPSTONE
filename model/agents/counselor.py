@@ -30,7 +30,7 @@ class CounselorAgent:
         
         self.dialogues = None
         self.dialogue_history_id = None
-        self.dialogue_history = None
+        self.dialogue_history = []
         
         self.selected_supervisor = None
 

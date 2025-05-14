@@ -30,7 +30,17 @@ const LoginPage = () => {
       return;
     }
   
+      // 1. user 정보 저장
       localStorage.setItem("user", JSON.stringify(data));
+      // 2. userId를 모델 서버에 전송
+      await fetch(`https://model-server-281506025529.asia-northeast3.run.app/load_counselor?user_id=${data.id}`, {
+        method: "GET",  // 또는 POST (서버가 어떤 방식 받는지에 따라)
+        headers: {
+          "Content-Type": "application/json"
+        },
+        // ✅ 쿼리스트링으로 보내는 방식 예시
+      });
+
       router.push("/chat");
     } catch (error) {
       console.error('Error:', error);

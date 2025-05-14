@@ -127,23 +127,19 @@ export default function ChatWindow({
                         sender: "user",
                         text: msg.message,
                         timestamp: msg.timestamp,
-                        sessionId: msg.sessionId
+                        sessionId: msg.sessionId  // ✅ 추가
                     });
 
                     if (msg.response) {
-                        const sentences = msg.response.match(/[^.!?]+[.!?]+/g) || [msg.response];
-                        sentences.forEach((sentence, i) => {
-                            parsed.push({
-                                id: `${msg.id || Date.now()}_resp_${i}`,
-                                sender: "bot",
-                                text: sentence.trim(),
-                                timestamp: msg.timestamp,
-                                sessionId: msg.sessionId
-                            });
+                        parsed.push({
+                            id: msg.id ? `resp_${msg.id}` : `resp_${Date.now()}_${index}`,
+                            sender: "bot",
+                            text: msg.response,
+                            timestamp: msg.timestamp,
+                            sessionId: msg.sessionId  // ✅ 추가
                         });
                     }
                 });
-
                 console.log("🔍 응답에 포함된 세션ID들:", parsed.map(m => m.sessionId));
                 parsed.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
                 setMessages(parsed);
@@ -176,34 +172,77 @@ export default function ChatWindow({
     }, [sessionId, selectedSessionId]);
 
     const fetchGreeting = async () => {
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        const userId = storedUser?.id;
         try {
-            const response = await axios.get("https://model-server-281506025529.asia-northeast3.run.app/gen");
+            const res = await fetch("https://model-server-281506025529.asia-northeast3.run.app/gen", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_info: {
+                        user_id: userId
+                    },
+                    query: {
+                        user_input: "<SOS>"
+                    }
+                })
+            });
+            const data = await res.json();  // 💡 JSON 파싱
 
-            if (response.data.response) {
-                await typeText(response.data.response); // ✅ 문장 타이핑
-                setShowIntro(false);                   // ✅ 인트로 숨김
-
-                setTimeout(() => {
-                    setShowInputBox(true);             // ✅ 0.8초 후 입력창 표시
-                }, 800);
+            if (data.response) {
+                const greeting = {
+                    id: Date.now(),
+                    sender: "bot",
+                    text: data.response,
+                };
+                setMessages([greeting]);
+                setShowIntro(false); // ✅ Intro 화면 끄기
+                setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
             }
         } catch (error) {
             console.error("초기 인사말 불러오기 실패:", error);
             setMessages([]);
             setShowIntro(false);
-
-            // 실패해도 입력창 딜레이 표시 유지
-            setTimeout(() => {
-                setShowInputBox(true);
-            }, 800);
+            setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
         }
     };
-
-
-
-    const handleIntroClick = () => {
+        
+    const handleIntroClick = async () => {
         fetchGreeting(); // ✅ "Let me hear your heart" 클릭 시 서버 호출
         setIntroClicked(true); // 클릭했으니까 애니메이션 시작
+
+        try {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            const userId = storedUser?.id;
+            const sessionIdToSend = selectedSessionId || sessionId;
+
+            await fetch("https://model-server-281506025529.asia-northeast3.run.app/select_session", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_info: {
+                        user_id: userId,
+                    },
+                    session_info: {
+                        session_id: sessionIdToSend,
+                    },
+                    dialog_history: {
+                        history: []  // ✅ 초기에는 빈 배열
+                    }
+                })
+            });
+
+            //
+            console.log("✅ 인트로 클릭 시 모델 서버에 초기 세션 전송 완료");
+        } catch (error) {
+            console.error("❌ 인트로 클릭 시 모델 서버 전송 실패:", error);
+        }
+
+
         setTimeout(() => {
             setIntroVisible(false); // 0.5초 뒤에 실제로 IntroBox 제거
         }, 800); // fadeOutUp 애니메이션 시간과 맞춰야 함
@@ -229,6 +268,9 @@ export default function ChatWindow({
     }
     const handleSend = async () => {
         const currentSessionId = selectedSessionId || sessionId;
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        const userId = storedUser?.id;
+
         if (!input.trim() || !currentSessionId) return;
 
         const userMessage = {
@@ -251,10 +293,19 @@ export default function ChatWindow({
             // 1. 모델 응답 받기
             const res = await fetch("/api/chat", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: input }),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_info: {
+                        user_id: userId
+                    },
+                    query: {
+                        user_input: input
+                    }
+                })
             });
-
+            console.log("📦 요청 바디:", { message: input, userId });
             const data = await res.json();
             const replyText = data.message || "답변을 불러오지 못했어요.";
 
