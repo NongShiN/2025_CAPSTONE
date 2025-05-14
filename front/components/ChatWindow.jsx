@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "../styles/ChatWindow.module.css";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import URLS from '../config';
 
 export default function ChatWindow({
                                        newChatTrigger,
@@ -101,7 +102,7 @@ export default function ChatWindow({
         const fetchMessages = async () => {
             setSessionId(selectedSessionId);
             try {
-                const res = await fetch(`https://my-backend-281506025529.asia-northeast3.run.app/api/chat/history?sessionId=${selectedSessionId}`, {
+                const res = await fetch(`${URLS.BACK}/api/chat/history?sessionId=${selectedSessionId}`, {
                     headers: {
                         "Authorization": `Bearer ${storedUser.token}`
                     }
@@ -175,7 +176,7 @@ export default function ChatWindow({
         const storedUser = JSON.parse(localStorage.getItem("user"));
         const userId = storedUser?.id;
         try {
-            const res = await fetch("https://model-server-281506025529.asia-northeast3.run.app/gen", {
+            const res = await fetch(`${URLS.MODEL}/gen`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -218,7 +219,7 @@ export default function ChatWindow({
             const userId = storedUser?.id;
             const sessionIdToSend = selectedSessionId || sessionId;
 
-            await fetch("https://model-server-281506025529.asia-northeast3.run.app/select_session", {
+            await fetch(`${URLS.MODEL}/select_session`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -331,7 +332,7 @@ export default function ChatWindow({
             // 4. 메시지 저장 (한 번만)
             const storedUser = JSON.parse(localStorage.getItem("user"));
 
-            await fetch("https://my-backend-281506025529.asia-northeast3.run.app/api/chat", {
+            await fetch(`${URLS.BACK}/api/chat`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

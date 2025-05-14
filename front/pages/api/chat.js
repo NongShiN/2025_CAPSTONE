@@ -1,3 +1,5 @@
+import URLS from '../../config';
+
 export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method Not Allowed" });
@@ -16,7 +18,7 @@ export default async function handler(req, res) {
 
     try {
         // ✅ 여기를 OpenAI → 너의 모델 서버로 변경
-        const response = await fetch("https://model-server-281506025529.asia-northeast3.run.app/gen", {
+        const response = await fetch(`${URLS.MODEL}/gen`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { useState, useEffect, useCallback } from "react";
 import styles from "../styles/Sidebar.module.css";
-
+import URLS from '../config';
 
 export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newChatTrigger, refreshSessionList, theme }) {
     const router = useRouter();
@@ -17,7 +17,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser && !storedUser.guest) {
             try {
-                const res = await fetch("https://my-backend-281506025529.asia-northeast3.run.app/api/chat/history", {
+                const res = await fetch(`${URLS.BACK}/api/chat/history`, {
                     headers: {
                         "Authorization": `Bearer ${storedUser.token}`
                     }
@@ -120,7 +120,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
             
             // 로그인한 사용자인 경우 백엔드 DB에서도 삭제
             if (storedUser && !storedUser.guest) {
-                const response = await fetch(`https://my-backend-281506025529.asia-northeast3.run.app/api/chat/session/${idToDelete}`, {
+                const response = await fetch(`${URLS.BACK}/api/chat/session/${idToDelete}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${storedUser.token}`,
@@ -252,7 +252,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                 }
 
                                 try {
-                                    const res = await fetch("https://model-server-281506025529.asia-northeast3.run.app", {
+                                    const res = await fetch(`${URLS.MODEL}`, {
                                         method: "POST",
                                         headers: {
                                             "Content-Type": "application/json",

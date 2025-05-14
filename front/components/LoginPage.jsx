@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import styles from "../styles/LoginPage.module.css";
 import { signIn } from "next-auth/react";
+import URLS from '../config';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -11,7 +12,7 @@ const LoginPage = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('https://my-backend-281506025529.asia-northeast3.run.app/api/auth/login', {
+      const res = await fetch(`${URLS.BACK}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,7 +34,7 @@ const LoginPage = () => {
       // 1. user 정보 저장
       localStorage.setItem("user", JSON.stringify(data));
       // 2. userId를 모델 서버에 전송
-      await fetch(`https://model-server-281506025529.asia-northeast3.run.app/load_counselor?user_id=${data.id}`, {
+      await fetch(`${URLS.MODEL}/load_counselor?user_id=${data.id}`, {
         method: "GET",  // 또는 POST (서버가 어떤 방식 받는지에 따라)
         headers: {
           "Content-Type": "application/json"

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import styles from '../styles/SignupPage.module.css';
 import { motion } from 'framer-motion';
+import URLS from '../config';
 
 const SignupPage = () => {
     const router = useRouter();
@@ -23,7 +24,7 @@ const SignupPage = () => {
     
       setIsLoading(true);
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://my-backend-281506025529.asia-northeast3.run.app';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || `${URLS.BACK}`;
         const res = await fetch(`${apiUrl}/api/auth/signup`, {
           method: 'POST',
           headers: {
