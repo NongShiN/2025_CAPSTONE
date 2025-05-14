@@ -287,18 +287,9 @@ export default function ChatWindow({
                     severity: data.severity || 0
                 })
             });
-// 5. 타이틀 동기화 요청
-            await fetch("https://my-backend-281506025529.asia-northeast3.run.app/api/chat/title", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${storedUser.token}`,
-                },
-                body: JSON.stringify({
-                    sessionId: currentSessionId,
-                    title: generatedTitle,
-                }),
-            });
+
+            await new Promise((resolve) => setTimeout(resolve, 300)); // 💡 300ms 딜레이 추가
+
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {

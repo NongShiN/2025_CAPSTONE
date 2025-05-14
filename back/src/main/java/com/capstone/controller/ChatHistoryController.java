@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat")
@@ -31,39 +32,35 @@ public class ChatHistoryController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
-            
-            // Get the next available ID
+
+            // ID 발급
             Long nextId = chatHistoryService.getNextId();
-            
+
+            // ChatHistory 생성 및 저장
             ChatHistory chatHistory = ChatHistory.builder()
-                .id(nextId)
-                .user(user)
-                .message(chatHistoryDTO.getMessage())
-                .response(chatHistoryDTO.getResponse())
-                .insight(chatHistoryDTO.getInsight())
-                .cognitiveDistortion(chatHistoryDTO.getCognitiveDistortion())
-                .severity(chatHistoryDTO.getSeverity())
-                .sessionId(
-                    chatHistoryDTO.getSessionId() != null && !chatHistoryDTO.getSessionId().isEmpty()
-                        ? chatHistoryDTO.getSessionId()
-                        : UUID.randomUUID().toString()
-                )
-                .build();
-            
-            ChatHistory savedChatHistory = chatHistoryService.saveChatHistory(chatHistory);
-            
-            ChatHistoryDTO responseDTO = ChatHistoryDTO.builder()
-                .userId(savedChatHistory.getUser().getId().toString())
-                .message(savedChatHistory.getMessage())
-                .response(savedChatHistory.getResponse())
-                .insight(savedChatHistory.getInsight())
-                .cognitiveDistortion(savedChatHistory.getCognitiveDistortion())
-                .severity(savedChatHistory.getSeverity())
-                .timestamp(savedChatHistory.getTimestamp())
-                .sessionId(savedChatHistory.getSessionId())
-                .build();
-                
-            return ResponseEntity.ok(responseDTO);
+                    .id(nextId)
+                    .user(user)
+                    .message(chatHistoryDTO.getMessage())
+                    .response(chatHistoryDTO.getResponse())
+                    .insight(chatHistoryDTO.getInsight())
+                    .cognitiveDistortion(chatHistoryDTO.getCognitiveDistortion())
+                    .severity(chatHistoryDTO.getSeverity())
+                    .sessionId(
+                            chatHistoryDTO.getSessionId() != null && !chatHistoryDTO.getSessionId().isEmpty()
+                                    ? chatHistoryDTO.getSessionId()
+                                    : UUID.randomUUID().toString()
+                    )
+                    .title(null)  // 여기선 null로 저장 (동기화는 별도로 수행)
+                    .build();
+
+            chatHistoryService.saveChatHistory(chatHistory);
+
+            // 💡 title 전달된 경우 전체 세션의 메시지에 대해 업데이트
+            if (chatHistoryDTO.getTitle() != null && !chatHistoryDTO.getTitle().isBlank()) {
+                chatHistoryService.updateTitleForSession(user.getId(), chatHistoryDTO.getSessionId(), chatHistoryDTO.getTitle());
+            }
+
+            return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -75,24 +72,28 @@ public class ChatHistoryController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
+
             List<ChatHistory> chatHistories;
             if (sessionId != null && !sessionId.isEmpty()) {
                 chatHistories = chatHistoryService.findByUserIdAndSessionId(user.getId(), sessionId);
             } else {
                 chatHistories = chatHistoryService.findByUserId(user.getId());
             }
+
             List<ChatHistoryDTO> responseDTOs = chatHistories.stream()
-                .map(history -> ChatHistoryDTO.builder()
-                    .userId(history.getUser().getId().toString())
-                    .message(history.getMessage())
-                    .response(history.getResponse())
-                    .insight(history.getInsight())
-                    .cognitiveDistortion(history.getCognitiveDistortion())
-                    .severity(history.getSeverity())
-                    .timestamp(history.getTimestamp())
-                    .sessionId(history.getSessionId())
-                    .build())
-                .collect(Collectors.toList());
+                    .map(history -> ChatHistoryDTO.builder()
+                            .userId(history.getUser().getId().toString())
+                            .message(history.getMessage())
+                            .response(history.getResponse())
+                            .insight(history.getInsight())
+                            .cognitiveDistortion(history.getCognitiveDistortion())
+                            .severity(history.getSeverity())
+                            .timestamp(history.getTimestamp())
+                            .sessionId(history.getSessionId())
+                            .title(history.getTitle())
+                            .build())
+                    .collect(Collectors.toList());
+
             return ResponseEntity.ok(responseDTOs);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -105,11 +106,11 @@ public class ChatHistoryController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
-            
+
             chatHistoryService.deleteSession(user.getId(), sessionId);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-} 
+}
