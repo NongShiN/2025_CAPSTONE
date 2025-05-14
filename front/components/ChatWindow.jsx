@@ -127,19 +127,23 @@ export default function ChatWindow({
                         sender: "user",
                         text: msg.message,
                         timestamp: msg.timestamp,
-                        sessionId: msg.sessionId  // ✅ 추가
+                        sessionId: msg.sessionId
                     });
 
                     if (msg.response) {
-                        parsed.push({
-                            id: msg.id ? `resp_${msg.id}` : `resp_${Date.now()}_${index}`,
-                            sender: "bot",
-                            text: msg.response,
-                            timestamp: msg.timestamp,
-                            sessionId: msg.sessionId  // ✅ 추가
+                        const sentences = msg.response.match(/[^.!?]+[.!?]+/g) || [msg.response];
+                        sentences.forEach((sentence, i) => {
+                            parsed.push({
+                                id: `${msg.id || Date.now()}_resp_${i}`,
+                                sender: "bot",
+                                text: sentence.trim(),
+                                timestamp: msg.timestamp,
+                                sessionId: msg.sessionId
+                            });
                         });
                     }
                 });
+
                 console.log("🔍 응답에 포함된 세션ID들:", parsed.map(m => m.sessionId));
                 parsed.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
                 setMessages(parsed);
@@ -174,23 +178,28 @@ export default function ChatWindow({
     const fetchGreeting = async () => {
         try {
             const response = await axios.get("https://model-server-281506025529.asia-northeast3.run.app/gen");
+
             if (response.data.response) {
-                const greeting = {
-                    id: Date.now(),
-                    sender: "bot",
-                    text: response.data.response,
-                };
-                setMessages([greeting]);
-                setShowIntro(false); // ✅ Intro 화면 끄기
-                setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
+                await typeText(response.data.response); // ✅ 문장 타이핑
+                setShowIntro(false);                   // ✅ 인트로 숨김
+
+                setTimeout(() => {
+                    setShowInputBox(true);             // ✅ 0.8초 후 입력창 표시
+                }, 800);
             }
         } catch (error) {
             console.error("초기 인사말 불러오기 실패:", error);
             setMessages([]);
             setShowIntro(false);
-            setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
+
+            // 실패해도 입력창 딜레이 표시 유지
+            setTimeout(() => {
+                setShowInputBox(true);
+            }, 800);
         }
     };
+
+
 
     const handleIntroClick = () => {
         fetchGreeting(); // ✅ "Let me hear your heart" 클릭 시 서버 호출
