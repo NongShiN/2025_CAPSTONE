@@ -1,9 +1,10 @@
 # MASCC (Multi-Agent System for Counsel Chat)
 import os
 import sys
+import json
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from openai import OpenAI
-from agents.counselor import CounselorAgent
+from .agents.counselor import CounselorAgent
 import datetime
 import logging
 
@@ -24,21 +25,66 @@ class MASCC:
     def __init__(self, args, llm, retriever):
         self.args = args
         self.llm = llm
-        # self.counselor = {}
-        self.counselor = CounselorAgent(args, llm, retriever)
+        self.retriever = retriever
+        self.counselor = {}
+        #self.counselor = {"user1": CounselorAgent(self.args, self.llm, self.retriever)}
         logging.info("MASCC system initialized.")
+    
         
-    #def getCounselor(self, user_id: int):
-    #    if self.counselor.find(user_id):
-    #        return self.counselor[user_id]
-    #    else:
-    #        self.counselor[user_id] = CounselorAgent(args, llm, retriever)
-    #        return self.counselor[user_id]
+    # user_id에 해당하는 counselor 에이전트 인스턴스를 반환
+    def get_counselor(self, user_id):
+        if user_id not in self.counselor.keys():
+            self.counselor[user_id] = CounselorAgent(self.args, self.llm, self.retriever)
+            
+        return self.counselor[user_id]
+        # TODO: 처음 생성되는 에이전트의 dialogues가 아무것도 없을 때 디폴트값이 필요함
 
-    def generate(self, args, counselor_utterance, client_utterance, timestamp):
+    
+    def transform_dialogue_history(self, data):
+        dialogue_history = []
+
+        for entry in data:
+            dialogue_history.append({
+                "speaker": "Client",
+                "utterance": entry["message"]
+            })
+            dialogue_history.append({
+                "speaker": "Counselor",
+                "utterance": entry["response"]
+            })
+
+        return dialogue_history
+    
+    
+    # user_id의 전체 dialogues 중에서 dialogue_history_id에 해당하는 대화 내역을 counselor 에이전트 내부 변수에 저장 
+    def select_session(self, user_id, dialogue_history_id, dialogue_history):
+        dialogue_history = json.loads(dialogue_history)
+        counselor = self.get_counselor(user_id)
+        
+        counselor.dialogue_history_id = dialogue_history_id
+        
+        transfromed_dialogue_history = []
+        for entry in dialogue_history:
+            transfromed_dialogue_history.append({
+                "speaker": "Client",
+                "utterance": entry["message"]
+            })
+            transfromed_dialogue_history.append({
+                "speaker": "Counselor",
+                "utterance": entry["response"]
+            })
+            
+        counselor.dialogue_history = transfromed_dialogue_history
+        #counselor.load_dialogue_history(dialogue_history_id)
+    
+    
+    def generate(self, args, user_id, client_utterance, timestamp):
         logging.info("Running single-turn interaction.")
-        # return self.getCounselor(user_id=user_id).generate_response(args, counselor_utterance, client_utterance, timestamp)
-        return self.counselor.generate_response(args, counselor_utterance, client_utterance, timestamp)
+
+        counselor = self.get_counselor(user_id)
+        
+        return counselor.generate_response(args, client_utterance, timestamp)
+
 
 if __name__ == "__main__":
     from sentence_transformers import SentenceTransformer
@@ -60,6 +106,6 @@ if __name__ == "__main__":
     client_utterance = "I feel like no matter what I do, it's never enough."
     timestamp = datetime.datetime.now().isoformat()
     
-    response = mascc.generate(args, counselor_utterance, client_utterance, timestamp)
+    response = mascc.generate(args, client_utterance, timestamp)
     print("\n[Counselor Response]:")
     print(response)

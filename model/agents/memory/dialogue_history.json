@@ -1,39 +1,42 @@
 {
-  "dialogue_history": [
-    {
-      "speaker": "Counselor",
-      "utterance": "How are you doing?",
-      "timestamp": "2025-04-25T02:55:35.102793"
-    },
-    {
-        "speaker": "Client",
-        "utterance": "Nobody likes me.",
-        "timestamp": "2025-04-25T02:55:40.102793"
-    },
-    {
-        "speaker": "Counselor",
-        "utterance": "What makes you think that?",
-        "timestamp": "2025-04-25T02:55:47.102793"
-    },
-    {
-        "speaker": "Client",
-        "utterance": "People often ignore me at work.",
-        "timestamp": "2025-04-25T02:55:55.102793"
-    },
-    {
-        "speaker": "Counselor",
-        "utterance": "Can you think of a recent example?",
-        "timestamp": "2025-04-25T02:56:12.102793"
-    },
-    {
-        "speaker": "Client",
-        "utterance": "Yesterday, no one responded when I said good morning.",
-        "timestamp": "2025-04-25T02:56:30.102793"
-    },
-    {
-        "speaker": "Counselor",
-        "utterance": "Is it possible they didn’t hear you or were distracted?",
-        "timestamp": "2025-04-25T02:56:59.102793"
-    }
-  ]
+  "user_info": {
+    "user_id": "sadfwefsadfsdfasdf"
+  },
+  "session_info": {
+    "session_id": "jdifwakefisldkfielk"
+  },
+  "dialog_history": {
+    "history": [
+      {
+        "id": 1,
+        "message": "Hi",
+        "response": "Hello, how can I help you today?",
+        "timestamp": "2025-05-14T06:25:48.450Z"
+      },
+      {
+        "id": 2,
+        "message": "i've been really anxious lately.",
+        "response": "Would you like to talk about what’s making you anxious?",
+        "timestamp": "2025-05-14T06:25:48.450Z"
+      },
+      {
+        "id": 4,
+        "message": "actually, I think I might be depressed.",
+        "response": "I'm sorry to hear that. It's important to talk about these feelings.",
+        "timestamp": "2025-05-14T06:25:48.450Z"
+      },
+      {
+        "id": 5,
+        "message": "I don't know what to do.",
+        "response": "It's okay to feel overwhelmed. Let's take it one step at a time.",
+        "timestamp": "2025-05-14T06:25:48.450Z"
+      },
+      {
+        "id": 6,
+        "message": "I feel like I'm in a dark hole.",
+        "response": "That sounds really tough. Can you tell me more about it?",
+        "timestamp": "2025-05-14T06:25:48.450Z"
+      }
+    ]
+  }
 }
