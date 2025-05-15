@@ -11,6 +11,7 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    console.log("✅ BACKEND URL:", URLS.BACK);
     try {
       const res = await fetch(`${URLS.BACK}/api/auth/login`, {
         method: 'POST',
