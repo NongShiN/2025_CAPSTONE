@@ -353,6 +353,18 @@ export default function ChatWindow({
 
             await new Promise((resolve) => setTimeout(resolve, 300)); // 💡 300ms 딜레이 추가
 
+            await fetch(`${URLS.BACK}/api/chat/title`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${storedUser.token}`,
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    title: generatedTitle,
+                }),
+            });
+
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {
