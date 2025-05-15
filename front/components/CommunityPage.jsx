@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../styles/CommunityPage.module.css";
+import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import URLS from '../config';
 
 export default function CommunityPage() {
     const [isGuest, setIsGuest] = useState(false);
@@ -10,30 +12,31 @@ export default function CommunityPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const router = useRouter();
     const [theme, setTheme] = useState(null);
-    const [storedPosts, setStoredPosts] = useState([]);
+    const [newChatTrigger, setNewChatTrigger] = useState(0);
+    const [refreshSessionList, setRefreshSessionList] = useState(0);
+    const [commentCounts, setCommentCounts] = useState({}); // postId: count
+    const { id } = router.query;
 
-    useEffect(() => {
-        const posts = JSON.parse(localStorage.getItem("posts")) || [];
-        setStoredPosts(posts);
-    }, []);
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         setIsGuest(!!storedUser?.guest);
         if (storedUser) {
             setTheme(storedUser.theme || "blue");
         }
-        const likedIds = JSON.parse(localStorage.getItem("likedPosts") || "[]");
-        const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-        const mapped = storedPosts.map(post => ({
-            ...post,
-            liked: likedIds.includes(post.id)
-        }));
-        setPosts(mapped);
+        fetchPosts();
     }, []);
-    const [newChatTrigger, setNewChatTrigger] = useState(0);
-    const [refreshSessionList, setRefreshSessionList] = useState(0);
+
+    const fetchPosts = async () => {
+        try {
+            const response = await axios.get(`${URLS.BACK}/api/posts`);
+            setPosts(response.data);
+        } catch (err) {
+            console.error('Error fetching posts:', err);
+        }
+    };
+
     const handleSelectChat = (sessionId) => {
-        router.push(`/chat/${sessionId}`); // ✅ 기존 세션으로 이동
+        router.push(`/chat/${sessionId}`);
     };
 
     const handleNewChat = () => {
@@ -42,9 +45,23 @@ export default function CommunityPage() {
         setNewChatTrigger(prev => prev + 1);
         setRefreshSessionList(prev => prev + 1);
     };
-    const formatTimeAgo = (timestamp) => {
+
+    const handleLike = async (id, e) => {
+        e.stopPropagation();
+        try {
+            await axios.post(`${URLS.BACK}/api/posts/${id}/like`);
+            fetchPosts();
+        } catch (err) {
+            console.error('Error liking post:', err);
+        }
+    };
+
+    const formatTimeAgo = (isoString) => {
+        if (!isoString) return '';
+
         const now = Date.now();
-        const diff = Math.floor((now - timestamp) / 1000);
+        const createdTime = new Date(isoString).getTime(); // ← 여기서 문자열 → 숫자 변환
+        const diff = Math.floor((now - createdTime) / 1000); // 초 단위 차이
 
         if (diff < 60) return `${diff}초 전`;
         if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
@@ -61,25 +78,40 @@ export default function CommunityPage() {
 
     const getHotPosts = (posts) => {
         const now = Date.now();
-
-        const corrected = posts.map((post) => {
-            const isTooFar = typeof post.createdAt === "number" && post.createdAt - now > 86400000;
-            const finalCreatedAt = isTooFar ? now - 5 * 60 * 1000 : post.createdAt;
-            return {
-                ...post,
-                createdAt: finalCreatedAt,
-            };
-        });
-        return corrected
+        return posts
             .filter((post) => {
                 const diffInSeconds = Math.floor((now - post.createdAt) / 1000);
-                return typeof post.createdAt === "number" && diffInSeconds <= 60 * 60 * 24 * 7;
+                return diffInSeconds <= 60 * 60 * 24 * 7;
             })
             .sort((a, b) => b.likes - a.likes)
             .slice(0, 3);
     };
+    useEffect(() => {
+        const fetchCommentCount = async (postId) => {
+            try {
+                const res = await axios.get(`${URLS.BACK}/api/comments/post/${postId}`);
+                return Array.isArray(res.data) ? res.data.length : 0;
+            } catch (err) {
+                console.error(`❌ 댓글 수 실패 (postId: ${postId})`, err);
+                return 0;
+            }
+        };
 
+        const fetchAllCommentCounts = async () => {
+            const newCounts = {};
+            await Promise.all(posts.map(async (post) => {
+                const count = await fetchCommentCount(post.id);
+                newCounts[post.id] = count;
+            }));
+            setCommentCounts(newCounts); // ✅ 이건 posts를 변경하지 않음
+        };
+
+        if (posts.length > 0) {
+            fetchAllCommentCounts();
+        }
+    }, [posts]);
     if (!theme) return null;
+
     return (
         <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
             <Sidebar
@@ -133,8 +165,17 @@ export default function CommunityPage() {
                                             <span key={tag} className={styles.tag}>{tag}</span>
                                         ))}
                                     </div>
-                                    <div className={styles.postMeta}>{post.author} • {formatTimeAgo(post.createdAt)}</div>
-                                    <div className={styles.postStats}> {post.likes?.toLocaleString()} BPM • {post.views?.toLocaleString()} views • {Array.isArray(post.comments) ? post.comments.length : 0} comments</div>
+                                    <div className={styles.postMeta}>익명 • {formatTimeAgo(post.createdAt)}</div>
+
+                                    <div className={styles.postStats}>
+                                        <button
+                                            onClick={(e) => handleLike(post.id, e)}
+                                            className={styles.likeButton}
+                                        >
+                                            ❤️ {post.likes?.toLocaleString()} BPM
+                                        </button>
+                                        • {post.views?.toLocaleString()} views • 💬 {post.commentCount || 0} comments
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -146,7 +187,7 @@ export default function CommunityPage() {
                 <div className={styles.sectionBox}>
                     <h4>🔥 Hot Post</h4>
                     <ul className={styles.sideList}>
-                        {storedPosts.length > 0 && getHotPosts(storedPosts).map((post) => (
+                        {posts.length > 0 && getHotPosts(posts).map((post) => (
                             <li
                                 key={post.id}
                                 onClick={() => router.push(`/community/post/${post.id}`)}

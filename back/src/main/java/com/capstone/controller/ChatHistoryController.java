@@ -32,35 +32,44 @@ public class ChatHistoryController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
-
-            // ID 발급
+            
+            // Get the next available ID
             Long nextId = chatHistoryService.getNextId();
-
-            // ChatHistory 생성 및 저장
+            
+            // 같은 session_id를 가진 첫 번째 메시지인지 확인
+            boolean isFirstMessage = chatHistoryService.findByUserIdAndSessionId(user.getId(), chatHistoryDTO.getSessionId()).isEmpty();
+            
             ChatHistory chatHistory = ChatHistory.builder()
-                    .id(nextId)
-                    .user(user)
-                    .message(chatHistoryDTO.getMessage())
-                    .response(chatHistoryDTO.getResponse())
-                    .insight(chatHistoryDTO.getInsight())
-                    .cognitiveDistortion(chatHistoryDTO.getCognitiveDistortion())
-                    .severity(chatHistoryDTO.getSeverity())
-                    .sessionId(
-                            chatHistoryDTO.getSessionId() != null && !chatHistoryDTO.getSessionId().isEmpty()
-                                    ? chatHistoryDTO.getSessionId()
-                                    : UUID.randomUUID().toString()
-                    )
-                    .title(null)  // 여기선 null로 저장 (동기화는 별도로 수행)
-                    .build();
-
-            chatHistoryService.saveChatHistory(chatHistory);
-
-            // 💡 title 전달된 경우 전체 세션의 메시지에 대해 업데이트
-            if (chatHistoryDTO.getTitle() != null && !chatHistoryDTO.getTitle().isBlank()) {
-                chatHistoryService.updateTitleForSession(user.getId(), chatHistoryDTO.getSessionId(), chatHistoryDTO.getTitle());
-            }
-
-            return ResponseEntity.ok().build();
+                .id(nextId)
+                .user(user)
+                .message(chatHistoryDTO.getMessage())
+                .response(chatHistoryDTO.getResponse())
+                .insight(chatHistoryDTO.getInsight())
+                .cognitiveDistortion(chatHistoryDTO.getCognitiveDistortion())
+                .severity(chatHistoryDTO.getSeverity())
+                .sessionId(
+                    chatHistoryDTO.getSessionId() != null && !chatHistoryDTO.getSessionId().isEmpty()
+                        ? chatHistoryDTO.getSessionId()
+                        : UUID.randomUUID().toString()
+                )
+                .title(isFirstMessage ? chatHistoryDTO.getTitle() : null)  // 첫 번째 메시지일 때만 title 저장
+                .build();
+            
+            ChatHistory savedChatHistory = chatHistoryService.saveChatHistory(chatHistory);
+            
+            ChatHistoryDTO responseDTO = ChatHistoryDTO.builder()
+                .userId(savedChatHistory.getUser().getId().toString())
+                .message(savedChatHistory.getMessage())
+                .response(savedChatHistory.getResponse())
+                .insight(savedChatHistory.getInsight())
+                .cognitiveDistortion(savedChatHistory.getCognitiveDistortion())
+                .severity(savedChatHistory.getSeverity())
+                .timestamp(savedChatHistory.getTimestamp())
+                .sessionId(savedChatHistory.getSessionId())
+                .title(savedChatHistory.getTitle())
+                .build();
+                
+            return ResponseEntity.ok(responseDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -72,28 +81,25 @@ public class ChatHistoryController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
-
             List<ChatHistory> chatHistories;
             if (sessionId != null && !sessionId.isEmpty()) {
                 chatHistories = chatHistoryService.findByUserIdAndSessionId(user.getId(), sessionId);
             } else {
                 chatHistories = chatHistoryService.findByUserId(user.getId());
             }
-
             List<ChatHistoryDTO> responseDTOs = chatHistories.stream()
-                    .map(history -> ChatHistoryDTO.builder()
-                            .userId(history.getUser().getId().toString())
-                            .message(history.getMessage())
-                            .response(history.getResponse())
-                            .insight(history.getInsight())
-                            .cognitiveDistortion(history.getCognitiveDistortion())
-                            .severity(history.getSeverity())
-                            .timestamp(history.getTimestamp())
-                            .sessionId(history.getSessionId())
-                            .title(history.getTitle())
-                            .build())
-                    .collect(Collectors.toList());
-
+                .map(history -> ChatHistoryDTO.builder()
+                    .userId(history.getUser().getId().toString())
+                    .message(history.getMessage())
+                    .response(history.getResponse())
+                    .insight(history.getInsight())
+                    .cognitiveDistortion(history.getCognitiveDistortion())
+                    .severity(history.getSeverity())
+                    .timestamp(history.getTimestamp())
+                    .sessionId(history.getSessionId())
+                    .title(history.getTitle())
+                    .build())
+                .collect(Collectors.toList());
             return ResponseEntity.ok(responseDTOs);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -106,11 +112,38 @@ public class ChatHistoryController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
-
+            
             chatHistoryService.deleteSession(user.getId(), sessionId);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-}
+
+    @PostMapping("/title")
+    public ResponseEntity<?> updateSessionTitle(@RequestBody Map<String, String> request) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            User user = userService.findByEmail(userEmail);
+
+            String sessionId = request.get("sessionId");
+            String title = request.get("title");
+
+            if (sessionId == null || title == null) {
+                return ResponseEntity.badRequest().body("sessionId와 title이 필요합니다.");
+            }
+
+            // 해당 세션의 모든 메시지의 title을 업데이트
+            List<ChatHistory> chatHistories = chatHistoryService.findByUserIdAndSessionId(user.getId(), sessionId);
+            for (ChatHistory chatHistory : chatHistories) {
+                chatHistory.setTitle(title);
+                chatHistoryService.saveChatHistory(chatHistory);
+            }
+
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+} 

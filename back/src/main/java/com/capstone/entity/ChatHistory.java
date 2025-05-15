@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatHistory {
-
     @Id
     private Long id;
 
@@ -26,6 +25,9 @@ public class ChatHistory {
 
     @Column(name = "session_id", nullable = false)
     private String sessionId;
+
+    @Column(name = "title")
+    private String title;
 
     @Column(columnDefinition = "TEXT")
     private String message;
@@ -43,7 +45,4 @@ public class ChatHistory {
     private String cognitiveDistortion;
 
     private Integer severity;
-
-    @Column(columnDefinition = "TEXT")
-    private String title;
-}
+} 

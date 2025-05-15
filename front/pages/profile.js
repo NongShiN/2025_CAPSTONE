@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "@/styles/ProfilePage.module.css";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import URLS from '../config';
 
 export default function ProfilePage() {
     const router = useRouter();
@@ -14,25 +16,83 @@ export default function ProfilePage() {
     const [myPosts, setMyPosts] = useState([]);
     const [isNewChat, setIsNewChat] = useState(false);
 
+    const [summary, setSummary] = useState({
+        sessionCount: 0,
+        postCount: 0,
+        likeCount: 0,
+        myPosts: []
+    });
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
-        const storedSessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
-        const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-
-        if (!storedUser) {
+        console.log("🟡 storedUser:", storedUser);
+        if (!storedUser?.id) {
             router.push("/login");
-        } else {
-            setUser(storedUser);
-            setTheme(storedUser.theme || "blue");
-            const filtered = storedPosts.filter(post => post.saveauthor === storedUser.email);
-            setMyPosts(filtered);
+            return;
         }
 
-        setSessionCount(storedSessions.length);
-        setPostCount(storedPosts.length);
-        const totalLikes = storedPosts.reduce((sum, post) => sum + (post.likes || 0), 0);
-        setLikeCount(totalLikes);
-    }, [router]);
+        setUser(storedUser);
+        setTheme(storedUser.theme || "blue");
+
+        const fetchProfileSummary = async () => {
+            try {
+                // ✅ 1. 포스트 불러오기
+                const postRes = await axios.get(`${URLS.BACK}/api/posts`, {
+                    headers: {
+                        Authorization: storedUser.token ? `Bearer ${storedUser.token}` : undefined
+                    }
+                });
+
+                const allPosts = postRes.data || [];
+                console.log("🟨 postRes.data[0]:", allPosts[0]);
+                const myPosts = allPosts.filter(p => p.username === storedUser.username);
+
+                const postCount = myPosts.length;
+                const likeCount = myPosts.reduce((sum, p) => sum + (p.likeCount || 0), 0);
+
+                // ✅ 2. 세션 불러오기
+                let sessionCount = 0;
+                try {
+                    const res = await fetch(`${URLS.BACK}/api/chat/history`, {
+                        headers: {
+                            "Authorization": `Bearer ${storedUser.token}`,
+                        }
+                    });
+                    const data = await res.json();
+                    const uniqueSessionIds = new Set();
+                    data.forEach(h => {
+                        if (String(h.userId) === String(storedUser.id)) {
+                            const sid = h.sessionId || h.session_id;
+                            if (sid) uniqueSessionIds.add(sid);
+                        }
+                    });
+                    sessionCount = uniqueSessionIds.size;
+                } catch (e) {
+                    console.warn("⚠ 세션 fetch 실패, 로컬에서 대체 시도");
+                    const localSessions = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+                    sessionCount = localSessions.length;
+                }
+
+                // ✅ 3. 요약 저장
+                setSummary({
+                    postCount,
+                    likeCount,
+                    sessionCount,
+                    myPosts,
+                });
+
+                console.log("📊 요약 데이터:", {
+                    postCount,
+                    likeCount,
+                    sessionCount,
+                    posts: myPosts,
+                });
+            } catch (err) {
+                console.error("❌ 프로필 요약 로딩 실패:", err);
+            }
+        };
+
+        fetchProfileSummary();
+    }, []);
     const handleNewChat = () => {
         const newId = uuidv4();
         setIsNewChat(true);
@@ -85,35 +145,29 @@ export default function ProfilePage() {
                         <h3>Activity</h3>
                         <div className={styles.statsGrid}>
                             <div className={styles.statBox}>
-                                <p className={styles.statNumber}>{sessionCount}</p>
+                                <p className={styles.statNumber}>{summary.sessionCount}</p>
                                 <p className={styles.statLabel}>Sessions</p>
                             </div>
                             <div className={styles.statBox}>
-                                <p className={styles.statNumber}>{postCount}</p>
+                                <p className={styles.statNumber}>{summary.postCount}</p>
                                 <p className={styles.statLabel}>Posts</p>
                             </div>
                             <div className={styles.statBox}>
-                                <p className={styles.statNumber}>{likeCount}</p>
+                                <p className={styles.statNumber}>{summary.likeCount}</p>
                                 <p className={styles.statLabel}>Likes</p>
                             </div>
                         </div>
                     </div>
                     <div className={styles.myPostsSection}>
                         <h3>My Posts</h3>
-                        {myPosts.length > 0 ? (
-                            <div className={styles.postListScrollArea}>
-                                <ul>
-                                    {myPosts.map((post) => (
-                                        <li
-                                            key={post.id}
-                                            onClick={() => handlePostClick(post.id)}
-                                            className={styles.postItem}
-                                        >
-                                            {post.title} • {formatDate(post.createdAt)}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                        {summary.myPosts.length > 0 ? (
+                            <ul>
+                                {summary.myPosts.map((post) => (
+                                    <li key={post.id} onClick={() => handlePostClick(post.id)} className={styles.postItem}>
+                                        {post.title} • {formatDate(post.createdAt)}
+                                    </li>
+                                ))}
+                            </ul>
                         ) : (
                             <p>작성한 글이 없습니다.</p>
                         )}

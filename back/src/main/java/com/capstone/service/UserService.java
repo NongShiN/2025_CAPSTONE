@@ -1,5 +1,6 @@
 package com.capstone.service;
 
+import com.capstone.entity.AuthProvider;
 import com.capstone.entity.User;
 import com.capstone.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,16 +10,37 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
+    public User createUser(String email, String password, String username) {
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = User.builder()
+                .email(email)
+                .password(passwordEncoder.encode(password))
+                .username(username)
+                .isGuest(false)
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Transactional
     public User createGuestUser() {
         User user = User.builder()
                 .username("Guest_" + System.currentTimeMillis())
                 .isGuest(true)
-                .authProvider("guest")
                 .build();
 
         return userRepository.save(user);
@@ -26,11 +48,6 @@ public class UserService {
 
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-    }
-
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 } 

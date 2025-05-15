@@ -242,7 +242,7 @@ export default function ChatWindow({
         // 0.8초 뒤에 인트로 박스 제거
         setTimeout(() => {
             setIntroVisible(false);
-        }, 800);
+        }, 100);
 
         // 1초 뒤에 그리팅 메시지 출력 시작
         setTimeout(() => {
@@ -412,7 +412,7 @@ export default function ChatWindow({
                 })}
 
                 {/* 상담사 입력 중 표시 */}
-                {isBotTyping && !botTypingText && (
+                {isBotTyping && !botTypingText && messages.length > 0 && (
                     <motion.div
                         key="typing"
                         className={`${styles.messageBubble} ${styles.botMessage}`}

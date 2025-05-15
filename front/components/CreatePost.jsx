@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../styles/CreatePost.module.css";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import URLS from '../config';
 
 export default function CreatePost() {
     const router = useRouter();
@@ -81,40 +83,32 @@ export default function CreatePost() {
         }
     };
 
-    const handleSubmit = () => {
-        const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+    const handleSubmit = async () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (isEditMode) {
-            const existing = storedPosts.find(p => p.id === editingPostId);
-            const updated = {
-                ...existing,
-                title,
-                tags: tags.split(",").map(t => t.trim()),
-                content,
-            };
-            const updatedList = storedPosts.map(p => p.id === editingPostId ? updated : p);
-            localStorage.setItem("posts", JSON.stringify(updatedList));
-        } else {
-            const autoTags = tags.split(",").map(t => t.trim());
-
-            const newPost = {
-                id: uuidv4(),
-                title,
-                tags: autoTags,
-                content,
-                createdAt: Date.now(),
-                likedBy: [],
-                likes: 0,
-                views: 0,
-                comments: [],
-                saveauthor: storedUser.email || "anonym",
-                author: "익명",
-                timeAgo: "방금 전",
-            };
-            localStorage.setItem("posts", JSON.stringify([...storedPosts, newPost]));
+        const postData = {
+            title,
+            tags: tags.split(",").map(t => t.trim()),
+            content
+        };
+        try {
+            if (isEditMode) {
+                await axios.put(`${URLS.BACK}/api/posts/${editingPostId}`, postData, {
+                    headers: {
+                        Authorization: storedUser?.token ? `Bearer ${storedUser.token}` : undefined
+                    }
+                });
+            } else {
+                await axios.post(`${URLS.BACK}/api/posts`, postData, {
+                    headers: {
+                        Authorization: storedUser?.token ? `Bearer ${storedUser.token}` : undefined
+                    }
+                });
+            }
+            router.push("/community");
+        } catch (err) {
+            alert("게시글 저장에 실패했습니다.");
+            console.error(err);
         }
-
-        router.push("/community");
     };
     if (!theme) return null;
     return (
