@@ -132,12 +132,15 @@ export default function ChatWindow({
                     });
 
                     if (msg.response) {
-                        parsed.push({
-                            id: msg.id ? `resp_${msg.id}` : `resp_${Date.now()}_${index}`,
-                            sender: "bot",
-                            text: msg.response,
-                            timestamp: msg.timestamp,
-                            sessionId: msg.sessionId  // ✅ 추가
+                        const sentences = msg.response.split(/(?<=[.!?])\s+/).filter(Boolean);
+                        sentences.forEach((sentence, i) => {
+                            parsed.push({
+                                id: msg.id ? `resp_${msg.id}_${i}` : `resp_${Date.now()}_${index}_${i}`,
+                                sender: "bot",
+                                text: sentence.trim(),
+                                timestamp: msg.timestamp,
+                                sessionId: msg.sessionId
+                            });
                         });
                     }
                 });
@@ -193,15 +196,10 @@ export default function ChatWindow({
             const data = await res.json();  // 💡 JSON 파싱
 
             if (data.response) {
-                const greeting = {
-                    id: Date.now(),
-                    sender: "bot",
-                    text: data.response,
-                };
-                setMessages([greeting]);
-                setShowIntro(false); // ✅ Intro 화면 끄기
-                setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
-            }
+            await typeText(data.response);  // ✨ 타이핑 출력
+            setShowIntro(false); 
+            setShowInputBox(true); 
+        }
         } catch (error) {
             console.error("초기 인사말 불러오기 실패:", error);
             setMessages([]);
@@ -211,7 +209,6 @@ export default function ChatWindow({
     };
         
     const handleIntroClick = async () => {
-        fetchGreeting(); // ✅ "Let me hear your heart" 클릭 시 서버 호출
         setIntroClicked(true); // 클릭했으니까 애니메이션 시작
 
         try {
@@ -237,17 +234,22 @@ export default function ChatWindow({
                 })
             });
 
-            //
             console.log("✅ 인트로 클릭 시 모델 서버에 초기 세션 전송 완료");
         } catch (error) {
             console.error("❌ 인트로 클릭 시 모델 서버 전송 실패:", error);
         }
 
-
+        // 0.8초 뒤에 인트로 박스 제거
         setTimeout(() => {
-            setIntroVisible(false); // 0.5초 뒤에 실제로 IntroBox 제거
-        }, 800); // fadeOutUp 애니메이션 시간과 맞춰야 함
+            setIntroVisible(false);
+        }, 800);
+
+        // 1초 뒤에 그리팅 메시지 출력 시작
+        setTimeout(() => {
+            fetchGreeting(); // ✨ 타이핑 애니메이션 포함된 인사 출력
+        }, 1000);
     };
+
     async function fetchTitleFromLLM(fullMessages) {
         try {
             const chatText = fullMessages
