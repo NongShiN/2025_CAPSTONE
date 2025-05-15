@@ -54,7 +54,16 @@ public class PostController {
 
     @PostMapping("/{id}/like")
     public ResponseEntity<Void> likePost(@PathVariable Long id) {
-        postService.likePost(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+        Long userId = userDetails.getUser().getId();
+        postService.likePost(id, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<Void> increaseView(@PathVariable Long id) {
+        postService.increaseViewCount(id);
         return ResponseEntity.ok().build();
     }
 } 

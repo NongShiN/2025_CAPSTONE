@@ -111,10 +111,28 @@ public class PostService {
     }
 
     @Transactional
-    public void likePost(Long id) {
+    public void likePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (post.getLikedUsers().contains(user)) {
+            // 이미 좋아요를 누른 경우 좋아요 취소
+            post.getLikedUsers().remove(user);
+        } else {
+            // 좋아요 추가
+            post.getLikedUsers().add(user);
+        }
+        post.setLikeCount(post.getLikedUsers().size());
+        postRepository.save(post);
+    }
+
+    @Transactional
+    public void increaseViewCount(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-        post.setLikeCount(post.getLikeCount() + 1);
+        post.setViewCount(post.getViewCount() + 1);
         postRepository.save(post);
     }
 
