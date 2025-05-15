@@ -33,6 +33,9 @@ class CounselorAgent:
         self.dialogue_history = []
         
         self.selected_supervisor = None
+        self.session_info = {
+            "ipt_log" : {"history": []},  # 백에서 받아온다.
+        }
 
 
     # 이후에 없어질 함수 (또는 수정)
@@ -111,8 +114,25 @@ class CounselorAgent:
             intervention_points = supervisor.decide_intervention_point(supervisor.pf_rating)
             dynamic_prompt = supervisor.generate_intervention_guidance(str(self.dialogue_history), supervisor.pf_rating, intervention_points)
         elif selected_supervisor == "IPT":
-            supervisor = SupervisorIPT(args, self.llm)
-            
+            supervisor = SupervisorIPT(args, self.llm, ipt_log=self.session_info["ipt_log"])
+
+            stage = supervisor.classify_stage(str(self.dialogue_history))
+            problem_area = supervisor.classify_problem_area(str(self.dialogue_history))
+
+            self.session_info["ipt_log"]["history"].append({"stage": stage, "problem_area": problem_area})
+
+            dynamic_prompt = supervisor.generate_guidance(
+                dialogue_history=str(self.dialogue_history),
+                stage=stage,
+                problem_area=problem_area
+            )
+        elif selected_supervisor == "Empathic":
+            supervisor = SupervisorEmpathic(args, self.llm)
+
+            dynamic_prompt = supervisor.generate_guidance(str(self.dialogue_history))
+        elif selected_supervisor == "DBT":
+            supervisor = SupervisorDBT(args, self.llm)
+
             dynamic_prompt = supervisor.generate_guidance(str(self.dialogue_history))
         else:
             dynamic_prompt = str(self.selected_supervisor)
