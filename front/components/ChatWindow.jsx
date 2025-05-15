@@ -242,7 +242,7 @@ export default function ChatWindow({
         // 0.8초 뒤에 인트로 박스 제거
         setTimeout(() => {
             setIntroVisible(false);
-        }, 800);
+        }, 100);
 
         // 1초 뒤에 그리팅 메시지 출력 시작
         setTimeout(() => {
@@ -353,6 +353,18 @@ export default function ChatWindow({
 
             await new Promise((resolve) => setTimeout(resolve, 300)); // 💡 300ms 딜레이 추가
 
+            await fetch(`${URLS.BACK}/api/chat/title`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${storedUser.token}`,
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    title: generatedTitle,
+                }),
+            });
+
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {
@@ -412,7 +424,7 @@ export default function ChatWindow({
                 })}
 
                 {/* 상담사 입력 중 표시 */}
-                {isBotTyping && !botTypingText && (
+                {isBotTyping && !botTypingText && messages.length > 0 && (
                     <motion.div
                         key="typing"
                         className={`${styles.messageBubble} ${styles.botMessage}`}
