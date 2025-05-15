@@ -101,13 +101,22 @@ def get_greeting_by_time():
         return random.choice(EVENING_MESSAGES)
 
 
+# TODO: post 메소드로 변경해야함
 @app.get("/load_counselor")
-def load_counselor(user_id: str):
-    mascc.get_counselor(user_id)
+def load_counselor(user_id: int):
+    counselor = mascc.get_counselor(int(user_id))
     print(f"============== Loading Counselor Agent Complete. ==============")
     print(mascc.counselor.keys())
     
-    return {"user_id": user_id, "current_counselor_agent_list": str(mascc.counselor.keys())}
+    # TODO: dummy variable. 백에서 받아와야함
+    counselor.user_info["user_id"] = int(user_id)
+    counselor.user_info["insight"] = {}
+    print(counselor.user_info)
+    return {
+        "user_id": int(user_id),
+        "user_info": counselor.user_info,
+        "current_counselor_agent_list": str(mascc.counselor.keys())
+        }
 
     
 #@app.get("/select_session")
@@ -135,10 +144,23 @@ async def select_session(user_info: dialog.UserInfo, session_info: dialog.Sessio
     counselor.dialogue_history = transformed_dialogue_history
     counselor.dialogue_history_id = session_id
     
+    # 나중에 백에서 불러와야함
+    # 현재는 dummy variable
+    counselor.session_info[session_id] = {
+        "insight": {},
+        "cbt_log" : {},
+        "pf_score" : {},
+        "ipt_log" : {"history": []}
+    }
+    
     print(counselor.dialogue_history)
     print(counselor.dialogue_history_id)
     
-    return transformed_dialogue_history
+    return {
+        "dialogue history id": session_id,
+        "dialogue history":transformed_dialogue_history,
+        "session_info": counselor.session_info[session_id]
+        }
 
 @app.post("/gen")
 def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
