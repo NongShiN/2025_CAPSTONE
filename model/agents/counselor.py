@@ -92,8 +92,8 @@ class CounselorAgent:
         print(self.user_info)
         print(self.session_info)
         info = json.loads(self.extract_insight(self.dialogue_history, client_utterance, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"]))
-        self.user_info = info["user_info"]
-        self.session_info[self.dialogue_history_id]["session_insight"] = info["session_info"]
+        self.user_info["insight"] = info["user_insight"]
+        self.session_info[self.dialogue_history_id]["insight"] = info["session_insight"]
         print(f"===================================== user info ======================================\n{self.user_info}")
         print(f"==================================== session insight ====================================\n{self.session_info}")
  
@@ -101,9 +101,6 @@ class CounselorAgent:
         print(f"==================================== selected supervisor =============================\n{self.selected_supervisor}")
         
         if self.selected_supervisor == "None":
-            insight = self.extract_insight(self.dialogue_history, self.insight, client_utterance)
-            self.insight = json.loads(insight)
-            
             dynamic_prompt = "This utterance does not require any special techniques to be applied. Focus on guiding the conversation appropriately."
         elif self.selected_supervisor == "CBT":
             last_counselor_utterance = self.dialogue_history[-2]["utterance"]

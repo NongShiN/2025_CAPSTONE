@@ -119,13 +119,6 @@ def load_counselor(user_id: int):
         }
 
     
-#@app.get("/select_session")
-#def select_session(user_id: str, dialogue_history_id: str, dialogue_history: str):
-#    mascc.select_session(user_id, dialogue_history_id, dialogue_history)
-#    print(f"============== Loading Session history Complete. ==============")
-#    print(mascc.counselor[user_id].dialogue_history_id)
-#    print(mascc.counselor[user_id].dialogue_history)
-    
 @app.post("/select_session")
 async def select_session(user_info: dialog.UserInfo, session_info: dialog.SessionInfo, dialog_history: dialog.DialogHistory):
     user_id = user_info.user_id
@@ -167,8 +160,8 @@ def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
     global last_interaction_time
     user_id = user_info.user_id
     user_input = query.user_input
-    print("🔍 받은 요청 - user_input:", user_input)
     print("🔍 받은 요청 - user_id:", user_id)
+    print("🔍 받은 요청 - user_input:", user_input)
     counselor = mascc.get_counselor(user_id)
     
     try:
@@ -192,7 +185,7 @@ def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
             utterance=result,
             timestamp=last_interaction_time
             )
-        print(counselor.dialogue_history)
+        # print(counselor.dialogue_history)
         print("✅ 생성된 응답:", result)
         return {"response": result}
     
