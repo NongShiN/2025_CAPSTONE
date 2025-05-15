@@ -141,3 +141,8 @@ config.yaml
 
 
 node_modules/
+
+# 로컬 환경 설정 숨김
+application.yml
+
+back/src/main/resources/application.yml
