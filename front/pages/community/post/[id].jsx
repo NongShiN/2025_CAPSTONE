@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../../../styles/PostDetail.module.css";
 import { v4 as uuidv4 } from "uuid";
-import { useRef } from "react";
 import axios from "axios";
 import URLS from '@/config';
 
@@ -18,10 +17,6 @@ export default function PostDetailPage() {
     const [commentInput, setCommentInput] = useState("");
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingText, setEditingText] = useState("");
-    const [replyingTo, setReplyingTo] = useState(null);
-    const [replyInput, setReplyInput] = useState("");
-    const [editingReplyId, setEditingReplyId] = useState(null);
-    const [editingReplyText, setEditingReplyText] = useState("");
 
     useEffect(() => {
         if (!router.isReady || !id) return;
