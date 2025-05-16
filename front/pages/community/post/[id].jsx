@@ -84,6 +84,27 @@ export default function PostDetailPage() {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
+    useEffect(() => {
+        if (!router.isReady || !id || !user?.token) return;
+
+        const increaseViewCount = async () => {
+            try {
+                await axios.post(
+                    `${URLS.BACK}/api/posts/${id}/view`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${user.token}`,
+                        },
+                    }
+                );
+            } catch (err) {
+                console.error("조회수 증가 실패:", err);
+            }
+        };
+
+        increaseViewCount();
+    }, [id, router.isReady, user?.token]);
     // 좋아요
     const handleLike = async () => {
         try {

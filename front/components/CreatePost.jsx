@@ -51,6 +51,30 @@ export default function CreatePost() {
         }
     }, [selectedSessionId, chatSessions]);
 
+
+    useEffect(() => {
+        const { id } = router.query;
+        if (id) {
+            setIsEditMode(true);
+            setEditingPostId(id);
+            // 기존 게시글 데이터 불러오기
+            const fetchPost = async () => {
+                try {
+                    const response = await axios.get(`${URLS.BACK}/api/posts/${id}`);
+                    const post = response.data;
+                    setTitle(post.title);
+                    setContent(post.content);
+                    setTags(post.tags.join(", "));
+                } catch (err) {
+                    console.error("게시글을 불러오지 못했습니다.", err);
+                    alert("게시글을 불러오지 못했습니다.");
+                    router.push("/community");
+                }
+            };
+            fetchPost();
+        }
+    }, [router.query]);
+
     const handleNewChat = () => {
         const newId = uuidv4();
         setIsNewChat(true);
