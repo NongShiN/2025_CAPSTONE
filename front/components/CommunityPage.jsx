@@ -16,7 +16,6 @@ export default function CommunityPage() {
     const [refreshSessionList, setRefreshSessionList] = useState(0);
     const [commentCounts, setCommentCounts] = useState({}); // postId: count
     const { id } = router.query;
-
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         setIsGuest(!!storedUser?.guest);
@@ -46,16 +45,6 @@ export default function CommunityPage() {
         setRefreshSessionList(prev => prev + 1);
     };
 
-    const handleLike = async (id, e) => {
-        e.stopPropagation();
-        try {
-            await axios.post(`${URLS.BACK}/api/posts/${id}/like`);
-            fetchPosts();
-        } catch (err) {
-            console.error('Error liking post:', err);
-        }
-    };
-
     const formatTimeAgo = (isoString) => {
         if (!isoString) return '';
 
@@ -76,16 +65,6 @@ export default function CommunityPage() {
         )
         .sort((a, b) => b.createdAt - a.createdAt);
 
-    const getHotPosts = (posts) => {
-        const now = Date.now();
-        return posts
-            .filter((post) => {
-                const diffInSeconds = Math.floor((now - post.createdAt) / 1000);
-                return diffInSeconds <= 60 * 60 * 24 * 7;
-            })
-            .sort((a, b) => b.likes - a.likes)
-            .slice(0, 3);
-    };
     useEffect(() => {
         const fetchCommentCount = async (postId) => {
             try {
@@ -109,6 +88,20 @@ export default function CommunityPage() {
         if (posts.length > 0) {
             fetchAllCommentCounts();
         }
+    }, [posts]);
+
+    const getHotPosts = (posts) => {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        return posts
+            .filter(post => new Date(post.createdAt) >= sevenDaysAgo)
+            .sort((a, b) => b.likeCount - a.likeCount)
+            .slice(0, 3); // 상위 3개만 보여주기 (원하면 조절 가능)
+    };
+
+    useEffect(() => {
+        console.log("🔥 posts 내용:", posts);
     }, [posts]);
     if (!theme) return null;
 
@@ -168,13 +161,9 @@ export default function CommunityPage() {
                                     <div className={styles.postMeta}>익명 • {formatTimeAgo(post.createdAt)}</div>
 
                                     <div className={styles.postStats}>
-                                        <button
-                                            onClick={(e) => handleLike(post.id, e)}
-                                            className={styles.likeButton}
-                                        >
-                                            ❤️ {post.likes?.toLocaleString()} BPM
-                                        </button>
-                                        • {post.views?.toLocaleString()} views • 💬 {post.commentCount || 0} comments
+                                        {post.likeCount?.toLocaleString() || 0} BPM
+                                        • {post.viewCount?.toLocaleString() || 0} views
+                                        • 💬 {post.commentCount || 0} comments
                                     </div>
                                 </div>
                             </div>

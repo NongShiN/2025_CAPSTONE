@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useRouter } from "next/router";
 import styles from "../styles/LoginPage.module.css";
 import { signIn } from "next-auth/react";
@@ -8,7 +8,25 @@ const LoginPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const chatExamples = [
+    "💬 What’s on your mind today?",
+    "💬 Ask me anything.",
+    "💬 Share your thoughts with me.",
+    "💬 Need help? Let’s talk.",
+    "💬 Tell me your story.",
+    "💬 Ready to chat?"
+  ];
+  const [currentExample, setCurrentExample] = useState(chatExamples[0]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentExample(() => {
+        const nextIndex = Math.floor(Math.random() * chatExamples.length);
+        return chatExamples[nextIndex];
+      });
+    }, 2200); // 2.5초 간격
 
+    return () => clearInterval(interval);
+  }, []);
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log("✅ BACKEND URL:", URLS.BACK);
@@ -61,9 +79,9 @@ const LoginPage = () => {
       <div className={styles.container}>
         <div className={styles.left}>
           <img src="/logo.png" alt="로고" className={styles.logo} />
-          <h1>Learn, Discover & Automate in One Place.</h1>
-          <p>Create a chatbot that understands you.</p>
-          <div className={styles.chatExample}>💬 Chat interface example here</div>
+          <h1>Talk, Think & Share — All in One Space.</h1>
+          <p>Unfold your story with a chatbot that understand you.</p>
+          <div className={styles.chatExample}>{currentExample}</div>
         </div>
 
         <div className={styles.right}>

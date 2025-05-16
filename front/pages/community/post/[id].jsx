@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "../../../styles/PostDetail.module.css";
 import { v4 as uuidv4 } from "uuid";
-import { useRef } from "react";
 import axios from "axios";
 import URLS from '@/config';
 
@@ -18,10 +17,6 @@ export default function PostDetailPage() {
     const [commentInput, setCommentInput] = useState("");
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingText, setEditingText] = useState("");
-    const [replyingTo, setReplyingTo] = useState(null);
-    const [replyInput, setReplyInput] = useState("");
-    const [editingReplyId, setEditingReplyId] = useState(null);
-    const [editingReplyText, setEditingReplyText] = useState("");
 
     useEffect(() => {
         if (!router.isReady || !id) return;
@@ -84,6 +79,27 @@ export default function PostDetailPage() {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
+    useEffect(() => {
+        if (!router.isReady || !id || !user?.token) return;
+
+        const increaseViewCount = async () => {
+            try {
+                await axios.post(
+                    `${URLS.BACK}/api/posts/${id}/view`,
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${user.token}`,
+                        },
+                    }
+                );
+            } catch (err) {
+                console.error("조회수 증가 실패:", err);
+            }
+        };
+
+        increaseViewCount();
+    }, [id, router.isReady, user?.token]);
     // 좋아요
     const handleLike = async () => {
         try {
