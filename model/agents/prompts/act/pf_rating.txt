@@ -52,5 +52,8 @@ Here are the sub-skills to evaluate:
   6.4 Builds helpful habits over time  
   6.5 Keeps promises to self and others  
 
-Dialogue history:
+# Dialogue history:
 [Dialogue history]
+
+Prior Psychological Flexibility Rating:
+[PF rating]

@@ -141,8 +141,12 @@ async def select_session(user_info: dialog.UserInfo, session_info: dialog.Sessio
     # 현재는 dummy variable
     counselor.session_info[session_id] = {
         "insight": {},
-        "cbt_log" : {},
-        "pf_score" : {},
+        "selected_supervisor": None,
+        "cbt_info": {"cbt_log" : {},
+                     "basic_memory" : [],
+                     "cd_memory" : []
+                     },
+        "pf_rating": {},
         "ipt_log" : {"history": []}
     }
     

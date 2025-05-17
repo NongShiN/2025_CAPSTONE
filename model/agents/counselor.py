@@ -33,8 +33,6 @@ class CounselorAgent:
         self.dialogue_history_id = None
         self.dialogue_history = []
         
-        self.selected_supervisor = None
-        
         self.user_info = {
             "user_id" : None,
             "insight" : None
@@ -59,7 +57,7 @@ class CounselorAgent:
             "timestamp": timestamp
         })
         
-        print(f"dialogue history id : {self.dialogue_history_id}\ndialogue history :\n{generate_dialogue_history_input(self.dialogue_history)}")
+        #print(f"dialogue history id : {self.dialogue_history_id}\ndialogue history :\n{generate_dialogue_history_input(self.dialogue_history)}")
     
     
     def select_supervisor(self, dialogue_history, user_insight, session_insight):
@@ -67,7 +65,7 @@ class CounselorAgent:
         supervisor_selecting_prompt = (prompt_template
                                        .replace("[User insight]", str(user_insight))
                                        .replace("[Session insight]", str(session_insight))
-                                       .replace("[Dialogue history]", str(dialogue_history))
+                                       #.replace("[Dialogue history]", str(dialogue_history))
                                        )
         selected_supervisor = call_llm(supervisor_selecting_prompt, llm=self.llm, model=self.model, temperature=0)
         
@@ -91,21 +89,30 @@ class CounselorAgent:
         
         print(self.user_info)
         print(self.session_info)
+        
         info = json.loads(self.extract_insight(self.dialogue_history, client_utterance, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"]))
+        #info = self.extract_insight(self.dialogue_history, client_utterance, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"])
+        #print(f"==================================== info ====================================\n{info}\n====================== end ======================")
+        #info = json.loads(info)
+
         self.user_info["insight"] = info["user_insight"]
         self.session_info[self.dialogue_history_id]["insight"] = info["session_insight"]
         print(f"===================================== user info ======================================\n{self.user_info}")
         print(f"==================================== session insight ====================================\n{self.session_info}")
- 
-        self.selected_supervisor = self.select_supervisor(self.dialogue_history, self.user_info, self.session_info)
-        print(f"==================================== selected supervisor =============================\n{self.selected_supervisor}")
+
+        if len(self.dialogue_history) > 8:
+            if self.session_info[self.dialogue_history_id]["selected_supervisor"] == None:
+                self.session_info[self.dialogue_history_id]["selected_supervisor"] = self.select_supervisor(self.dialogue_history, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"])
         
-        if self.selected_supervisor == "None":
-            dynamic_prompt = "This utterance does not require any special techniques to be applied. Focus on guiding the conversation appropriately."
-        elif self.selected_supervisor == "CBT":
+        selected_supervisor = self.session_info[self.dialogue_history_id]["selected_supervisor"]
+        print(f"==================================== selected supervisor =============================\n{selected_supervisor}")
+        
+        if selected_supervisor == "None":
+            dynamic_prompt = "There is no need to apply specific psychotherapy or counseling techniques at this stage. Simply continue with appropriate and casual conversation, while also conducting a pre-interview to gather client information necessary for future psychological counseling or therapy."
+        elif selected_supervisor == "CBT":
             last_counselor_utterance = self.dialogue_history[-2]["utterance"]
             
-            supervisor = SupervisorCBT(self.args, self.llm, self.retriever, model=self.model, temperature=self.temperature)
+            supervisor = SupervisorCBT(self.args, self.session_info[self.dialogue_history_id]["cbt_info"], self.llm, self.retriever, model=self.model, temperature=self.temperature)
             
             basic_info, cd_info = supervisor.extract_info_from_utterance(
                 client_utterance,
@@ -115,19 +122,30 @@ class CounselorAgent:
                 timestamp
             )
             
-            supervisor.update_baisc_and_cd_memory(args, basic_info, cd_info)
-            
+            supervisor.update_baisc_and_cd_memory(basic_info, cd_info)
+            self.session_info[self.dialogue_history_id]["cbt_info"] = {"cbt_log" : supervisor.cbt_log,
+                                                                        "basic_memory" : supervisor.basic_memory,
+                                                                        "cd_memory" : supervisor.cd_memory
+                                                                        }
             dynamic_prompt = supervisor.compose_dynamic_prompt(self.args,
                                                                last_counselor_utterance,
                                                                client_utterance,
                                                                f_llm=call_llm)
-        elif self.selected_supervisor == "ACT":
+            print("==============================")
+            print(self.session_info[self.dialogue_history_id]["cbt_info"])
+            print("==============================")
+        elif selected_supervisor == "ACT":
             supervisor = SupervisorACT(args, self.llm)
             
-            supervisor.evaluate_pf_processes(str(self.dialogue_history))
-            intervention_points = supervisor.decide_intervention_point(supervisor.pf_rating)
-            dynamic_prompt = supervisor.generate_intervention_guidance(str(self.dialogue_history), supervisor.pf_rating, intervention_points)
-        elif self.selected_supervisor == "IPT":
+            prior_pf_rating = self.session_info[self.dialogue_history_id]["pf_rating"]
+            pf_rating = supervisor.evaluate_pf_processes(str(self.dialogue_history), prior_pf_rating)
+            self.session_info[self.dialogue_history_id]["pf_rating"] = pf_rating
+            
+            intervention_points = supervisor.decide_intervention_point(pf_rating)
+            
+            dynamic_prompt = supervisor.generate_intervention_guidance(str(self.dialogue_history), pf_rating, intervention_points)
+            print(self.session_info[self.dialogue_history_id]["pf_rating"])
+        elif selected_supervisor == "IPT":
             supervisor = SupervisorIPT(args, self.llm, ipt_log=self.session_info["ipt_log"])
 
             stage = supervisor.classify_stage(str(self.dialogue_history))
@@ -140,16 +158,16 @@ class CounselorAgent:
                 stage=stage,
                 problem_area=problem_area
             )
-        elif self.selected_supervisor == "Empathic":
+        elif selected_supervisor == "Empathic":
             supervisor = SupervisorEmpathic(args, self.llm)
 
             dynamic_prompt = supervisor.generate_guidance(str(self.dialogue_history))
-        elif self.selected_supervisor == "DBT":
+        elif selected_supervisor == "DBT":
             supervisor = SupervisorDBT(args, self.llm)
 
             dynamic_prompt = supervisor.generate_guidance(str(self.dialogue_history))
         else:
-            dynamic_prompt = str(self.selected_supervisor)
+            dynamic_prompt = str(selected_supervisor)
         return dynamic_prompt
             
             
@@ -160,7 +178,7 @@ class CounselorAgent:
                         .replace("[Guidance]", dynamic_prompt)
                         )
         #print(final_prompt)
-        return call_llm(final_prompt, llm=self.llm, model=self.model, temperature=self.temperature) + " <" + self.selected_supervisor + ">"
+        return call_llm(final_prompt, llm=self.llm, model=self.model, temperature=self.temperature)
 
 
 if __name__ == "__main__":

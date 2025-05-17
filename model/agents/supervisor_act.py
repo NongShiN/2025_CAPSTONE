@@ -23,7 +23,6 @@ class SupervisorACT:
         self.guidance_prompt_template = load_prompt("prompts/act/act_guidance.txt")
         self.rating_prompt_template = load_prompt("prompts/act/pf_rating.txt")
 
-        self.pf_rating = {}
         # desrciption of positive psychological processes
         self.ppp = {
             "Acceptance": [
@@ -61,10 +60,14 @@ class SupervisorACT:
             ]
         }
 
-    def evaluate_pf_processes(self, dialogue_history):
-        prompt = self.rating_prompt_template.replace("[Dialogue history]", dialogue_history)
+    def evaluate_pf_processes(self, dialogue_history, prior_pf_rating):
+        prompt = (self.rating_prompt_template
+                  .replace("[Dialogue history]", dialogue_history)
+                  .replace("[PF rating]", str(prior_pf_rating))
+                  )
         response = call_llm(prompt, llm=self.llm, model=self.model, temperature=0)
         response = clean_json_response(response)
+        
         try:
             pf_scores = json.loads(response)
         except json.JSONDecodeError as e:
@@ -72,10 +75,12 @@ class SupervisorACT:
             logging.error(f"Response received: {response}")
             raise ValueError("LLM response was not valid JSON.")
 
-        self.pf_rating = {}
+        pf_rating = {}
         for process, scores in pf_scores.items():
             if isinstance(scores, list) and scores:
-                self.pf_rating[process] = sum(scores) / len(scores)
+                pf_rating[process] = sum(scores) / len(scores)
+        
+        return pf_rating
     
     def decide_intervention_point(self, pf_rating, threshold=4):
         intervention_points = {}
@@ -91,9 +96,11 @@ class SupervisorACT:
             ppp_to_apply.append(f"{process} techniques:\n- {joined}")
         techniques_str = "\n\n".join(ppp_to_apply)
 
-        prompt = self.guidance_prompt_template.replace("[Psychological flexibility rating]", str(pf_rating))
-        prompt = prompt.replace("[Dialogue history]", dialogue_history)
-        prompt = prompt.replace("Intervention techniques", techniques_str)
+        prompt = (self.guidance_prompt_template
+                  .replace("[Psychological flexibility rating]", str(pf_rating))
+                  .replace("[Dialogue history]", dialogue_history)
+                  .replace("Intervention techniques", techniques_str)
+                  )
         return prompt
     
 if __name__ == "__main__":

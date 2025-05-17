@@ -18,8 +18,7 @@ You may:
 - Revise outdated or incomplete ones
 - Leave unchanged categories as-is
 
-
-### Focus categories (for both session and general):
+## Focus categories (for both session and general):
 - Presenting Issues
 - Emotional State
 - Cognitive Patterns
@@ -30,8 +29,14 @@ You may:
 
 If not mentioned, write "None".
 
+# Input:
+dialogue_history: [Dialogue history]  
+general_user_insight: [User insight]
+session-specific_insight : [Session insight]
+utterance: [Utterance]  
 
-### Respond in this format:
+You must output only the following JSON format. The output must begin and end with a single JSON object, exactly matching this structure.
+# Output format:
 {
   "session_insight": {
     "Presenting Issues": "...",
@@ -52,9 +57,3 @@ If not mentioned, write "None".
     "Values or Goals": "..."
   }
 }
-
-### Input:
-dialogue_history: [Dialogue history]  
-general_user_insight: [User insight]
-session-specific_insight : [Session insight]
-utterance: [Utterance]  
