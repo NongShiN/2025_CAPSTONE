@@ -181,7 +181,12 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                         + New chat
                     </button>
 
-                    <button className={styles.iconBtn} onClick={() => setShowSearch(!showSearch)} title="Search">
+                    <button
+                        className={styles.iconBtn}
+                        onClick={() => setShowSearch(!showSearch)}
+                        title="Search"
+                        disabled={isGuest}
+                    >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="11" cy="11" r="8" />
@@ -252,7 +257,45 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                 }
 
                                 try {
-                                    const res = await fetch(`${URLS.MODEL}`, {
+                                    const payload = {
+                                        user_info: {
+                                            user_id: String(userId),
+                                        },
+                                        session_info: {
+                                            session_id: session.id,
+                                            insight: {
+                                            },
+                                            selected_supervisor: "None",
+                                            cbt_info: {
+                                                "cbt_log": {},
+                                                "basic_memory": [],
+                                                "cd_memory": []
+                                            },
+                                            pf_rating: {
+                                                "Present Moment": 5.0,
+                                                "Self": 4.0,
+                                                "Acceptance": 5.0,
+                                                "Defusion": 4.4,
+                                                "Values": 5.4,
+                                                "Committed Action":4.4
+                                            },
+                                            ipt_log: {
+                                                history: []
+                                            }
+                                        },
+                                        dialog_history: {
+                                            history: session.messages.map((msg, index) => ({
+                                                id: index + 1,
+                                                message: msg.sender === "user" ? msg.text : "",
+                                                response: msg.sender === "bot" ? msg.text : "",
+                                                timestamp: new Date(msg.timestamp).toISOString(),
+                                            })),
+                                        }
+                                    };
+
+                                    console.log("📤 select_session 요청 payload:", payload);
+
+                                    const res = await fetch(`${URLS.MODEL}/select_session`, {
                                         method: "POST",
                                         headers: {
                                             "Content-Type": "application/json",
@@ -263,6 +306,12 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                             },
                                             session_info: {
                                                 session_id: session.id,
+                                                insight:{},
+                                                selected_supervisor: "None",
+                                                cbt_info:{},
+                                                pf_rating:{},
+                                                ipt_log:{"history": []
+                                                }
                                             },
                                             dialog_history: {
                                                 history: session.messages.map((msg, index) => ({
@@ -274,17 +323,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                             },
                                         }),
                                     });
-                                    console.log(JSON.stringify({
-                                        user_info: {
-                                            user_id: String(userId),
-                                        },
-                                        session_info: {
-                                            session_id: session.id,
-                                        },
-                                        dialog_history: {
-                                            history: dialogueHistory,
-                                        },
-                                    }));
+
                                     const result = await res.json();
                                     console.log("✅ 모델 서버 응답:", result);
                                 } catch (error) {

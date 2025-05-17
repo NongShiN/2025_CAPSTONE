@@ -216,6 +216,33 @@ export default function ChatWindow({
             const userId = storedUser?.id;
             const sessionIdToSend = selectedSessionId || sessionId;
 
+            const payload = {
+                user_info: {
+                    user_id: String(userId),
+                },
+                session_info: {
+                    session_id: sessionIdToSend,
+                    insight: {
+                    },
+                    selected_supervisor: "None",
+                    cbt_info: {
+                        "cbt_log": {},
+                        "basic_memory": [],
+                        "cd_memory": []
+                    },
+                    pf_rating: {
+                    },
+                    ipt_log: {
+                        history: []
+                    }
+                },
+                dialog_history: {
+                    history: []
+                }
+            };
+
+            console.log("📤 NewCHat에 대한 selectSession 요청 payload:", payload);
+
             await fetch(`${URLS.MODEL}/select_session`, {
                 method: "POST",
                 headers: {
@@ -223,15 +250,21 @@ export default function ChatWindow({
                 },
                 body: JSON.stringify({
                     user_info: {
-                        user_id: userId,
+                        user_id: String(userId),
                     },
                     session_info: {
                         session_id: sessionIdToSend,
+                        insight:{},
+                        selected_supervisor: "None",
+                        cbt_info:{},
+                        pf_rating:{},
+                        ipt_log:{"history": []
+                        }
                     },
                     dialog_history: {
-                        history: []  // ✅ 초기에는 빈 배열
-                    }
-                })
+                        history:[]
+                    },
+                }),
             });
 
             console.log("✅ 인트로 클릭 시 모델 서버에 초기 세션 전송 완료");

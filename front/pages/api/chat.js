@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method Not Allowed" });
     }
-    
+    console.log("URL:", URLS);
     console.log(`Request Body: ${req.body}`);
 
     const {
@@ -17,6 +17,7 @@ export default async function handler(req, res) {
     console.log(`user_id: ${user_id}, user_input: ${user_input}`);
 
     try {
+        console.log("✅ MODEL URL:", URLS.MODEL);
         // ✅ 여기를 OpenAI → 너의 모델 서버로 변경
         const response = await fetch(`${URLS.MODEL}/gen`, {
             method: "POST",
