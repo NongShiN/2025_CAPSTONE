@@ -1,0 +1,66 @@
+{
+    "user_info": {
+        "user_id": 1
+    },
+    "session_info": {
+      "session_id": "actfwakefisldkfielk",
+      "insight": {
+        "Presenting Issues": "Preoccupation with thoughts of death, particularly at night, leading to fear and frustration.", 
+        "Emotional State": "Fearful and frustrated when confronted with thoughts of death.",
+        "Cognitive Patterns": "Tendency to ruminate on death, especially in quiet moments before sleep.",
+        "Behavioral Patterns": "Engaging in activities like playing music or games to cope with anxiety.",
+        "Interpersonal Context": "None",
+        "Trauma or Stressors": "None",
+        "Values or Goals": "Seeking comfort and joy through music and games."
+      },
+      "selected_supervisor": "None",
+      "cbt_info": {
+        "cbt_log": {},
+        "basic_memory": [],
+        "cd_memory": []
+      },
+      "pf_rating": {
+        "Present Moment": 5.0,
+        "Self": 4.0,
+        "Acceptance": 5.0,
+        "Defusion": 4.4,
+        "Values": 5.4,
+        "Committed Action":4.4
+      },
+      "ipt_log": { "history": [] }
+    },
+    "dialog_history": {
+      "history": [
+        {
+          "id": 1,
+          "message": "Hi",
+          "response": "Hi there! It's great to hear from you. How are you feeling today? I'm here to listen and support you, so please feel free to share whatever is on your mind.",
+          "timestamp": "2025-05-14T06:25:48.450Z"
+        },
+        {
+          "id": 2,
+          "message": "I've been thinking too much about death these days",
+          "response": "I'm really sorry to hear that you've been preoccupied with thoughts about death; that can be a heavy and unsettling experience. It's natural to grapple with such profound topics, and I want you to know that it's okay to explore those feelings. Can you share more about what's been on your mind? I'm here to support you through this and help you find some clarity or comfort in your reflections.",
+          "timestamp": "2025-05-14T06:25:48.450Z"
+        },
+        {
+          "id": 4,
+          "message": "I'm just gonna die if I'm born, but I don't want to die. It's like falling asleep and not waking up. I'm afraid my consciousness will stop",
+          "response": "I hear you, and it sounds like you're grappling with some deep fears about existence and what it means to be alive. It's completely understandable to feel anxious about the idea of death and the unknown; many people share these thoughts at various points in their lives. Instead of pushing those feelings away, it might help to sit with them and explore what they reveal about your values and what truly matters to you. Remember, you're not alone in this, and we can work through these feelings together to find some peace and understanding. How do you feel about discussing what brings you joy or meaning in your life?",
+          "timestamp": "2025-05-14T06:25:48.450Z"
+        },
+        {
+          "id": 5,
+          "message": "It doesn't matter if you're alive. It's inevitable that you're going to die anyway. I'm afraid of death itself. No matter how meaningful you live your life now, you're afraid of dying",
+          "response": "I can sense how heavy this fear of death feels for you, and it's really important to acknowledge the weight of those thoughts. It's true that life is fragile, and it's natural to feel a sense of anxiety over its impermanence. While the inevitability of death can be daunting, it often invites us to reflect on what makes our lives meaningful and precious right now. Perhaps we can explore what brings you comfort or joy in the midst of these fears, allowing you to connect with the beauty of the present moment. I'm here to support you as we navigate these feelings together.",
+          "timestamp": "2025-05-14T06:25:48.450Z"
+        },
+        {
+          "id": 6,
+          "message": "I'm normally fine, but when I suddenly think of death through anything related to it before I go to bed, I inevitably get so scared that I'm going to die and my consciousness stops, I get frustrated.",
+          "response": "It sounds like these thoughts about death are really weighing on you, especially at night when everything feels quieter. It might be helpful to try to observe those thoughts from a distance, almost like watching clouds pass by in the sky. You could even try saying to yourself, \"I am having the thought that I am afraid of death\" to create some space between you and that fear. In the midst of this, what are some small actions or moments that bring you joy or connect you to what truly matters? Focusing on those values can help anchor you in the present, even when those heavy thoughts arise. I'm here to support you as you explore this together.",
+          "timestamp": "2025-05-14T06:25:48.450Z"
+        }
+      ]
+    }
+}

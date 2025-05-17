@@ -1,4 +1,5 @@
 import random
+import json
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -102,19 +103,22 @@ def get_greeting_by_time():
 
 
 # TODO: post 메소드로 변경해야함
-@app.get("/load_counselor")
-def load_counselor(user_id: int):
-    counselor = mascc.get_counselor(int(user_id))
+@app.post("/load_counselor")
+def load_counselor(user_info: dialog.UserInfo):
+    user_id = user_info.user_id
+    insight = user_info.insight
+    
+    counselor = mascc.get_counselor(user_id)
     print(f"============== Loading Counselor Agent Complete. ==============")
     print(mascc.counselor.keys())
     
     # TODO: dummy variable. 백에서 받아와야함
-    counselor.user_info["user_id"] = int(user_id)
-    counselor.user_info["insight"] = {}
+    counselor.user_info["user_id"] = user_id
+    counselor.user_info["insight"] = insight
     print(counselor.user_info)
     return {
-        "user_id": int(user_id),
-        "user_info": counselor.user_info,
+        "user_id": counselor.user_info["user_id"],
+        "user_info": counselor.user_info["insight"],
         "current_counselor_agent_list": str(mascc.counselor.keys())
         }
 
@@ -137,21 +141,29 @@ async def select_session(user_info: dialog.UserInfo, session_info: dialog.Sessio
     counselor.dialogue_history = transformed_dialogue_history
     counselor.dialogue_history_id = session_id
     
+    counselor.session_info[session_id] = {
+        "insight": session_info.insight,
+        "selected_supervisor": session_info.selected_supervisor,
+        "cbt_info": session_info.cbt_info,
+        "pf_rating": session_info.pf_rating,
+        "ipt_log": session_info.ipt_log
+    }
     # 나중에 백에서 불러와야함
     # 현재는 dummy variable
-    counselor.session_info[session_id] = {
-        "insight": {},
-        "selected_supervisor": None,
-        "cbt_info": {"cbt_log" : {},
-                     "basic_memory" : [],
-                     "cd_memory" : []
-                     },
-        "pf_rating": {},
-        "ipt_log" : {"history": []}
-    }
+    #counselor.session_info[session_id] = {
+    #    "insight": {},
+    #    "selected_supervisor": None,
+    #    "cbt_info": {"cbt_log" : {},
+    #                 "basic_memory" : [],
+    #                 "cd_memory" : []
+    #                 },
+    #    "pf_rating": {},
+    #    "ipt_log" : {"history": []}
+    #}
     
-    print(counselor.dialogue_history)
+    print(counselor.session_info[session_id])
     print(counselor.dialogue_history_id)
+    print(counselor.dialogue_history)
     
     return {
         "dialogue history id": session_id,

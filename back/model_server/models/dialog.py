@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
+from typing import Optional
 
 class Dialog(BaseModel):
     id: int
@@ -14,10 +15,16 @@ class DialogHistory(BaseModel):
     
 class UserInfo(BaseModel):
     user_id: int
+    insight: Optional[dict] = None
     
     
 class SessionInfo(BaseModel):
     session_id: str
+    insight: dict
+    selected_supervisor: str
+    cbt_info: dict
+    pf_rating: dict
+    ipt_log: dict
     
 
 class UserInput(BaseModel):
