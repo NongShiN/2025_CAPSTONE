@@ -23,7 +23,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                     }
                 });
                 const data = await res.json();
-                
+                console.log("data확인용:",data)
                 const sessionsMap = {};
                 data.forEach(history => {
                     const sid = history.sessionId || history.session_id;
@@ -31,20 +31,42 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                         console.error("sessionId가 없는 history:", history);
                         return;
                     }
-                    
+
                     if (!sessionsMap[sid]) {
                         sessionsMap[sid] = {
                             id: sid,
                             sessionId: sid,
                             title: history.title || history.message?.slice(0, 30) || "New Chat",
                             createdAt: new Date(history.timestamp),
-                            messages: []
+                            messages: [],
+                            // 여기에 추가
+                            basic_memory: [],
+                            cd_memory: [],
+                            ipt_log: history.ipt_log || null,
+                            pf_rating: history.pf_rating || null,
+                            selected_supervisor: history.selected_supervisor || null,
+                            session_insight: history.session_insight || null,
                         };
                     }
-                    
+
+
                     const messageId = `msg_${history.id}_${Date.now()}`;
                     const responseId = `resp_${history.id}_${Date.now()}`;
-                    
+
+                    sessionsMap[sid].basic_memory.push({
+                        speaker: "Client",
+                        utterance: history.message,
+                        insight: history.cbt_basic_insight,
+                        timestamp: history.timestamp
+                    });
+
+                    sessionsMap[sid].cd_memory.push({
+                        speaker: "Client",
+                        utterance: history.message,
+                        insight: history.cbt_cd_insight,
+                        timestamp: history.timestamp
+                    });
+
                     sessionsMap[sid].messages.push({
                         id: messageId,
                         sender: "user",
@@ -52,7 +74,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                         sessionId: sid,
                         timestamp: history.timestamp
                     });
-                    
+
                     if (history.response) {
                         sessionsMap[sid].messages.push({
                             id: responseId,
@@ -62,10 +84,17 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                             timestamp: history.timestamp
                         });
                     }
+                    console.log("세션맵 찍어보자:",sessionsMap[sid])
                 });
-                
+
                 Object.values(sessionsMap).forEach(session => {
                     session.messages.sort((a, b) => 
+                        new Date(a.timestamp) - new Date(b.timestamp)
+                    );
+                    session.basic_memory.sort((a, b) =>
+                        new Date(a.timestamp) - new Date(b.timestamp)
+                    );
+                    session.cd_memory.sort((a, b) =>
                         new Date(a.timestamp) - new Date(b.timestamp)
                     );
                 });
@@ -255,7 +284,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                         }
                                     }
                                 }
-
+                                console.log("session찍어보자:",session)
                                 try {
                                     const payload = {
                                         user_info: {
@@ -263,25 +292,15 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                         },
                                         session_info: {
                                             session_id: session.id,
-                                            insight: {
-                                            },
-                                            selected_supervisor: "None",
+                                            insight: {},
+                                            selected_supervisor: session.selected_supervisor || "None",
                                             cbt_info: {
-                                                "cbt_log": {},
-                                                "basic_memory": [],
-                                                "cd_memory": []
+                                                cbt_log: {},
+                                                basic_memory: session.basic_memory || [],
+                                                cd_memory: session.cd_memory || []
                                             },
-                                            pf_rating: {
-                                                "Present Moment": 5.0,
-                                                "Self": 4.0,
-                                                "Acceptance": 5.0,
-                                                "Defusion": 4.4,
-                                                "Values": 5.4,
-                                                "Committed Action":4.4
-                                            },
-                                            ipt_log: {
-                                                history: []
-                                            }
+                                            pf_rating: session.pf_rating || {},
+                                            ipt_log: session.ipt_log || { history: [] }
                                         },
                                         dialog_history: {
                                             history: session.messages.map((msg, index) => ({
@@ -306,12 +325,15 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                             },
                                             session_info: {
                                                 session_id: session.id,
-                                                insight:{},
-                                                selected_supervisor: "None",
-                                                cbt_info:{},
-                                                pf_rating:{},
-                                                ipt_log:{"history": []
-                                                }
+                                                insight: {},
+                                                selected_supervisor: session.selected_supervisor || "None",
+                                                cbt_info: {
+                                                    cbt_log: {},
+                                                    basic_memory: session.basic_memory || [],
+                                                    cd_memory: session.cd_memory || []
+                                                },
+                                                pf_rating: session.pf_rating || {},
+                                                ipt_log: session.ipt_log || { history: [] }
                                             },
                                             dialog_history: {
                                                 history: session.messages.map((msg, index) => ({
@@ -320,8 +342,9 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                                                     response: msg.sender === "bot" ? msg.text : "",
                                                     timestamp: new Date(msg.timestamp).toISOString(),
                                                 })),
-                                            },
+                                            }
                                         }),
+
                                     });
 
                                     const result = await res.json();

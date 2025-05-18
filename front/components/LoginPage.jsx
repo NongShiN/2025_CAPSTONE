@@ -64,7 +64,7 @@ const LoginPage = () => {
         },
         body: JSON.stringify({
           user_id: data.id,  // 여기에 필요한 데이터 추가
-          insight: {}
+          insight: {/*채우기*/}
         })
       });
       console.log("응답 요청:", payload)

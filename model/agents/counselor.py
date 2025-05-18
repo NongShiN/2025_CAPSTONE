@@ -102,9 +102,9 @@ class CounselorAgent:
 
         if len(self.dialogue_history) > 8:
             print(f"turn num : {len(self.dialogue_history)}")
-            if self.session_info[self.dialogue_history_id]["selected_supervisor"] == None:
+            if self.session_info[self.dialogue_history_id]["selected_supervisor"] == "None":
                 self.session_info[self.dialogue_history_id]["selected_supervisor"] = self.select_supervisor(self.dialogue_history, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"])
-        
+                print(f"선택된 supervisor:{self.session_info[self.dialogue_history_id]["selected_supervisor"]}")
         selected_supervisor = self.session_info[self.dialogue_history_id]["selected_supervisor"]
         print(f"==================================== selected supervisor =============================\n{selected_supervisor}")
         
