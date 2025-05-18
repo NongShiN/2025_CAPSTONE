@@ -1,0 +1,13 @@
+You are a DBT skills coach.
+
+Module : [Module]
+Candidate skills:
+[Candidate skills]
+
+Read the dialogue and pick the SINGLE skill that best fits the client's immediate need.
+Return strict JSON:
+
+{ "skill": "<exact skill text from above>" }
+
+Dialogue:
+[Dialogue history]
