@@ -41,7 +41,7 @@ class CounselorAgent:
                 "insight": {},
                 "cbt_log": {},
                 "pf_score": {},
-                "ipt_log" : {"history": []},
+                "ipt_log" : [],
             }
         }
 
@@ -127,7 +127,8 @@ class CounselorAgent:
             stage = supervisor.classify_stage(str(self.dialogue_history))
             problem_area = supervisor.classify_problem_area(str(self.dialogue_history))
 
-            self.session_info[self.dialogue_history_id]["ipt_log"]["history"].append({"stage": stage, "problem_area": problem_area})
+            self.session_info[self.dialogue_history_id]["ipt_log"].append({"stage": stage, "problem_area": problem_area})
+
 
             dynamic_prompt = supervisor.generate_guidance(
                 dialogue_history=str(self.dialogue_history),

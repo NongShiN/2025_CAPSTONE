@@ -26,17 +26,15 @@ class SupervisorIPT:
     # ------------------------------------------------------------------ #
     # INITIALISE
     # ------------------------------------------------------------------ #
-    def __init__(self, args, llm, ipt_log: dict, model: str = "gpt-4o-mini", temperature: float = 0.7):
+    def __init__(self, args, llm, ipt_log: list, model: str = "gpt-4o-mini", temperature: float = 0.7):
         self.args        = args
         self.llm         = llm
         self.model       = model
         self.temperature = temperature
 
         # ── 로그 객체 주입 ──
-        # ipt_log는 {"history": [ {"stage": "...", "problem_area": "..."}, ... ] } 형태
+        # ipt_log는 [ {"stage": "...", "problem_area": "..."}, ... ] 형태
         self.ipt_log = ipt_log
-        if "history" not in self.ipt_log or not isinstance(self.ipt_log["history"], list):
-            self.ipt_log["history"] = []
 
         # 템플릿 로드
         self.stage_cls_tmpl = load_prompt("prompts/ipt/ipt_stage_classifier.txt")
@@ -158,12 +156,12 @@ class SupervisorIPT:
         Convert previous (stage, area) pairs into a bullet list header that
         can be prepended to the classification prompts.
         """
-        if not self.ipt_log["history"]:
+        if not self.ipt_log:
             return ""
 
         pretty = "\n".join(
             f"- Stage: {item['stage']}, Area: {item['problem_area']}"
-            for item in self.ipt_log["history"]
+            for item in self.ipt_log
         )
         return f"Previous stage/area decisions:\n{pretty}\n\n"
 
@@ -236,8 +234,7 @@ if __name__ == "__main__":
 
     # 1) 세션별 로그 객체
     # ipt_log = {"history": []}
-    ipt_log = {
-        "history": [
+    ipt_log = [
             {
                 "stage": "middle",
                 "problem_area": "Grief"
@@ -247,7 +244,7 @@ if __name__ == "__main__":
                 "problem_area": "Grief"
             }
         ]
-    }
+
 
     # 2) 대화 히스토리
     dialogue = (
@@ -265,7 +262,7 @@ if __name__ == "__main__":
     problem_area = supervisor.classify_problem_area(dialogue)
 
     # 5) 로그 갱신(메인에서 직접)
-    ipt_log["history"].append({"stage": stage, "problem_area": problem_area})
+    ipt_log.append({"stage": stage, "problem_area": problem_area})
 
     # 6) 가이드 생성
     guidance_prompt = supervisor.generate_guidance(
@@ -277,4 +274,4 @@ if __name__ == "__main__":
     print("\n—— GUIDANCE PROMPT ——\n")
     print(guidance_prompt)
     print("\n—— ipt_log 현재 상태 ——\n")
-    print(json.dumps(ipt_log, indent=2, ensure_ascii=False))
+    print(ipt_log)
