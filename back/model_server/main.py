@@ -208,7 +208,13 @@ def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
         return {
             "response": result,
             "user_info": counselor.user_info,
-            "session_info": counselor.session_info[counselor.dialogue_history_id],
+            "selected_supervisor": counselor.session_info[counselor.dialogue_history_id]["selected_supervisor"],
+            "cbt_basic_memory": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["basic_memory"],
+            "cbt_cd_memory": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["cd_memory"],
+            "cbt_log": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["cbt_log"],
+            "pf_rating": counselor.session_info[counselor.dialogue_history_id]["pf_rating"],
+            "ipt_log": counselor.session_info[counselor.dialogue_history_id]["ipt_log"],
+            "session_insight": counselor.session_info[counselor.dialogue_history_id]["insight"],
         }
 
     except Exception as e:

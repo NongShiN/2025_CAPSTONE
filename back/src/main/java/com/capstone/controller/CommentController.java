@@ -5,7 +5,7 @@ import com.capstone.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.capstone.dto.CommentResponseDTO; // import 추가
 import java.util.List;
 
 @RestController
@@ -32,7 +32,10 @@ public class CommentController {
     public ResponseEntity<?> getCommentsByPostId(@PathVariable Long postId) {
         try {
             List<Comment> comments = commentService.getCommentsByPostId(postId);
-            return ResponseEntity.ok(comments);
+            List<CommentResponseDTO> result = comments.stream()
+                    .map(CommentResponseDTO::new)
+                    .toList();
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -42,12 +45,14 @@ public class CommentController {
     public ResponseEntity<?> getCommentsByUserId(@PathVariable Long userId) {
         try {
             List<Comment> comments = commentService.getCommentsByUserId(userId);
-            return ResponseEntity.ok(comments);
+            List<CommentResponseDTO> result = comments.stream()
+                    .map(CommentResponseDTO::new)
+                    .toList();
+            return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteComment(
             @PathVariable Long commentId,

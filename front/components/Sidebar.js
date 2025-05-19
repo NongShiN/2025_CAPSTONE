@@ -25,7 +25,10 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                 const data = await res.json();
                 console.log("data확인용:",data)
                 const sessionsMap = {};
-                data.forEach(history => {
+
+                data
+                    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)) // 오래된 것 → 최신
+                    .forEach(history => {
                     const sid = history.sessionId || history.session_id;
                     if (!sid) {
                         console.error("sessionId가 없는 history:", history);
@@ -52,6 +55,12 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
 
                     const messageId = `msg_${history.id}_${Date.now()}`;
                     const responseId = `resp_${history.id}_${Date.now()}`;
+
+                    //sessionsMap[sid].cbt_log = history.cbt_log;
+                    sessionsMap[sid].ipt_log = history.ipt_log || {} ;
+                    sessionsMap[sid].pf_rating = history.pf_rating || {};
+                    sessionsMap[sid].selected_supervisor = history.selected_supervisor || null;
+                    sessionsMap[sid].session_insight = history.session_insight || {};
 
                     sessionsMap[sid].basic_memory.push({
                         speaker: "Client",

@@ -54,11 +54,4 @@ public class ChatHistoryService {
         // 세션의 모든 채팅 내역 삭제
         chatHistoryRepository.deleteAll(chatHistories);
     }
-    public void updateTitleForSession(Long userId, String sessionId, String title) {
-        List<ChatHistory> chatHistories = chatHistoryRepository.findByUser_IdAndSessionIdOrderByTimestampDesc(userId, sessionId);
-        for (ChatHistory chat : chatHistories) {
-            chat.setTitle(title);
-        }
-        chatHistoryRepository.saveAll(chatHistories);
-    }
 } 
