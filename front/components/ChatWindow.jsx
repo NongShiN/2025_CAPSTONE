@@ -351,11 +351,29 @@ export default function ChatWindow({
 
             console.log("data확인용:",output)
             const user_info = output.user_info;
-            const session_info = output.session_info;
+            const selected_supervisor = output.selected_supervisor;
+            const cbt_basic_memory = output.cbt_basic_memory;
+            const cbt_cd_memory = output.cbt_cd_memory;
+            const cbt_log = output.cbt_log;
+            const pf_rating = output.pf_rating;
+            const ipt_log = output.ipt_log;
+            const session_insight = output.session_insight;
+            const cbt_basic_insight = Array.isArray(cbt_basic_memory) && cbt_basic_memory.length > 0
+                ? cbt_basic_memory[cbt_basic_memory.length - 1]
+                : "";
 
+            const cbt_cd_insight = Array.isArray(cbt_cd_memory) && cbt_cd_memory.length > 0
+                ? cbt_cd_memory[cbt_cd_memory.length - 1]
+                : "";
             console.log("여기서부터 확인하세요")
-            console.log(user_info);
-            console.log(session_info);
+            console.log("user_info:",user_info);
+            console.log("selected_supervisor:",selected_supervisor);
+            console.log("cbt_basic_insight:", cbt_basic_insight);
+            console.log("cbt_cd_insight:",cbt_cd_insight);
+            console.log("cbt_log:",cbt_log);
+            console.log("pf_rating:",pf_rating);
+            console.log("ipt_log:",ipt_log);
+            console.log("session_insight:",session_insight);
 
             const replyText = output.response || "답변을 불러오지 못했어요.";
 
@@ -377,6 +395,20 @@ export default function ChatWindow({
             // 3. title 생성
             const generatedTitle = await fetchTitleFromLLM(updatedMessages);
             console.log("🎯 생성된 제목:", generatedTitle);
+            //저장전 로그 확인
+            const payload = {
+                message: userMessage.text,
+                response: replyText,
+                sessionId: currentSessionId,
+                title: generatedTitle || userMessage.text.slice(0, 30),
+                sessionInsight: output.session_insight || {},
+                iptLog: output.ipt_log || {},
+                pfRating: output.pf_rating || {},
+                selectedSupervisor: output.selected_supervisor || "None"
+
+            };
+
+            console.log("저장전 payload:", payload);
 
             // 4. 메시지 저장 (한 번만)
             const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -392,10 +424,15 @@ export default function ChatWindow({
                     response: replyText,
                     sessionId: currentSessionId,
                     title: generatedTitle || userMessage.text.slice(0, 30),
-                    insight: output.insight || "",
-                    cognitiveDistortion: output.cognitiveDistortion || "",
-                    severity: output.severity || 0
-
+                    sessionInsight: output.session_insight || {},
+                    iptLog: output.ipt_log || {},
+                    pfRating: output.pf_rating || {},
+                    //cbt_info: output.session_info.cbt_info || {},
+                    selectedSupervisor: output.selected_supervisor || "None",
+                    //cognitiveDistortion: output.cognitiveDistortion || "",
+                    //severity: output.severity || 0
+                    cbtBasicInsight: cbt_basic_insight,
+                    cbtCdInsight: cbt_cd_insight
                 })
             });
 
