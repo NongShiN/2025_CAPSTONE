@@ -54,7 +54,7 @@ const LoginPage = () => {
       localStorage.setItem("user", JSON.stringify(data));
       const payload = {
         user_id: data.id,
-        insight: {}
+        insight: JSON.parse(data.user_insight)
       };
       // 2. userId를 모델 서버에 전송
       await fetch(`${URLS.MODEL}/load_counselor`, {
@@ -64,10 +64,11 @@ const LoginPage = () => {
         },
         body: JSON.stringify({
           user_id: data.id,  // 여기에 필요한 데이터 추가
-          insight: {/*채우기*/}
+          insight: JSON.parse(data.user_insight)
         })
       });
-      console.log("응답 요청:", payload)
+      console.log(data)
+      console.log("로그인시 모델에 응답 요청:", payload)
       router.push("/chat");
     } catch (error) {
       console.error('Error:', error);

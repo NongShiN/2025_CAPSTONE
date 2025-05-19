@@ -48,6 +48,7 @@ public class AuthService {
                 .email(user.getEmail())
                 .username(user.getUsername())
                 .token(token)
+                .user_insight(user.getUserInsight())
                 .build();
     }
 
