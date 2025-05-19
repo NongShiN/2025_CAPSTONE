@@ -424,17 +424,27 @@ export default function ChatWindow({
                     response: replyText,
                     sessionId: currentSessionId,
                     title: generatedTitle || userMessage.text.slice(0, 30),
-                    sessionInsight: output.session_insight || {},
-                    iptLog: output.ipt_log || {},
-                    pfRating: output.pf_rating || {},
-                    //cbt_info: output.session_info.cbt_info || {},
-                    selectedSupervisor: output.selected_supervisor || "None",
-                    //cognitiveDistortion: output.cognitiveDistortion || "",
-                    //severity: output.severity || 0
-                    cbtBasicInsight: cbt_basic_insight,
-                    cbtCdInsight: cbt_cd_insight
+
                 })
             });
+
+            await fetch(`${URLS.BACK}/api/chat/session/${currentSessionId}/supervisor`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    selectedSupervisor: output.selected_supervisor || "None",
+                })
+            });
+
+
+
+
+
+
 
             await new Promise((resolve) => setTimeout(resolve, 300)); // 💡 300ms 딜레이 추가
             await fetch(`${URLS.BACK}/api/chat/title`, {

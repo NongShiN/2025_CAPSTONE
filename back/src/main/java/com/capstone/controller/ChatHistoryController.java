@@ -32,15 +32,12 @@ public class ChatHistoryController {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
-            
-            // Get the next available ID
-            Long nextId = chatHistoryService.getNextId();
+
             
             // 같은 session_id를 가진 첫 번째 메시지인지 확인
             boolean isFirstMessage = chatHistoryService.findByUserIdAndSessionId(user.getId(), chatHistoryDTO.getSessionId()).isEmpty();
             
             ChatHistory chatHistory = ChatHistory.builder()
-                .id(nextId)
                 .user(user)
                 .message(chatHistoryDTO.getMessage())
                 .response(chatHistoryDTO.getResponse())
