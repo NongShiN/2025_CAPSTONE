@@ -216,13 +216,13 @@ public class ChatHistoryController {
     @PutMapping("/session/{sessionId}/rating")
     public ResponseEntity<?> updatePfRating(
             @PathVariable String sessionId,
-            @RequestBody Map<String, Integer> request) {
+            @RequestBody Map<String, String> request) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String userEmail = authentication.getName();
             User user = userService.findByEmail(userEmail);
 
-            Integer pfRating = request.get("pfRating");
+            String pfRating = request.get("pfRating");
             if (pfRating == null) {
                 return ResponseEntity.badRequest().body("pfRating이 필요합니다.");
             }

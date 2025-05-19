@@ -52,7 +52,7 @@ public class ChatHistory {
     private String selectedSupervisor;
 
     @Column(name = "pf_rating")
-    private Integer pfRating;
+    private String pfRating;
 
     @Column(name = "ipt_log", columnDefinition = "TEXT")
     private String iptLog;

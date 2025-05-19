@@ -365,6 +365,8 @@ export default function ChatWindow({
             const cbt_cd_insight = Array.isArray(cbt_cd_memory) && cbt_cd_memory.length > 0
                 ? cbt_cd_memory[cbt_cd_memory.length - 1]
                 : "";
+            console.log("cbt_basic_memory:",cbt_basic_memory)
+            console.log("cbt_cd_memory:",cbt_cd_memory)
             console.log("여기서부터 확인하세요")
             console.log("user_info:",user_info);
             console.log("selected_supervisor:",selected_supervisor);
@@ -404,8 +406,9 @@ export default function ChatWindow({
                 sessionInsight: output.session_insight || {},
                 iptLog: output.ipt_log || {},
                 pfRating: output.pf_rating || {},
-                selectedSupervisor: output.selected_supervisor || "None"
-
+                selectedSupervisor: output.selected_supervisor || "None",
+                cbtBasicInsight: cbt_basic_insight || "",
+                cbtCdInsight: cbt_cd_insight || ""
             };
 
             console.log("저장전 payload:", payload);
@@ -440,9 +443,29 @@ export default function ChatWindow({
                 })
             });
 
-
-
-
+            await fetch(`${URLS.BACK}/api/chat/session/${currentSessionId}/rating`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    pfRating: JSON.stringify(output.pf_rating || {})
+                })
+            });
+            console.log(typeof session_insight,session_insight)
+            await fetch(`${URLS.BACK}/api/chat/session/${currentSessionId}/insight`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    sessionInsight: JSON.stringify(output.session_insight || {})
+                })
+            });
 
 
 

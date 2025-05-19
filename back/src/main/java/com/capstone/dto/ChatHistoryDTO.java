@@ -23,7 +23,7 @@ public class ChatHistoryDTO {
     private String title;
     private String sessionInsight;
     private String selectedSupervisor;
-    private Integer pfRating;
+    private String pfRating;
     private String iptLog;
     private String cbtBasicInsight;
     private String cbtCdInsight;
