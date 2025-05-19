@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ModelResponseDTO {
     private String response;
-    private String insight;
-    private String cognitiveDistortion;
-    private Integer severity;
+    private String cbtBasicInsight;
+    private String cbtCdInsight;
+    private String iptLog;
 } 

@@ -30,15 +30,6 @@ public class ChatHistory {
     @Column(name = "response", columnDefinition = "TEXT")
     private String response;
 
-    @Column(name = "insight", columnDefinition = "TEXT")
-    private String insight;
-
-    @Column(name = "cognitive_distortion")
-    private String cognitiveDistortion;
-
-    @Column(name = "severity")
-    private Integer severity;
-
     @Column(name = "session_id")
     private String sessionId;
 
@@ -62,6 +53,9 @@ public class ChatHistory {
 
     @Column(name = "cbt_cd_insight", columnDefinition = "TEXT")
     private String cbtCdInsight;
+
+    @Column(name = "cbt_log", columnDefinition = "TEXT")
+    private String cbtLog;
 
     @CreationTimestamp
     @Column(name = "timestamp")

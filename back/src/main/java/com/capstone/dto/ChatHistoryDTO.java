@@ -16,9 +16,6 @@ public class ChatHistoryDTO {
     private String message;
     private String response;
     private LocalDateTime timestamp;
-    private String insight;
-    private String cognitiveDistortion;
-    private Integer severity;
     private String sessionId;
     private String title;
     private String sessionInsight;
@@ -27,4 +24,5 @@ public class ChatHistoryDTO {
     private String iptLog;
     private String cbtBasicInsight;
     private String cbtCdInsight;
+    private String cbtLog;
 }

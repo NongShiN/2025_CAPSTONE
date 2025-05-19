@@ -196,10 +196,10 @@ export default function ChatWindow({
             const data = await res.json();  // 💡 JSON 파싱
 
             if (data.response) {
-            await typeText(data.response);  // ✨ 타이핑 출력
-            setShowIntro(false); 
-            setShowInputBox(true); 
-        }
+                await typeText(data.response);  // ✨ 타이핑 출력
+                setShowIntro(false);
+                setShowInputBox(true);
+            }
         } catch (error) {
             console.error("초기 인사말 불러오기 실패:", error);
             setMessages([]);
@@ -207,7 +207,7 @@ export default function ChatWindow({
             setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
         }
     };
-        
+
     const handleIntroClick = async () => {
         setIntroClicked(true); // 클릭했으니까 애니메이션 시작
 
@@ -350,7 +350,7 @@ export default function ChatWindow({
             const output = out.output;
 
             console.log("data확인용:",output)
-            const user_info = output.user_info;
+            const user_insight = output.user_insight;
             const selected_supervisor = output.selected_supervisor;
             const cbt_basic_memory = output.cbt_basic_memory;
             const cbt_cd_memory = output.cbt_cd_memory;
@@ -368,7 +368,7 @@ export default function ChatWindow({
             console.log("cbt_basic_memory:",cbt_basic_memory)
             console.log("cbt_cd_memory:",cbt_cd_memory)
             console.log("여기서부터 확인하세요")
-            console.log("user_info:",user_info);
+            console.log("user_insight:",user_insight);
             console.log("selected_supervisor:",selected_supervisor);
             console.log("cbt_basic_insight:", cbt_basic_insight);
             console.log("cbt_cd_insight:",cbt_cd_insight);
@@ -399,16 +399,18 @@ export default function ChatWindow({
             console.log("🎯 생성된 제목:", generatedTitle);
             //저장전 로그 확인
             const payload = {
+                userId: String(userId),
                 message: userMessage.text,
                 response: replyText,
                 sessionId: currentSessionId,
                 title: generatedTitle || userMessage.text.slice(0, 30),
-                sessionInsight: output.session_insight || {},
-                iptLog: output.ipt_log || {},
-                pfRating: output.pf_rating || {},
+                sessionInsight: JSON.stringify(output.session_insight || {}),
+                iptLog: JSON.stringify(output.ipt_log || {}),
+                pfRating: JSON.stringify(output.pf_rating || {}),
                 selectedSupervisor: output.selected_supervisor || "None",
-                cbtBasicInsight: cbt_basic_insight || "",
-                cbtCdInsight: cbt_cd_insight || ""
+                cbtBasicInsight: JSON.stringify(cbt_basic_insight || {}),
+                cbtCdInsight: JSON.stringify(cbt_cd_insight || {}),
+                cbtLog: JSON.stringify(cbt_log || {})
             };
 
             console.log("저장전 payload:", payload);
@@ -422,12 +424,17 @@ export default function ChatWindow({
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${storedUser.token}`
                 },
-                body: JSON.stringify({
-                    message: userMessage.text,
-                    response: replyText,
-                    sessionId: currentSessionId,
-                    title: generatedTitle || userMessage.text.slice(0, 30),
+                body: JSON.stringify(payload)
+            });
 
+            await fetch(`${URLS.BACK}/api/auth/user/${userId}/insight`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    userInsight: JSON.stringify(user_insight || {}),
                 })
             });
 
@@ -468,8 +475,6 @@ export default function ChatWindow({
             });
 
 
-
-            await new Promise((resolve) => setTimeout(resolve, 300)); // 💡 300ms 딜레이 추가
             await fetch(`${URLS.BACK}/api/chat/title`, {
                 method: "POST",
                 headers: {

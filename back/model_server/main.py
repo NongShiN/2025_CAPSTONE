@@ -207,7 +207,7 @@ def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
         print("✅ session_info:", counselor.session_info[counselor.dialogue_history_id])
         return {
             "response": result,
-            "user_info": counselor.user_info,
+            "user_insight": counselor.user_info["insight"],
             "selected_supervisor": counselor.session_info[counselor.dialogue_history_id]["selected_supervisor"],
             "cbt_basic_memory": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["basic_memory"],
             "cbt_cd_memory": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["cd_memory"],
