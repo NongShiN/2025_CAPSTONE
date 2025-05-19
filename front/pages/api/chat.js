@@ -33,9 +33,9 @@ export default async function handler(req, res) {
                 }
             })
         });
-        const data = await response.json();
-        console.log("🎯 모델 응답 결과:", data); // ✅ 여기에 로그 추가
-        res.status(200).json({ message: data.response });
+        const output = await response.json();
+        console.log("🎯 모델 응답 결과:", output); // ✅ 여기에 로그 추가
+        res.status(200).json({ output: output });
     } catch (error) {
         console.error("Model API error:", error);
         res.status(500).json({ message: "Error fetching model response" });

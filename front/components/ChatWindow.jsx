@@ -346,8 +346,18 @@ export default function ChatWindow({
                 })
             });
             console.log("📦 요청 바디:", { message: input, userId });
-            const data = await res.json();
-            const replyText = data.message || "답변을 불러오지 못했어요.";
+            const out = await res.json();
+            const output = out.output;
+
+            console.log("data확인용:",output)
+            const user_info = output.user_info;
+            const session_info = output.session_info;
+
+            console.log("여기서부터 확인하세요")
+            console.log(user_info);
+            console.log(session_info);
+
+            const replyText = output.response || "답변을 불러오지 못했어요.";
 
             await typeText(replyText);
 
@@ -382,9 +392,10 @@ export default function ChatWindow({
                     response: replyText,
                     sessionId: currentSessionId,
                     title: generatedTitle || userMessage.text.slice(0, 30),
-                    insight: data.insight || "",
-                    cognitiveDistortion: data.cognitiveDistortion || "",
-                    severity: data.severity || 0
+                    insight: output.insight || "",
+                    cognitiveDistortion: output.cognitiveDistortion || "",
+                    severity: output.severity || 0
+
                 })
             });
 

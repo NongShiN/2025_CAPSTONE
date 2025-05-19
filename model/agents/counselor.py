@@ -92,7 +92,7 @@ class CounselorAgent:
         
         info = json.loads(self.extract_insight(self.dialogue_history, client_utterance, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"]))
         #info = self.extract_insight(self.dialogue_history, client_utterance, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"])
-        #print(f"==================================== info ====================================\n{info}\n====================== end ======================")
+        print(f"==================================== info ====================================\n{info}\n====================== end ======================")
         #info = json.loads(info)
 
         self.user_info["insight"] = info["user_insight"]

@@ -56,14 +56,14 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                     sessionsMap[sid].basic_memory.push({
                         speaker: "Client",
                         utterance: history.message,
-                        insight: history.cbt_basic_insight,
+                        insight: history.cbt_basic_insight ?? null,
                         timestamp: history.timestamp
                     });
 
                     sessionsMap[sid].cd_memory.push({
                         speaker: "Client",
                         utterance: history.message,
-                        insight: history.cbt_cd_insight,
+                        insight: history.cbt_cd_insight ?? null,
                         timestamp: history.timestamp
                     });
 
