@@ -43,10 +43,15 @@
 <p align="center"><img margin="Auto" width="900" src="docs/ERD.png"></p>
 
 
-## 3️⃣ **Demo (시연 영상)**
+## 3️⃣ Service 
 
+### 1) Demo (시연 영상)
 
 #### 추후에 우리 영상을 넣어아햠
+
+### 2) Service Link
+
+[Click here](https://web-server-281506025529.asia-northeast3.run.app/login)
 
 ## 4️⃣ Reference
 
