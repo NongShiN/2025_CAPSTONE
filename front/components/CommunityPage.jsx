@@ -128,7 +128,6 @@ export default function CommunityPage() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                        <button className={styles.searchBtn}>Search</button>
                     </div>
                     <button
                         className={styles.createPostButton}

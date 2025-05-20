@@ -486,6 +486,13 @@ export default function ChatWindow({
                     title: generatedTitle,
                 }),
             });
+<<<<<<< HEAD
+            if (typeof setRefreshSessionList === "function") {
+                setRefreshSessionList(true);
+                // 필요하면 잠시 후 false로 초기화 (Sidebar가 다시 갱신될 수 있게)
+                setTimeout(() => setRefreshSessionList(false), 200);
+            }
+=======
 
             await fetch(`${URLS.BACK}/api/chat/title`, {
                 method: "POST",
@@ -499,11 +506,13 @@ export default function ChatWindow({
                 }),
             });
 
+>>>>>>> origin/refactor#91v3
         } catch (e) {
             console.error("메시지 저장 중 오류:", e);
         } finally {
             setIsBotTyping(false);
             setIsSending(false);
+            setRefreshSessionList(prev => !prev);
         }
     };
 
