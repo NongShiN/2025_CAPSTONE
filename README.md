@@ -1,64 +1,99 @@
-# 2025_capstone
+![프로젝트 아키텍처](docs/banner.png)
 
-## LLM 이용한 사용자 심리 상담 시스템
-- 개요: 사용자가 대화를 통해 심리 상태의 개선을 이룰 수 있는 LLM 기반 어플리케이션을 개발함
+## 1️⃣ Introduction
+
+### 1) GPT 기반 심리상담 멀티에이전트 플랫폼
+본 프로젝트는 GPT를 활용한 심리상담 챗봇 시스템으로, 사용자의 감정 상태에 따라 ACT, CBT, DBT 등 다양한 심리이론 기반의 에이전트를 자동 할당하고,
+지속적인 상담 일관성을 유지하는 멀티에이전트 상담 플랫폼입니다.
+
+
+### 2) Project Objective
+- 개요: 사용자가 대화를 통해 심리 상태의 개선을 이룰 수 있는 LLM 기반 어플리케이션을 개발
 - 요구사항
-  
   1.  단순한 챗봇 시스템을 구축해서는 안되며, 심리 상담 이론에 근거한 대화가 이뤄져야 함
   2. 대화가 가능한 GUI가 구축되어야 함
   3. 사용자가 나중에 중간에 대화를 종료하고, 나중에 대화를 이어 나가길 원할 경우 다시 맥락을 이어 나갈 수 있는 기능이 구현되어야 함
   4. 사용자를 대상으로 개발된 어플리케이션의 효과성(심리 상태 개선)에 대한 검증이 이뤄져야 함
+ 
+---
+ 
+## 2️⃣ Service Architecture
 
-## 커밋메시지 규칙
-feat : 새로운 기능의 추가
+### 1) Project Tree
 
-fix: 버그 수정
-
-docs: 문서 수정
-
-style: 스타일 관련 기능 (코드 포맷팅, 세미콜론 누락, 코드 자체의 변경이 없는 경우)
-
-refactor: 코드 리펙토링
-
-test: 테스트 코트, 리펙토링 테스트 코드 추가
-
-chore: 빌드 업무 수정, 패키지 매니저 수정(ex .gitignore 수정)
-
-
-예시) 이슈번호가 5 일때 커밋메시지 -> feat #5: add new function.
-                      브랜치 이름 -> feat#5
-
-
-## 프로젝트 구조도 (예시)
 ```
-2025_CAPSTONE/
-│
-├── frontend/              # 프론트엔드 (React, Next.js 등)
-│   ├── public/
-│   ├── src/
-│   └── package.json
-│
-├── backend/               # 백엔드 (FastAPI, Flask, Django 등)
-│   ├── app/
-│   ├── requirements.txt
-│   └── main.py
-│
-├── model/                 # AI/ML 모델
-│   ├── inference.py       # 예측 함수
-│   ├── train.py           # 학습용 코드
-│   ├── model.pkl          # 저장된 모델 파일
-│   └── utils.py
-│
-├── database/              # DB 관련 구성 (초기 스키마, 마이그레이션, 쿼리 등)
-│   ├── schema.sql
-│   ├── init_db.py
-│   └── config.py
-│
-├── streamlit/             # 프로토타입용 Streamlit 앱
-│   ├── app.py
-│   └── components/
-│
-├── .env                   # 공통 환경 변수 (백/모델에서 공유할 경우)
-├── README.md
-└── docker-compose.yml     # 전체 시스템 통합 (옵션)
+📦2025_capstone
+├─ 📂back # Spring Boot 백엔드 서버
+│  └─ 📂model_server # FastAPI 기반  GPT 모델 서버
+├─ 📂docs
+├─ 📂front # React + Node.js 프론트엔드
+├─ 📂model # GPT prompt 생성 모델
+├─ 📂streamlit # service prototype
+├─ 📜.gitignore
+├─ 📜README.md
+├─ 📜package-lock.json
+└─ 📜package.json
 ```
+> 각 디렉토리별 실행 방법 및 기술 상세 설명은 해당 폴더의 `README.md`를 참조하세요.
+
+### 2) 프로젝트 전체 구조도
+<p align="center"><img margin="Auto" width="900" src="docs/architecture.png"></p>
+
+### 3) 데이터베이스 ERD
+<p align="center"><img margin="Auto" width="900" src="docs/ERD.png"></p>
+
+
+## 3️⃣ Service 
+
+### 1) Demo (시연 영상)
+
+#### 추후에 우리 영상을 넣어아햠
+
+### 2) Service Link
+
+[Click here](https://web-server-281506025529.asia-northeast3.run.app/login)
+
+## 4️⃣ Reference
+
+
+#### 수정필요
+
+## 5️⃣ 팀원 소개
+
+
+&nbsp;
+<table align="center" width="1000px">
+  <tr height="155px">
+    <td align="center" width="180px">
+      <a href="https://github.com/minzai0116"><img src="docs/members/minjea.png"/></a>
+    </td>
+    <td align="center" width="180px">
+      <a href="https://github.com/andsosallycanwait"><img src="docs/members/seonghyeon.png"/></a>
+    </td>
+    <td align="center" width="180px">
+      <a href="https://github.com/gyunggyung"><img src="docs/members/kieung.png"/></a>
+    </td>
+    <td align="center" width="180px">
+      <a href="https://github.com/chosanghyeonsju"><img src="docs/members/sanghyeon.png"/></a>
+    </td>
+    <td align="center" width="180px">
+      <a href="https://github.com/NongShiN"><img src="docs/members/chanwoong.png"/></a>
+    </td>
+  </tr>
+  <tr height="50px">
+    <td align="center" width="180px"><a href="https://github.com/minzai0116">김민재</a></td>
+    <td align="center" width="180px"><a href="https://github.com/andsosallycanwait">류성현</a></td>
+    <td align="center" width="180px"><a href="https://github.com/gyunggyung">염기웅</a></td>
+    <td align="center" width="180px"><a href="https://github.com/chosanghyeonsju">조상현</a></td>
+    <td align="center" width="180px"><a href="https://github.com/NongShiN">황찬웅</a></td>
+  </tr>
+  <tr height="80px">
+    <td align="center" width="180px"><a>프론트엔드 / PM</a></td>
+    <td align="center" width="180px"><a>모델 프레임워크 디자인</a></td>
+    <td align="center" width="180px"><a>모델 평가 / 제작 보조</a></td>
+    <td align="center" width="180px"><a>백엔드</a></td>
+    <td align="center" width="180px"><a>프론트엔드 / 서비스 배포</a></td>
+  </tr>
+</table>
+
+&nbsp;

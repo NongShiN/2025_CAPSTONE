@@ -33,13 +33,15 @@ class CounselorAgent:
         self.dialogue_history_id = None
         self.dialogue_history = []
         
+
         self.user_info = {
             "user_id" : None,
             "insight" : None
         }
-        self.session_info = {
-            "ipt_log" : {"history": []},  # 백에서 받아온다.
-        }
+        self.session_info = {}
+        self.selected_supervisor = None
+
+
         
     def load_dialogue_history(self, dialogue_history_id):
         self.dialogue_history_id = dialogue_history_id
@@ -147,12 +149,13 @@ class CounselorAgent:
             dynamic_prompt = supervisor.generate_intervention_guidance(str(self.dialogue_history), pf_rating, intervention_points)
             print(self.session_info[self.dialogue_history_id]["pf_rating"])
         elif selected_supervisor == "IPT":
-            supervisor = SupervisorIPT(args, self.llm, ipt_log=self.session_info["ipt_log"])
+            supervisor = SupervisorIPT(args, self.llm, ipt_log=self.session_info[self.dialogue_history_id]["ipt_log"])
 
             stage = supervisor.classify_stage(str(self.dialogue_history))
             problem_area = supervisor.classify_problem_area(str(self.dialogue_history))
 
-            self.session_info["ipt_log"]["history"].append({"stage": stage, "problem_area": problem_area})
+            self.session_info[self.dialogue_history_id]["ipt_log"].append({"stage": stage, "problem_area": problem_area})
+
 
             dynamic_prompt = supervisor.generate_guidance(
                 dialogue_history=str(self.dialogue_history),

@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+model/agents/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -121,9 +122,6 @@ asset/
 
 # model
 save_pic/
-*.png
-*.pickle
-*.png
 *.pickle
 *.pkl
 lgbm_model.txt

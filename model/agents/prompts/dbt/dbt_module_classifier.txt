@@ -25,6 +25,7 @@ Module definitions
 
 Guidelines
 • Choose the ONE module whose skills would most effectively reduce suffering now.
+• If you detect suicidal ideation, self-harm urges, or life-threatening crisis → module = Distress Tolerance.
 • If unclear, select Mindfulness as default.
 • Output must match the exact JSON schema below.
 
