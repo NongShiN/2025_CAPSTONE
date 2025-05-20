@@ -3,8 +3,12 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import styles from "@/styles/ProfilePage.module.css";
 import { v4 as uuidv4 } from "uuid";
+<<<<<<< HEAD
+import URLS from "@/config";
+=======
 import axios from "axios";
 import URLS from '../config';
+>>>>>>> origin/refactor#91v3
 
 export default function ProfilePage() {
     const router = useRouter();
@@ -14,7 +18,6 @@ export default function ProfilePage() {
     const [postCount, setPostCount] = useState(0);
     const [likeCount, setLikeCount] = useState(0);
     const [myPosts, setMyPosts] = useState([]);
-    const [isNewChat, setIsNewChat] = useState(false);
 
     const [summary, setSummary] = useState({
         sessionCount: 0,
@@ -24,8 +27,13 @@ export default function ProfilePage() {
     });
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
+<<<<<<< HEAD
+        const userId = storedUser?.id;
+        if (!storedUser) {
+=======
         console.log("🟡 storedUser:", storedUser);
         if (!storedUser?.id) {
+>>>>>>> origin/refactor#91v3
             router.push("/login");
             return;
         }
@@ -33,6 +41,62 @@ export default function ProfilePage() {
         setUser(storedUser);
         setTheme(storedUser.theme || "blue");
 
+<<<<<<< HEAD
+        const fetchData = async () => {
+            try {
+                const userId = String(storedUser.id).trim();
+                const token = storedUser.token;
+                const headers = { Authorization: `Bearer ${token}` };
+
+                // ✅ 세션 불러오기
+                const sessionsRes = await fetch(`${URLS.BACK}/api/chat/history`, { headers });
+                const sessions = await sessionsRes.json();
+
+                console.log("🧾 [전체 세션]", sessions);
+                console.log("🔑 [로그인 유저 userId]", userId, typeof userId);
+
+                // ✅ 각 세션에 userId 있는지 확인
+                sessions.forEach((s, i) => {
+                    console.log(`📄 [세션 ${i}]`, {
+                        sessionId: s.sessionId || s.session_id,
+                        userId: s.userId ?? s.user_id, // 혹시 다른 형식일 수도 있음
+                        typeofUserId: typeof s.userId ?? typeof s.user_id
+                    });
+                });
+
+                // ✅ 실제 필터링
+                const mySessions = sessions.filter(s =>
+                    String(s.userId ?? s.user_id).trim() === userId
+                );
+                setSessionCount(mySessions.length);
+                const uniqueSessionIds = [...new Set(mySessions.map(s => s.sessionId || s.session_id))];
+
+                console.log("🧾 전체 세션 수:", sessions.length);
+                console.log("🧑‍💻 내 세션 필터링 후:", mySessions.length);
+                console.log("📌 고유 세션 ID 개수:", uniqueSessionIds.length);
+
+                setSessionCount(uniqueSessionIds.length);
+                // 🧠 2. 전체 게시글
+                const postsRes = await fetch(`${URLS.BACK}/api/posts`, { headers });
+                const allPosts = await postsRes.json();
+
+                // 🧠 3. 내가 작성한 게시글만 필터링
+                const myPosts = allPosts.filter(p => Number(p.userId) === Number(userId));
+                setMyPosts(myPosts);
+                setPostCount(myPosts.length);
+
+                const totalLikes = myPosts.reduce((sum, post) => sum + (post.likeCount || 0), 0);
+                setLikeCount(totalLikes);
+
+            } catch (err) {
+                console.error("🔥 프로필 데이터 로딩 실패:", err);
+            }
+        };
+
+        fetchData();
+    }, [router]);
+
+=======
         const fetchProfileSummary = async () => {
             try {
                 // ✅ 1. 포스트 불러오기
@@ -93,24 +157,29 @@ export default function ProfilePage() {
 
         fetchProfileSummary();
     }, []);
+>>>>>>> origin/refactor#91v3
     const handleNewChat = () => {
         const newId = uuidv4();
-        setIsNewChat(true);
-        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
+        router.push(`/chat/${newId}`);
     };
+
     const handleSelectChat = (id) => {
-        router.push(`/chat/${id}`)}
-    const handlePostClick = (postId) => {
-        router.push(`community/post/${postId}`); // 포스트 ID를 이용한 라우팅
+        router.push(`/chat/${id}`);
     };
+
+    const handlePostClick = (postId) => {
+        router.push(`/community/post/${postId}`);
+    };
+
     const handleSave = () => {
         const updatedUser = { ...user, theme };
         localStorage.setItem("user", JSON.stringify(updatedUser));
         alert("Profile updated!");
     };
+
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
-        return date.toLocaleString(); // 예시: '2025. 4. 28. 오후 8:25:38'
+        return date.toLocaleString(); // '2025. 5. 20. 오후 12:34:56'
     };
 
     if (!user) return null;
@@ -158,8 +227,25 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     </div>
+
                     <div className={styles.myPostsSection}>
                         <h3>My Posts</h3>
+<<<<<<< HEAD
+                        {myPosts.length > 0 ? (
+                            <div className={styles.postListScrollArea}>
+                                <ul>
+                                    {myPosts.map((post) => (
+                                        <li
+                                            key={post.id}
+                                            onClick={() => handlePostClick(post.id)}
+                                            className={styles.postItem}
+                                        >
+                                            {post.title} • {formatDate(post.created_at)}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+=======
                         {summary.myPosts.length > 0 ? (
                             <ul>
                                 {summary.myPosts.map((post) => (
@@ -168,10 +254,12 @@ export default function ProfilePage() {
                                     </li>
                                 ))}
                             </ul>
+>>>>>>> origin/refactor#91v3
                         ) : (
                             <p>작성한 글이 없습니다.</p>
                         )}
                     </div>
+
                     <div className={styles.accountSettings}>
                         <h3>Account Settings</h3>
                         <button className={styles.secondaryBtn}>Change Password</button>
