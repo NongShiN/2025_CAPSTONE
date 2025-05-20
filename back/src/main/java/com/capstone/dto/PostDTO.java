@@ -22,4 +22,5 @@ public class PostDTO {
     private LocalDateTime createdAt;
     private String username;
     private List<String> tags;
+    private Long userId;
 } 
