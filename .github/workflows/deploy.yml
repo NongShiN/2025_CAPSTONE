@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          path: .
 
       - name: Detect changed paths
         id: filter
@@ -26,12 +24,12 @@ jobs:
         with:
           filters: |
             front:
-              - '2025_capstone/front/**'
+              - 'front/**'
             back:
-              - '2025_capstone/back/**'
-              - '!2025_capstone/back/model_server/**'
+              - 'back/**'
+              - '!back/model_server/**'
             model:
-              - '2025_capstone/back/model_server/**'
+              - 'back/model_server/**'
 
   deploy-front:
     name: Deploy Frontend
@@ -40,8 +38,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          path: .
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -50,7 +46,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          cd 2025_capstone/front
+          cd front
           docker build -t gcr.io/chatbot-deploy-457312/web-server .
           docker push gcr.io/chatbot-deploy-457312/web-server
 
@@ -71,8 +67,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          path: .
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -81,13 +75,13 @@ jobs:
 
       - name: Build Spring Boot
         run: |
-          cd 2025_capstone/back
+          cd back
           chmod +x mvnw
           ./mvnw clean package -DskipTests
 
       - name: Build and Push Docker Image
         run: |
-          cd 2025_capstone/back
+          cd back
           docker build -t gcr.io/chatbot-deploy-457312/my-backend .
           docker push gcr.io/chatbot-deploy-457312/my-backend
 
@@ -108,8 +102,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          path: .
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -119,8 +111,8 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build -t model_server \
-            -f 2025_capstone/back/model_server/Dockerfile \
-            2025_capstone
+            -f back/model_server/Dockerfile \
+            .
           docker tag model_server gcr.io/chatbot-deploy-457312/model-server
           docker push gcr.io/chatbot-deploy-457312/model-server
 
