@@ -8,31 +8,28 @@ on:
 
 jobs:
   check-changes:
-    name: Check which services changed
+    name: Check changed services
     runs-on: ubuntu-latest
     outputs:
       front: ${{ steps.filter.outputs.front }}
       back: ${{ steps.filter.outputs.back }}
       model: ${{ steps.filter.outputs.model }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Detect changed paths
-        id: filter
+      - id: filter
         uses: dorny/paths-filter@v2
         with:
           filters: |
             front:
-              - 'front/**'
+              - '2025_capstone/front/**'
             back:
-              - 'back/**'
-              - '!back/model_server/**'
+              - '2025_capstone/back/**'
+              - '!2025_capstone/back/model_server/**'
             model:
-              - 'back/model_server/**'
+              - '2025_capstone/back/model_server/**'
 
   deploy-front:
-    name: Deploy Frontend
     needs: check-changes
     if: needs.check-changes.outputs.front == 'true'
     runs-on: ubuntu-latest
@@ -44,9 +41,13 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+      - name: Configure Docker to use gcloud credentials
+        run: |
+          gcloud auth configure-docker
+
       - name: Build and Push Docker Image
         run: |
-          cd front
+          cd 2025_capstone/front
           docker build -t gcr.io/chatbot-deploy-457312/web-server .
           docker push gcr.io/chatbot-deploy-457312/web-server
 
@@ -61,7 +62,6 @@ jobs:
             --set-env-vars OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
 
   deploy-back:
-    name: Deploy Backend
     needs: check-changes
     if: needs.check-changes.outputs.back == 'true'
     runs-on: ubuntu-latest
@@ -73,15 +73,19 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+      - name: Configure Docker to use gcloud credentials
+        run: |
+          gcloud auth configure-docker
+
       - name: Build Spring Boot
         run: |
-          cd back
+          cd 2025_capstone/back
           chmod +x mvnw
           ./mvnw clean package -DskipTests
 
       - name: Build and Push Docker Image
         run: |
-          cd back
+          cd 2025_capstone/back
           docker build -t gcr.io/chatbot-deploy-457312/my-backend .
           docker push gcr.io/chatbot-deploy-457312/my-backend
 
@@ -93,10 +97,9 @@ jobs:
             --region asia-northeast3 \
             --port 8080 \
             --allow-unauthenticated \
-            --set-env-vars DB_HOST=34.64.69.195,DB_PORT=5432,DB_NAME=sound_of_mind,DB_USER=postgres,DB_PASS=1111,SPRING_PROFILES_ACTIVE=prod
+            --set-env-vars DB_HOST=${{ secrets.DB_HOST }},DB_PORT=${{ secrets.DB_PORT }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASS=${{ secrets.DB_PASS }},SPRING_PROFILES_ACTIVE=prod
 
   deploy-model:
-    name: Deploy Model Server
     needs: check-changes
     if: needs.check-changes.outputs.model == 'true'
     runs-on: ubuntu-latest
@@ -108,11 +111,13 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
+      - name: Configure Docker to use gcloud credentials
+        run: |
+          gcloud auth configure-docker
+
       - name: Build and Push Docker Image
         run: |
-          docker build -t model_server \
-            -f back/model_server/Dockerfile \
-            .
+          docker build -t model_server -f 2025_capstone/back/model_server/Dockerfile .
           docker tag model_server gcr.io/chatbot-deploy-457312/model-server
           docker push gcr.io/chatbot-deploy-457312/model-server
 
