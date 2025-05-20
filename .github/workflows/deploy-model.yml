@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'model/**'
+      - 'back/model_server/**'
     branches:
       - main
       - deploy
