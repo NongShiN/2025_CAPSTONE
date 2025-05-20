@@ -39,3 +39,4 @@ logging:
 
 cors:
   allowed-origins: https://web-server-281506025529.asia-northeast3.run.app
+  
