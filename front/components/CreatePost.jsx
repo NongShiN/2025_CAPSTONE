@@ -1,65 +1,105 @@
-// ✅ ProfilePage.jsx 백엔드 연동을 위한 통합 리팩토링 버전
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
-import styles from "@/styles/ProfilePage.module.css";
+import styles from "../styles/CreatePost.module.css";
 import { v4 as uuidv4 } from "uuid";
-<<<<<<< HEAD
-import URLS from "@/config";
-=======
 import axios from "axios";
 import URLS from '../config';
->>>>>>> origin/refactor#91v3
 
-export default function ProfilePage() {
+export default function CreatePost() {
     const router = useRouter();
-    const [user, setUser] = useState(null);
-    const [theme, setTheme] = useState("blue");
-    const [sessionCount, setSessionCount] = useState(0);
-    const [postCount, setPostCount] = useState(0);
-    const [likeCount, setLikeCount] = useState(0);
-    const [myPosts, setMyPosts] = useState([]);
+    const [title, setTitle] = useState("");
+    const [tags, setTags] = useState("");
+    const [content, setContent] = useState("");
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingPostId, setEditingPostId] = useState(null);
+    const [theme, setTheme] = useState(null);
+    const [chatSessions, setChatSessions] = useState([]);
+    const [selectedSessionId, setSelectedSessionId] = useState("");
+    const [selectedMessages, setSelectedMessages] = useState([]);
+    const [isNewChat, setIsNewChat] = useState(false);
+    const [isSummarizing, setIsSummarizing] = useState(false);
 
     useEffect(() => {
+        const id = localStorage.getItem("editingPostId");
+        const storedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+        const chats = JSON.parse(localStorage.getItem("chatSessions") || "[]");
+        setChatSessions(chats);
         const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (!storedUser) {
-            router.push("/login");
-            return;
+        if (storedUser) {
+            setTheme(storedUser.theme || "blue");
         }
+        if (id) {
+            const target = storedPosts.find(p => String(p.id) === id);
+            if (target) {
+                setTitle(target.title);
+                setTags((target.tags || []).join(", "));
+                setContent(target.content);
+                setIsEditMode(true);
+                setEditingPostId(target.id);
+            }
+            localStorage.removeItem("editingPostId");
+        }
+    }, []);
+    useEffect(() => {
+        const fetchSessions = async () => {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            if (!storedUser?.token) return;
 
-        setUser(storedUser);
-        setTheme(storedUser.theme || "blue");
-
-        const fetchData = async () => {
             try {
-                const token = storedUser.token;
-                const headers = { Authorization: `Bearer ${token}` };
+                const res = await fetch(`${URLS.BACK}/api/chat/history`, {
+                    headers: {
+                        Authorization: `Bearer ${storedUser.token}`
+                    }
+                });
+                const data = await res.json();
+                const sessionsMap = {};
+                data.forEach(history => {
+                    const sid = history.sessionId || history.session_id;
+                    if (!sid) return;
 
-                // ✅ 1. 세션 내역 가져오기
-                const sessionsRes = await fetch(`${URLS.BACK}/api/chat/history`, { headers });
-                const sessions = await sessionsRes.json();
-                const mySessions = sessions.filter(s => s.user_id === storedUser.id);
-                setSessionCount(mySessions.length);
+                    if (!sessionsMap[sid]) {
+                        sessionsMap[sid] = {
+                            id: sid,
+                            title: history.title || history.message?.slice(0, 30) || "Untitled",
+                            messages: []
+                        };
+                    }
 
-                // ✅ 2. 게시글 가져오기
-                const postsRes = await fetch(`${URLS.BACK}/api/posts`, { headers });
-                const allPosts = await postsRes.json();
-                const myPosts = allPosts.filter(p => p.saveauthor === storedUser.email);
-                setMyPosts(myPosts);
-                setPostCount(myPosts.length);
+                    sessionsMap[sid].messages.push({
+                        sender: "user",
+                        text: history.message,
+                        timestamp: history.timestamp
+                    });
 
-                // ✅ 3. 좋아요 수 계산
-                const totalLikes = myPosts.reduce((sum, post) => sum + (post.like_count || 0), 0);
-                setLikeCount(totalLikes);
-
+                    if (history.response) {
+                        sessionsMap[sid].messages.push({
+                            sender: "bot",
+                            text: history.response,
+                            timestamp: history.timestamp
+                        });
+                    }
+                });
+                const sessions = Object.values(sessionsMap).map(s => ({
+                    ...s,
+                    messages: s.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+                }));
+                setChatSessions(sessions);
             } catch (err) {
-                console.error("🔥 프로필 데이터 로딩 실패:", err);
+                console.error("세션 불러오기 실패:", err);
             }
         };
 
-        fetchData();
-    }, [router]);
+        fetchSessions();
+    }, []);
+    useEffect(() => {
+        const target = chatSessions.find(s => s.id === selectedSessionId);
+        if (target) {
+            setSelectedMessages(target.messages);
+        } else {
+            setSelectedMessages([]);
+        }
+    }, [selectedSessionId, chatSessions]);
 
 
     useEffect(() => {
@@ -87,17 +127,36 @@ export default function ProfilePage() {
 
     const handleNewChat = () => {
         const newId = uuidv4();
-        router.push(`/chat/${newId}`);
+        setIsNewChat(true);
+        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
     };
-
     const handleSelectChat = (id) => {
-        router.push(`/chat/${id}`);
+        router.push(`/chat/${id}`)}
+
+    const handleSummarize = async () => {
+        if (!selectedSessionId || selectedMessages.length === 0) return;
+
+        setIsSummarizing(true); // ✅ 생성중 상태 ON
+
+        try {
+            const res = await fetch('/api/gemini/generate-post-summary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: selectedMessages })
+            });
+
+            const data = await res.json();
+            setTitle(data.title || "제목 없음");
+            setContent(data.summary || "");
+            setTags(data.tag || "기타"); // 자동 태그 반영
+        } catch (err) {
+            console.error('요약 실패:', err);
+            alert("요약 생성에 실패했습니다.");
+        } finally {
+            setIsSummarizing(false); // ✅ 완료 후 상태 OFF
+        }
     };
 
-<<<<<<< HEAD
-    const handlePostClick = (postId) => {
-        router.push(`/community/post/${postId}`);
-=======
     const handleSubmit = async () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         const postData = {
@@ -124,99 +183,112 @@ export default function ProfilePage() {
             alert("게시글 저장에 실패했습니다.");
             console.error(err);
         }
->>>>>>> origin/refactor#91v3
     };
-
-    const handleSave = () => {
-        const updatedUser = { ...user, theme };
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        alert("Profile updated!");
-    };
-
-    const formatDate = (timestamp) => {
-        const date = new Date(timestamp);
-        return date.toLocaleString();
-    };
-
-    if (!user) return null;
-
+    if (!theme) return null;
     return (
-        <div className={`${styles.pageWrapper} ${styles[theme]}`}>
-            <Sidebar
-                onNewChat={handleNewChat}
-                onSelectChat={handleSelectChat}
-                isGuest={user.Guest}
-                theme={theme}
-            />
-            <main className={styles.mainContent}>
-                <div className={styles.profileCard}>
-                    <h2>My Profile</h2>
-                    <div className={styles.profileItem}><strong>Email:</strong> {user.email}</div>
+        <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
+            <div className={styles.createPostPage}>
+                <Sidebar
+                    onNewChat={handleNewChat}
+                    onSelectChat={handleSelectChat}
+                    theme={theme}
+                />
+                <main className={styles.mainContent}>
+                    <div className={styles.scrollWrapper}>
+                        <div className={styles.container}>
+                            <h2 className={styles.heading}>
+                                {isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}
+                            </h2>
 
-                    <div className={styles.profileItem}>
-                        <label className={styles.label}>Theme</label>
-                        <select
-                            className={styles.select}
-                            value={theme}
-                            onChange={(e) => setTheme(e.target.value)}
-                        >
-                            <option value="blue">Blue</option>
-                            <option value="purple">Purple</option>
-                            <option value="pink">Pink</option>
-                        </select>
-                    </div>
+                            {/* 🔧 여기 flex 줄로 감쌈 */}
+                            <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", marginBottom: "12px" }}>
+                                <div style={{ flex: 1 }}>
+                                    <label className={styles.label}>🧠 대화 선택</label>
+                                    <select
+                                        className={styles.select}
+                                        value={selectedSessionId || ""}
+                                        onChange={(e) => setSelectedSessionId(e.target.value)}
+                                    >
+                                        <option value="">대화를 선택하세요</option>
+                                        {chatSessions.map((s) => (
+                                            <option key={s.id} value={s.id}>{s.title}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                    <div className={styles.statsSection}>
-                        <h3>Activity</h3>
-                        <div className={styles.statsGrid}>
-                            <div className={styles.statBox}>
-                                <p className={styles.statNumber}>{sessionCount}</p>
-                                <p className={styles.statLabel}>Sessions</p>
+                                <button
+                                    className={styles.summarizeBtn}
+                                    onClick={handleSummarize}
+                                    disabled={!selectedSessionId || selectedMessages.length === 0}
+                                    style={{
+                                        height: "38px", // 드롭다운과 동일하게 맞춤
+                                        alignSelf: "flex-end", // flex 정렬이 밀릴 때 아래로 붙게
+                                        marginBottom: "5px",  // 라벨과 버튼 높이 맞추기
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    {isSummarizing ? (
+                                        <div className={styles.spinner}></div>
+                                    ) : (
+                                        "요약하여 제목/본문 넣기"
+                                    )}
+                                </button>
                             </div>
-                            <div className={styles.statBox}>
-                                <p className={styles.statNumber}>{postCount}</p>
-                                <p className={styles.statLabel}>Posts</p>
+
+                            {selectedMessages.length > 0 && (
+                                <div className={styles.chatPreview}>
+                                    <h4>💬 대화 미리보기</h4>
+                                    <div className={styles.chatBox}>
+                                        {selectedMessages.map((m, idx) => (
+                                            <div key={idx}>
+                                                <b>{m.sender === "user" ? "🙋" : "🤖"}</b> {m.text}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>제목</label>
+                                <input
+                                    className={styles.input}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
                             </div>
-                            <div className={styles.statBox}>
-                                <p className={styles.statNumber}>{likeCount}</p>
-                                <p className={styles.statLabel}>Likes</p>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>본문</label>
+                                <textarea
+                                    className={styles.textarea}
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    rows={8}
+                                />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>태그</label>
+                                <input
+                                    className={styles.input}
+                                    value={tags}
+                                    onChange={(e) => setTags(e.target.value)}
+                                    placeholder="예: 감정, GPT, 공감"
+                                />
+                            </div>
+
+                            <div className={styles.buttonRow}>
+                                <button className={styles.submitBtn} onClick={handleSubmit}>
+                                    {isEditMode ? "수정 완료" : "등록하기"}
+                                </button>
+                                <button className={styles.cancelBtn} onClick={() => router.back()}>
+                                    취소
+                                </button>
                             </div>
                         </div>
                     </div>
-
-                    <div className={styles.myPostsSection}>
-                        <h3>My Posts</h3>
-                        {myPosts.length > 0 ? (
-                            <div className={styles.postListScrollArea}>
-                                <ul>
-                                    {myPosts.map((post) => (
-                                        <li
-                                            key={post.id}
-                                            onClick={() => handlePostClick(post.id)}
-                                            className={styles.postItem}
-                                        >
-                                            {post.title} • {formatDate(post.created_at)}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ) : (
-                            <p>작성한 글이 없습니다.</p>
-                        )}
-                    </div>
-
-                    <div className={styles.accountSettings}>
-                        <h3>Account Settings</h3>
-                        <button className={styles.secondaryBtn}>Change Password</button>
-                        <button className={styles.dangerBtn}>Delete Account</button>
-                    </div>
-
-                    <div className={styles.buttonGroup}>
-                        <button className={styles.saveBtn} onClick={handleSave}>Save</button>
-                        <button className={styles.backBtn} onClick={() => router.back()}>Back</button>
-                    </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 }
