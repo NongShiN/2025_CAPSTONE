@@ -3,7 +3,8 @@ name: Selective Deploy to Cloud Run
 on:
   push:
     branches:
-      - main  # main 브랜치에 push될 때만 동작
+      - main
+      - deploy
 
 jobs:
   check-changes:
@@ -26,7 +27,7 @@ jobs:
               - '2025_capstone/front/**'
             back:
               - '2025_capstone/back/**'
-              - '!2025_capstone/back/model_server/**'  # 백엔드만
+              - '!2025_capstone/back/model_server/**'
             model:
               - '2025_capstone/back/model_server/**'
 
@@ -45,7 +46,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          cd 2025_capstone/front
+          cd ${{ github.workspace }}/2025_capstone/front
           docker build -t gcr.io/chatbot-deploy-457312/web-server .
           docker push gcr.io/chatbot-deploy-457312/web-server
 
@@ -74,13 +75,13 @@ jobs:
 
       - name: Build Spring Boot
         run: |
-          cd 2025_capstone/back
+          cd ${{ github.workspace }}/2025_capstone/back
           chmod +x mvnw
           ./mvnw clean package -DskipTests
 
       - name: Build and Push Docker Image
         run: |
-          cd 2025_capstone/back
+          cd ${{ github.workspace }}/2025_capstone/back
           docker build -t gcr.io/chatbot-deploy-457312/my-backend .
           docker push gcr.io/chatbot-deploy-457312/my-backend
 
@@ -109,7 +110,9 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t model_server -f 2025_capstone/back/model_server/Dockerfile .
+          docker build -t model_server \
+            -f ${{ github.workspace }}/2025_capstone/back/model_server/Dockerfile \
+            ${{ github.workspace }}
           docker tag model_server gcr.io/chatbot-deploy-457312/model-server
           docker push gcr.io/chatbot-deploy-457312/model-server
 
