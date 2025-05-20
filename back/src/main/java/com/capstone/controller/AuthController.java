@@ -90,4 +90,25 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
+
+    // 사용자 인사이트 업데이트
+    @PutMapping("/user/{id}/insight")
+    public ResponseEntity<?> updateUserInsight(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+        try {
+            String userInsight = request.get("userInsight");
+            if (userInsight == null) {
+                return ResponseEntity.badRequest().body("userInsight가 필요합니다.");
+            }
+
+            User user = userService.findById(id);
+            user.setUserInsight(userInsight);
+            userService.saveUser(user);
+
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
 }

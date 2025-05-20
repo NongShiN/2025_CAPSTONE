@@ -8,9 +8,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,16 +40,25 @@ public class UserService {
 
     @Transactional
     public User createGuestUser() {
-        User user = User.builder()
-                .username("Guest_" + System.currentTimeMillis())
-                .isGuest(true)
+        String guestUsername = "guest_" + UUID.randomUUID().toString().substring(0, 8);
+        String guestEmail = guestUsername + "@guest.com";
+        String guestPassword = UUID.randomUUID().toString();
+
+        User guestUser = User.builder()
+                .email(guestEmail)
+                .password(guestPassword)
+                .username(guestUsername)
                 .build();
 
-        return userRepository.save(user);
+        return userRepository.save(guestUser);
     }
 
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 } 

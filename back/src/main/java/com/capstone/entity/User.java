@@ -39,6 +39,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String username;
 
+    @Column(name = "user_insight", columnDefinition = "TEXT")
+    private String userInsight;
+
     @Column(name = "auth_provider")
     @Enumerated(EnumType.STRING)
     @Builder.Default

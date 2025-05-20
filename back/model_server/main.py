@@ -1,4 +1,5 @@
 import random
+import json
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -101,79 +102,121 @@ def get_greeting_by_time():
         return random.choice(EVENING_MESSAGES)
 
 
-@app.get("/load_counselor")
-def load_counselor(user_id: str):
-    mascc.get_counselor(user_id)
+# TODO: post 메소드로 변경해야함
+@app.post("/load_counselor")
+def load_counselor(user_info: dialog.UserInfo):
+    user_id = user_info.user_id
+    insight = user_info.insight
+
+    counselor = mascc.get_counselor(user_id)
     print(f"============== Loading Counselor Agent Complete. ==============")
     print(mascc.counselor.keys())
-    
-    return {"user_id": user_id, "current_counselor_agent_list": str(mascc.counselor.keys())}
 
-    
-#@app.get("/select_session")
-#def select_session(user_id: str, dialogue_history_id: str, dialogue_history: str):
-#    mascc.select_session(user_id, dialogue_history_id, dialogue_history)
-#    print(f"============== Loading Session history Complete. ==============")
-#    print(mascc.counselor[user_id].dialogue_history_id)
-#    print(mascc.counselor[user_id].dialogue_history)
-    
+    # TODO: dummy variable. 백에서 받아와야함
+    counselor.user_info["user_id"] = user_id
+    counselor.user_info["insight"] = insight
+    print(counselor.user_info)
+    return {
+        "user_id": counselor.user_info["user_id"],
+        "user_info": counselor.user_info["insight"],
+        "current_counselor_agent_list": str(mascc.counselor.keys())
+    }
+
+
 @app.post("/select_session")
 async def select_session(user_info: dialog.UserInfo, session_info: dialog.SessionInfo, dialog_history: dialog.DialogHistory):
     user_id = user_info.user_id
     session_id = session_info.session_id
     hist = dialog_history.history
     counselor = mascc.get_counselor(user_id)
-    
+
     transformed_dialogue_history = []
     for entry in hist:
         transformed_dialogue_history.append(
             {"speaker": "Client", "utterance": entry.message, "timestamp": entry.timestamp}
-            )
+        )
         transformed_dialogue_history.append(
             {"speaker": "Counselor", "utterance": entry.response, "timestamp": entry.timestamp}
-            )
+        )
     counselor.dialogue_history = transformed_dialogue_history
     counselor.dialogue_history_id = session_id
-    
-    print(counselor.dialogue_history)
+
+    counselor.session_info[session_id] = {
+        "insight": session_info.insight,
+        "selected_supervisor": session_info.selected_supervisor,
+        "cbt_info": session_info.cbt_info,
+        "pf_rating": session_info.pf_rating,
+        "ipt_log": session_info.ipt_log
+    }
+    # 나중에 백에서 불러와야함
+    # 현재는 dummy variable
+    #counselor.session_info[session_id] = {
+    #    "insight": {},
+    #    "selected_supervisor": None,
+    #    "cbt_info": {"cbt_log" : {},
+    #                 "basic_memory" : [],
+    #                 "cd_memory" : []
+    #                 },
+    #    "pf_rating": {},
+    #    "ipt_log" : {"history": []}
+    #}
+
+    print(counselor.session_info[session_id])
     print(counselor.dialogue_history_id)
-    
-    return transformed_dialogue_history
+    print(counselor.dialogue_history)
+
+    return {
+        "dialogue history id": session_id,
+        "dialogue history":transformed_dialogue_history,
+        "session_info": counselor.session_info[session_id]
+    }
 
 @app.post("/gen")
 def generate(user_info: dialog.UserInfo, query: dialog.UserInput):
     global last_interaction_time
     user_id = user_info.user_id
     user_input = query.user_input
-    print("🔍 받은 요청 - user_input:", user_input)
     print("🔍 받은 요청 - user_id:", user_id)
+    print("🔍 받은 요청 - user_input:", user_input)
     counselor = mascc.get_counselor(user_id)
-    
+
     try:
         if user_input == "<SOS>":
             greeting = get_greeting_by_time()
             last_interaction_time = datetime.now()
-            
+
             counselor.update_dialogue_history(
                 speaker="Counselor",
                 utterance=greeting,
                 timestamp=last_interaction_time
             )
-            
+
             return {"response": greeting}
-        
+
         result = chat_with_mascc(user_id, user_input, mascc)
         last_interaction_time = datetime.now()
-        
+
         counselor.update_dialogue_history(
-            speaker="Counselor", 
+            speaker="Counselor",
             utterance=result,
             timestamp=last_interaction_time
-            )
-        print(counselor.dialogue_history)
+        )
+        # print(counselor.dialogue_history)
         print("✅ 생성된 응답:", result)
-        return {"response": result}
-    
+        print("✅ user_info:", counselor.user_info)
+        print("✅ session_info:", counselor.session_info[counselor.dialogue_history_id])
+        return {
+            "response": result,
+            "user_insight": counselor.user_info["insight"],
+            "selected_supervisor": counselor.session_info[counselor.dialogue_history_id]["selected_supervisor"],
+            "cbt_basic_memory": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["basic_memory"],
+            "cbt_cd_memory": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["cd_memory"],
+            "cbt_log": counselor.session_info[counselor.dialogue_history_id]["cbt_info"]["cbt_log"],
+            "pf_rating": counselor.session_info[counselor.dialogue_history_id]["pf_rating"],
+            "ipt_log": counselor.session_info[counselor.dialogue_history_id]["ipt_log"],
+            "session_insight": counselor.session_info[counselor.dialogue_history_id]["insight"],
+        }
+
     except Exception as e:
         return {"error": str(e)}
 

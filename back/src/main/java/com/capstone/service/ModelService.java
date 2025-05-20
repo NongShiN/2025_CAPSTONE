@@ -46,9 +46,9 @@ public class ModelService {
         // TODO: 실제 모델 처리 로직 구현
         return ModelResponseDTO.builder()
                 .response("Sample response")
-                .insight("Sample insight")
-                .cognitiveDistortion("Sample distortion")
-                .severity(1)
+                .cbtBasicInsight("Sample CBT basic insight")
+                .cbtCdInsight("Sample CBT CD insight")
+                .iptLog("Sample IPT log")
                 .build();
     }
 
@@ -60,10 +60,16 @@ public class ModelService {
                 .user(user)
                 .message(chatHistoryDTO.getMessage())
                 .response(chatHistoryDTO.getResponse())
+                .sessionId(chatHistoryDTO.getSessionId())
+                .sessionInsight(chatHistoryDTO.getSessionInsight())
+                .selectedSupervisor(chatHistoryDTO.getSelectedSupervisor())
+                .pfRating(chatHistoryDTO.getPfRating())
+                .iptLog(chatHistoryDTO.getIptLog())
+                .cbtBasicInsight(chatHistoryDTO.getCbtBasicInsight())
+                .cbtCdInsight(chatHistoryDTO.getCbtCdInsight())
+                .cbtLog(chatHistoryDTO.getCbtLog())
+                .title(chatHistoryDTO.getTitle())
                 .timestamp(LocalDateTime.now())
-                .insight(chatHistoryDTO.getInsight())
-                .cognitiveDistortion(chatHistoryDTO.getCognitiveDistortion())
-                .severity(chatHistoryDTO.getSeverity())
                 .build();
 
         chatHistoryRepository.save(chatHistory);
@@ -78,10 +84,16 @@ public class ModelService {
                         .userId(history.getUser().getId().toString())
                         .message(history.getMessage())
                         .response(history.getResponse())
+                        .sessionId(history.getSessionId())
+                        .sessionInsight(history.getSessionInsight())
+                        .selectedSupervisor(history.getSelectedSupervisor())
+                        .pfRating(history.getPfRating())
+                        .iptLog(history.getIptLog())
+                        .cbtBasicInsight(history.getCbtBasicInsight())
+                        .cbtCdInsight(history.getCbtCdInsight())
+                        .cbtLog(history.getCbtLog())
+                        .title(history.getTitle())
                         .timestamp(history.getTimestamp())
-                        .insight(history.getInsight())
-                        .cognitiveDistortion(history.getCognitiveDistortion())
-                        .severity(history.getSeverity())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -97,10 +109,15 @@ public class ModelService {
                     data.put("message", history.getMessage());
                     data.put("response", history.getResponse());
                     data.put("timestamp", history.getTimestamp());
-                    data.put("cognitive_distortion", history.getCognitiveDistortion());
-                    data.put("insight", history.getInsight());
                     data.put("session_id", history.getSessionId());
-                    data.put("severity", history.getSeverity());
+                    data.put("session_insight", history.getSessionInsight());
+                    data.put("selected_supervisor", history.getSelectedSupervisor());
+                    data.put("pf_rating", history.getPfRating());
+                    data.put("ipt_log", history.getIptLog());
+                    data.put("cbt_basic_insight", history.getCbtBasicInsight());
+                    data.put("cbt_cd_insight", history.getCbtCdInsight());
+                    data.put("cbt_log", history.getCbtLog());
+                    data.put("title", history.getTitle());
                     return data;
                 })
                 .collect(Collectors.toList());

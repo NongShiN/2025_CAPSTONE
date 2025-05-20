@@ -29,7 +29,7 @@ const LoginPage = () => {
   }, []);
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("✅ BACKEND URL:", URLS.BACK);
+    console.log("URL:", URLS);
     try {
       const res = await fetch(`${URLS.BACK}/api/auth/login`, {
         method: 'POST',
@@ -52,15 +52,23 @@ const LoginPage = () => {
   
       // 1. user 정보 저장
       localStorage.setItem("user", JSON.stringify(data));
+      const payload = {
+        user_id: data.id,
+        insight: JSON.parse(data.user_insight)
+      };
       // 2. userId를 모델 서버에 전송
-      await fetch(`${URLS.MODEL}/load_counselor?user_id=${data.id}`, {
-        method: "GET",  // 또는 POST (서버가 어떤 방식 받는지에 따라)
+      await fetch(`${URLS.MODEL}/load_counselor`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        // ✅ 쿼리스트링으로 보내는 방식 예시
+        body: JSON.stringify({
+          user_id: data.id,  // 여기에 필요한 데이터 추가
+          insight: JSON.parse(data.user_insight)
+        })
       });
-
+      console.log(data)
+      console.log("로그인시 모델에 응답 요청:", payload)
       router.push("/chat");
     } catch (error) {
       console.error('Error:', error);

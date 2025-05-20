@@ -196,10 +196,10 @@ export default function ChatWindow({
             const data = await res.json();  // 💡 JSON 파싱
 
             if (data.response) {
-            await typeText(data.response);  // ✨ 타이핑 출력
-            setShowIntro(false); 
-            setShowInputBox(true); 
-        }
+                await typeText(data.response);  // ✨ 타이핑 출력
+                setShowIntro(false);
+                setShowInputBox(true);
+            }
         } catch (error) {
             console.error("초기 인사말 불러오기 실패:", error);
             setMessages([]);
@@ -207,7 +207,7 @@ export default function ChatWindow({
             setShowInputBox(true); // ✅ 인트로 사라진 후 입력창 표시
         }
     };
-        
+
     const handleIntroClick = async () => {
         setIntroClicked(true); // 클릭했으니까 애니메이션 시작
 
@@ -216,6 +216,33 @@ export default function ChatWindow({
             const userId = storedUser?.id;
             const sessionIdToSend = selectedSessionId || sessionId;
 
+            const payload = {
+                user_info: {
+                    user_id: String(userId),
+                },
+                session_info: {
+                    session_id: sessionIdToSend,
+                    insight: {
+                    },
+                    selected_supervisor: "None",
+                    cbt_info: {
+                        "cbt_log": {},
+                        "basic_memory": [],
+                        "cd_memory": []
+                    },
+                    pf_rating: {
+                    },
+                    ipt_log: {
+                        history: []
+                    }
+                },
+                dialog_history: {
+                    history: []
+                }
+            };
+
+            console.log("📤 NewCHat에 대한 selectSession 요청 payload:", payload);
+
             await fetch(`${URLS.MODEL}/select_session`, {
                 method: "POST",
                 headers: {
@@ -223,15 +250,25 @@ export default function ChatWindow({
                 },
                 body: JSON.stringify({
                     user_info: {
-                        user_id: userId,
+                        user_id: String(userId),
                     },
                     session_info: {
                         session_id: sessionIdToSend,
+                        insight:{},
+                        selected_supervisor: "None",
+                        cbt_info:{
+                            cbt_log:{},
+                            basic_memory:[],
+                            cd_memory:[]
+                        },
+                        pf_rating:{},
+                        ipt_log:{"history": []
+                        }
                     },
                     dialog_history: {
-                        history: []  // ✅ 초기에는 빈 배열
-                    }
-                })
+                        history:[]
+                    },
+                }),
             });
 
             console.log("✅ 인트로 클릭 시 모델 서버에 초기 세션 전송 완료");
@@ -309,8 +346,38 @@ export default function ChatWindow({
                 })
             });
             console.log("📦 요청 바디:", { message: input, userId });
-            const data = await res.json();
-            const replyText = data.message || "답변을 불러오지 못했어요.";
+            const out = await res.json();
+            const output = out.output;
+
+            console.log("data확인용:",output)
+            const user_insight = output.user_insight;
+            const selected_supervisor = output.selected_supervisor;
+            const cbt_basic_memory = output.cbt_basic_memory;
+            const cbt_cd_memory = output.cbt_cd_memory;
+            const cbt_log = output.cbt_log;
+            const pf_rating = output.pf_rating;
+            const ipt_log = output.ipt_log;
+            const session_insight = output.session_insight;
+            const cbt_basic_insight = Array.isArray(cbt_basic_memory) && cbt_basic_memory.length > 0
+                ? cbt_basic_memory[cbt_basic_memory.length - 1]
+                : "";
+
+            const cbt_cd_insight = Array.isArray(cbt_cd_memory) && cbt_cd_memory.length > 0
+                ? cbt_cd_memory[cbt_cd_memory.length - 1]
+                : "";
+            console.log("cbt_basic_memory:",cbt_basic_memory)
+            console.log("cbt_cd_memory:",cbt_cd_memory)
+            console.log("여기서부터 확인하세요")
+            console.log("user_insight:",user_insight);
+            console.log("selected_supervisor:",selected_supervisor);
+            console.log("cbt_basic_insight:", cbt_basic_insight);
+            console.log("cbt_cd_insight:",cbt_cd_insight);
+            console.log("cbt_log:",cbt_log);
+            console.log("pf_rating:",pf_rating);
+            console.log("ipt_log:",ipt_log);
+            console.log("session_insight:",session_insight);
+
+            const replyText = output.response || "답변을 불러오지 못했어요.";
 
             await typeText(replyText);
 
@@ -330,6 +397,23 @@ export default function ChatWindow({
             // 3. title 생성
             const generatedTitle = await fetchTitleFromLLM(updatedMessages);
             console.log("🎯 생성된 제목:", generatedTitle);
+            //저장전 로그 확인
+            const payload = {
+                userId: String(userId),
+                message: userMessage.text,
+                response: replyText,
+                sessionId: currentSessionId,
+                title: generatedTitle || userMessage.text.slice(0, 30),
+                sessionInsight: JSON.stringify(output.session_insight || {}),
+                iptLog: JSON.stringify(output.ipt_log || {}),
+                pfRating: JSON.stringify(output.pf_rating || {}),
+                selectedSupervisor: output.selected_supervisor || "None",
+                cbtBasicInsight: JSON.stringify(cbt_basic_insight || {}),
+                cbtCdInsight: JSON.stringify(cbt_cd_insight || {}),
+                cbtLog: JSON.stringify(cbt_log || {})
+            };
+
+            console.log("저장전 payload:", payload);
 
             // 4. 메시지 저장 (한 번만)
             const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -340,18 +424,68 @@ export default function ChatWindow({
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${storedUser.token}`
                 },
+                body: JSON.stringify(payload)
+            });
+
+            await fetch(`${URLS.BACK}/api/auth/user/${userId}/insight`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
                 body: JSON.stringify({
-                    message: userMessage.text,
-                    response: replyText,
-                    sessionId: currentSessionId,
-                    title: generatedTitle || userMessage.text.slice(0, 30),
-                    insight: data.insight || "",
-                    cognitiveDistortion: data.cognitiveDistortion || "",
-                    severity: data.severity || 0
+                    userInsight: JSON.stringify(user_insight || {}),
                 })
             });
 
-            await new Promise((resolve) => setTimeout(resolve, 300)); // 💡 300ms 딜레이 추가
+            await fetch(`${URLS.BACK}/api/chat/session/${currentSessionId}/supervisor`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    selectedSupervisor: output.selected_supervisor || "None",
+                })
+            });
+
+            await fetch(`${URLS.BACK}/api/chat/session/${currentSessionId}/rating`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    pfRating: JSON.stringify(output.pf_rating || {})
+                })
+            });
+            console.log(typeof session_insight,session_insight)
+            await fetch(`${URLS.BACK}/api/chat/session/${currentSessionId}/insight`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${storedUser.token}`
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    sessionInsight: JSON.stringify(output.session_insight || {})
+                })
+            });
+
+
+            await fetch(`${URLS.BACK}/api/chat/title`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${storedUser.token}`,
+                },
+                body: JSON.stringify({
+                    sessionId: currentSessionId,
+                    title: generatedTitle,
+                }),
+            });
 
             await fetch(`${URLS.BACK}/api/chat/title`, {
                 method: "POST",

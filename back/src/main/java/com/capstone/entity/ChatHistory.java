@@ -17,32 +17,47 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ChatHistory {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "session_id", nullable = false)
+    @Column(name = "message", columnDefinition = "TEXT")
+    private String message;
+
+    @Column(name = "response", columnDefinition = "TEXT")
+    private String response;
+
+    @Column(name = "session_id")
     private String sessionId;
 
     @Column(name = "title")
     private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String message;
+    @Column(name = "session_insight", columnDefinition = "TEXT")
+    private String sessionInsight;
 
-    @Column(columnDefinition = "TEXT")
-    private String response;
+    @Column(name = "selected_supervisor")
+    private String selectedSupervisor;
+
+    @Column(name = "pf_rating")
+    private String pfRating;
+
+    @Column(name = "ipt_log", columnDefinition = "TEXT")
+    private String iptLog;
+
+    @Column(name = "cbt_basic_insight", columnDefinition = "TEXT")
+    private String cbtBasicInsight;
+
+    @Column(name = "cbt_cd_insight", columnDefinition = "TEXT")
+    private String cbtCdInsight;
+
+    @Column(name = "cbt_log", columnDefinition = "TEXT")
+    private String cbtLog;
 
     @CreationTimestamp
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
-
-    @Column(columnDefinition = "TEXT")
-    private String insight;
-
-    @Column(columnDefinition = "TEXT")
-    private String cognitiveDistortion;
-
-    private Integer severity;
 } 

@@ -19,36 +19,21 @@ logging.basicConfig(
 )
 
 class SupervisorCBT:
-    def __init__(self, args, llm, retriever, model="gpt-4o-mini", temperature=0.7):
+    def __init__(self, args, cbt_info, llm, retriever, model="gpt-4o-mini", temperature=0.7):
         self.llm = llm
         self.model = model
         self.temperature = temperature
-        self.cd_memory = load_memory(args.cd_memory_path)
-        self.basic_memory = load_memory(args.basic_memory_path)
+        self.cd_memory = cbt_info["cd_memory"]
+        self.basic_memory = cbt_info["basic_memory"]
+        self.cbt_log = cbt_info["cbt_log"]
         self.retriever = retriever
         self.insight_prompt_template = load_prompt(args.insight_prompt_name)
         self.cd_prompt_template = load_prompt(args.cd_prompt_name)
         
-    def update_cbt_usage_log(self, cbt_usage_log_path, technique, current_stage):
-        abs_path = os.path.join(os.path.dirname(__file__), cbt_usage_log_path)
-        abs_path = os.path.abspath(abs_path)
-        
-        log = {}
-        if os.path.exists(abs_path):
-            with open(abs_path, 'r', encoding='utf-8') as f:
-                try:
-                    content = f.read().strip()
-                    if content:
-                        log = json.loads(content)
-                except json.JSONDecodeError as e:
-                    logging.warning("CBT log file is invalid JSON. Reinitializing. Error: %s", e)
+    def update_cbt_usage_log(self, cbt_log :dict, technique, current_stage):
+        cbt_log[technique] = int(current_stage)
 
-        log[technique] = int(current_stage)
-
-        with open(abs_path, 'w', encoding='utf-8') as f:
-            json.dump(log, f, indent=2, ensure_ascii=False)
-
-        return log
+        return cbt_log
 
     def calculate_cd_priority(self, cd_memory, alpha_recency=1.0, alpha_frequency=1.0, alpha_severity=1.0):
         now = datetime.datetime.now()
@@ -109,16 +94,14 @@ class SupervisorCBT:
 
         return basic_info, cd_info
 
-    def update_baisc_and_cd_memory(self, args, basic_info, cd_info):
+    def update_baisc_and_cd_memory(self, basic_info, cd_info):
         self.basic_memory.append(basic_info)
         if cd_info:
             self.cd_memory.append(cd_info)
             logging.info("Detected cognitive distortion: %s (Severity: %s)", cd_info['type'], cd_info['severity'])
         else:
             logging.info("No cognitive distortion detected.")
-        
-        save_memory(self.basic_memory, args.basic_memory_path)
-        save_memory(self.cd_memory, args.cd_memory_path)
+            
     
     def retrieve_relevant_memories(self, args, cd_to_treat, basic_memory, cd_memory):
         basic_texts = [f"Utterance: {entry['utterance']}\nInsight: {entry['insight']}" for entry in basic_memory]
@@ -157,14 +140,17 @@ class SupervisorCBT:
             example = technique_data.get("example", "")
 
             stage_prompt_template = load_prompt("prompts/cbt/decide_cbt_stage.txt")
-            cbt_log = self.update_cbt_usage_log(args.cbt_log_path, cbt_technique, "0")
-            stage_prompt = stage_prompt_template.replace("[CBT technique]", cbt_technique)
-            stage_prompt = stage_prompt.replace("[CBT Technique]", cbt_technique)
-            stage_prompt = stage_prompt.replace("[CBT progress]", progress_description)
-            stage_prompt = stage_prompt.replace("[CBT Usage Log]", json.dumps(cbt_log))
-            stage_prompt = stage_prompt.replace("[CBT dialogue]", example)
+            cbt_log = self.update_cbt_usage_log(self.cbt_log, cbt_technique, "0")
+            stage_prompt = (stage_prompt_template
+                            .replace("[CBT technique]", cbt_technique)
+                            .replace("[CBT Technique]", cbt_technique)
+                            .replace("[CBT progress]", progress_description)
+                            .replace("[CBT Usage Log]", str(cbt_log))
+                            .replace("[CBT dialogue]", example)
+                            )
+
             stage = f_llm(stage_prompt, llm=self.llm, model=self.model, temperature=self.temperature)
-            self.update_cbt_usage_log(args.cbt_log_path, cbt_technique, stage)
+            self.cbt_log = self.update_cbt_usage_log(self.cbt_log, cbt_technique, stage)
 
         guidance_template = load_prompt(args.dynamic_prompt_name)
         guidance = guidance_template.replace("[Latest dialogue]", latest_dialogue)
