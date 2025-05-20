@@ -41,7 +41,57 @@ export default function CreatePost() {
             localStorage.removeItem("editingPostId");
         }
     }, []);
+    useEffect(() => {
+        const fetchSessions = async () => {
+            const storedUser = JSON.parse(localStorage.getItem("user"));
+            if (!storedUser?.token) return;
 
+            try {
+                const res = await fetch(`${URLS.BACK}/api/chat/history`, {
+                    headers: {
+                        Authorization: `Bearer ${storedUser.token}`
+                    }
+                });
+                const data = await res.json();
+                const sessionsMap = {};
+                data.forEach(history => {
+                    const sid = history.sessionId || history.session_id;
+                    if (!sid) return;
+
+                    if (!sessionsMap[sid]) {
+                        sessionsMap[sid] = {
+                            id: sid,
+                            title: history.title || history.message?.slice(0, 30) || "Untitled",
+                            messages: []
+                        };
+                    }
+
+                    sessionsMap[sid].messages.push({
+                        sender: "user",
+                        text: history.message,
+                        timestamp: history.timestamp
+                    });
+
+                    if (history.response) {
+                        sessionsMap[sid].messages.push({
+                            sender: "bot",
+                            text: history.response,
+                            timestamp: history.timestamp
+                        });
+                    }
+                });
+                const sessions = Object.values(sessionsMap).map(s => ({
+                    ...s,
+                    messages: s.messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+                }));
+                setChatSessions(sessions);
+            } catch (err) {
+                console.error("세션 불러오기 실패:", err);
+            }
+        };
+
+        fetchSessions();
+    }, []);
     useEffect(() => {
         const target = chatSessions.find(s => s.id === selectedSessionId);
         if (target) {
@@ -137,108 +187,108 @@ export default function CreatePost() {
     if (!theme) return null;
     return (
         <div className={`${styles.communityPage} ${styles[`${theme}Theme`]}`}>
-        <div className={styles.createPostPage}>
-            <Sidebar
-                onNewChat={handleNewChat}
-                onSelectChat={handleSelectChat}
-                theme={theme}
-                 />
-            <main className={styles.mainContent}>
-                <div className={styles.scrollWrapper}>
-                <div className={styles.container}>
-                    <h2 className={styles.heading}>
-                        {isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}
-                    </h2>
+            <div className={styles.createPostPage}>
+                <Sidebar
+                    onNewChat={handleNewChat}
+                    onSelectChat={handleSelectChat}
+                    theme={theme}
+                />
+                <main className={styles.mainContent}>
+                    <div className={styles.scrollWrapper}>
+                        <div className={styles.container}>
+                            <h2 className={styles.heading}>
+                                {isEditMode ? "✏ 글 수정하기" : "📢 새 글 작성하기"}
+                            </h2>
 
-                    {/* 🔧 여기 flex 줄로 감쌈 */}
-                    <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", marginBottom: "12px" }}>
-                        <div style={{ flex: 1 }}>
-                            <label className={styles.label}>🧠 대화 선택</label>
-                            <select
-                                className={styles.select}
-                                value={selectedSessionId || ""}
-                                onChange={(e) => setSelectedSessionId(e.target.value)}
-                            >
-                                <option value="">대화를 선택하세요</option>
-                                {chatSessions.map((s) => (
-                                    <option key={s.id} value={s.id}>{s.title}</option>
-                                ))}
-                            </select>
-                        </div>
+                            {/* 🔧 여기 flex 줄로 감쌈 */}
+                            <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", marginBottom: "12px" }}>
+                                <div style={{ flex: 1 }}>
+                                    <label className={styles.label}>🧠 대화 선택</label>
+                                    <select
+                                        className={styles.select}
+                                        value={selectedSessionId || ""}
+                                        onChange={(e) => setSelectedSessionId(e.target.value)}
+                                    >
+                                        <option value="">대화를 선택하세요</option>
+                                        {chatSessions.map((s) => (
+                                            <option key={s.id} value={s.id}>{s.title}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                        <button
-                            className={styles.summarizeBtn}
-                            onClick={handleSummarize}
-                            disabled={!selectedSessionId || selectedMessages.length === 0}
-                            style={{
-                                height: "38px", // 드롭다운과 동일하게 맞춤
-                                alignSelf: "flex-end", // flex 정렬이 밀릴 때 아래로 붙게
-                                marginBottom: "5px",  // 라벨과 버튼 높이 맞추기
-                                whiteSpace: "nowrap",
-                            }}
-                        >
-                            {isSummarizing ? (
-                                <div className={styles.spinner}></div>
-                            ) : (
-                                "요약하여 제목/본문 넣기"
-                            )}
-                        </button>
-                    </div>
+                                <button
+                                    className={styles.summarizeBtn}
+                                    onClick={handleSummarize}
+                                    disabled={!selectedSessionId || selectedMessages.length === 0}
+                                    style={{
+                                        height: "38px", // 드롭다운과 동일하게 맞춤
+                                        alignSelf: "flex-end", // flex 정렬이 밀릴 때 아래로 붙게
+                                        marginBottom: "5px",  // 라벨과 버튼 높이 맞추기
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    {isSummarizing ? (
+                                        <div className={styles.spinner}></div>
+                                    ) : (
+                                        "요약하여 제목/본문 넣기"
+                                    )}
+                                </button>
+                            </div>
 
-                    {selectedMessages.length > 0 && (
-                        <div className={styles.chatPreview}>
-                            <h4>💬 대화 미리보기</h4>
-                            <div className={styles.chatBox}>
-                                {selectedMessages.map((m, idx) => (
-                                    <div key={idx}>
-                                        <b>{m.sender === "user" ? "🙋" : "🤖"}</b> {m.text}
+                            {selectedMessages.length > 0 && (
+                                <div className={styles.chatPreview}>
+                                    <h4>💬 대화 미리보기</h4>
+                                    <div className={styles.chatBox}>
+                                        {selectedMessages.map((m, idx) => (
+                                            <div key={idx}>
+                                                <b>{m.sender === "user" ? "🙋" : "🤖"}</b> {m.text}
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                </div>
+                            )}
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>제목</label>
+                                <input
+                                    className={styles.input}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>본문</label>
+                                <textarea
+                                    className={styles.textarea}
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    rows={8}
+                                />
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>태그</label>
+                                <input
+                                    className={styles.input}
+                                    value={tags}
+                                    onChange={(e) => setTags(e.target.value)}
+                                    placeholder="예: 감정, GPT, 공감"
+                                />
+                            </div>
+
+                            <div className={styles.buttonRow}>
+                                <button className={styles.submitBtn} onClick={handleSubmit}>
+                                    {isEditMode ? "수정 완료" : "등록하기"}
+                                </button>
+                                <button className={styles.cancelBtn} onClick={() => router.back()}>
+                                    취소
+                                </button>
                             </div>
                         </div>
-                    )}
-
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>제목</label>
-                        <input
-                            className={styles.input}
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
                     </div>
-
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>본문</label>
-                        <textarea
-                            className={styles.textarea}
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            rows={8}
-                        />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>태그</label>
-                        <input
-                            className={styles.input}
-                            value={tags}
-                            onChange={(e) => setTags(e.target.value)}
-                            placeholder="예: 감정, GPT, 공감"
-                        />
-                    </div>
-
-                    <div className={styles.buttonRow}>
-                        <button className={styles.submitBtn} onClick={handleSubmit}>
-                            {isEditMode ? "수정 완료" : "등록하기"}
-                        </button>
-                        <button className={styles.cancelBtn} onClick={() => router.back()}>
-                            취소
-                        </button>
-                    </div>
-                </div>
-                </div>
-            </main>
-        </div>
+                </main>
+            </div>
         </div>
     );
 }

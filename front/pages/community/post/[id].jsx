@@ -11,7 +11,7 @@ export default function PostDetailPage() {
     const [isGuest, setIsGuest] = useState(false);
     const router = useRouter();
     const { id } = router.query;
-    const [theme, setTheme] = useState(null);
+    const [theme, setTheme] = useState("blue");
     const [user, setUser] = useState(null);
     const [comments, setComments] = useState([]);
     const [commentInput, setCommentInput] = useState("");

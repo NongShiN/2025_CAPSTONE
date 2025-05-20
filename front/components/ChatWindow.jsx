@@ -504,6 +504,7 @@ export default function ChatWindow({
         } finally {
             setIsBotTyping(false);
             setIsSending(false);
+            setRefreshSessionList(prev => !prev);
         }
     };
 

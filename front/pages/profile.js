@@ -14,7 +14,6 @@ export default function ProfilePage() {
     const [postCount, setPostCount] = useState(0);
     const [likeCount, setLikeCount] = useState(0);
     const [myPosts, setMyPosts] = useState([]);
-    const [isNewChat, setIsNewChat] = useState(false);
 
     const [summary, setSummary] = useState({
         sessionCount: 0,
@@ -32,6 +31,7 @@ export default function ProfilePage() {
 
         setUser(storedUser);
         setTheme(storedUser.theme || "blue");
+
 
         const fetchProfileSummary = async () => {
             try {
@@ -95,22 +95,26 @@ export default function ProfilePage() {
     }, []);
     const handleNewChat = () => {
         const newId = uuidv4();
-        setIsNewChat(true);
-        router.push(`/chat/${newId}`); // ✅ 새로운 대화 시작하면 URL 이동
+        router.push(`/chat/${newId}`);
     };
+
     const handleSelectChat = (id) => {
-        router.push(`/chat/${id}`)}
-    const handlePostClick = (postId) => {
-        router.push(`community/post/${postId}`); // 포스트 ID를 이용한 라우팅
+        router.push(`/chat/${id}`);
     };
+
+    const handlePostClick = (postId) => {
+        router.push(`/community/post/${postId}`);
+    };
+
     const handleSave = () => {
         const updatedUser = { ...user, theme };
         localStorage.setItem("user", JSON.stringify(updatedUser));
         alert("Profile updated!");
     };
+
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
-        return date.toLocaleString(); // 예시: '2025. 4. 28. 오후 8:25:38'
+        return date.toLocaleString(); // '2025. 5. 20. 오후 12:34:56'
     };
 
     if (!user) return null;
@@ -158,6 +162,7 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     </div>
+
                     <div className={styles.myPostsSection}>
                         <h3>My Posts</h3>
                         {summary.myPosts.length > 0 ? (
@@ -172,6 +177,7 @@ export default function ProfilePage() {
                             <p>작성한 글이 없습니다.</p>
                         )}
                     </div>
+
                     <div className={styles.accountSettings}>
                         <h3>Account Settings</h3>
                         <button className={styles.secondaryBtn}>Change Password</button>
