@@ -1,0 +1,34 @@
+name: Deploy Backend
+
+on:
+  push:
+    paths:
+      - 'back/**'
+      - '!back/model_server/**'
+    branches:
+      - main
+      - deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - run: gcloud auth configure-docker
+      - run: |
+          cd back
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+          docker build -t gcr.io/chatbot-deploy-457312/my-backend .
+          docker push gcr.io/chatbot-deploy-457312/my-backend
+      - run: |
+          gcloud run deploy my-backend \
+            --image gcr.io/chatbot-deploy-457312/my-backend \
+            --platform managed \
+            --region asia-northeast3 \
+            --port 8080 \
+            --allow-unauthenticated \
+            --set-env-vars DB_HOST=${{ secrets.DB_HOST }},DB_PORT=${{ secrets.DB_PORT }},DB_NAME=${{ secrets.DB_NAME }},DB_USER=${{ secrets.DB_USER }},DB_PASS=${{ secrets.DB_PASS }},SPRING_PROFILES_ACTIVE=prod
