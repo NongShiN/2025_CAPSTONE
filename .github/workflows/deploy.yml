@@ -47,7 +47,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          cd 2025_capstone/front
+          cd front
           docker build -t gcr.io/chatbot-deploy-457312/web-server .
           docker push gcr.io/chatbot-deploy-457312/web-server
 
@@ -79,13 +79,12 @@ jobs:
 
       - name: Build Spring Boot
         run: |
-          cd 2025_capstone/back
+          cd back
           chmod +x mvnw
           ./mvnw clean package -DskipTests
 
       - name: Build and Push Docker Image
         run: |
-          cd 2025_capstone/back
           docker build -t gcr.io/chatbot-deploy-457312/my-backend .
           docker push gcr.io/chatbot-deploy-457312/my-backend
 
