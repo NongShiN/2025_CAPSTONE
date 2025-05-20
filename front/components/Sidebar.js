@@ -45,7 +45,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                             // 여기에 추가
                             basic_memory: [],
                             cd_memory: [],
-                            ipt_log: history.ipt_log || null,
+                            ipt_log: history.ipt_log || [],
                             pf_rating: history.pf_rating || null,
                             selected_supervisor: history.selected_supervisor || null,
                             session_insight: history.session_insight || null,
@@ -57,7 +57,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                     const responseId = `resp_${history.id}_${Date.now()}`;
 
                     //sessionsMap[sid].cbt_log = history.cbt_log;
-                    sessionsMap[sid].ipt_log = history.ipt_log || {} ;
+                    sessionsMap[sid].ipt_log = history.ipt_log || [] ;
                     sessionsMap[sid].pf_rating = history.pf_rating || {};
                     sessionsMap[sid].selected_supervisor = history.selected_supervisor || null;
                     sessionsMap[sid].session_insight = history.session_insight || {};

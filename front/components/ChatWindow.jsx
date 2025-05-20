@@ -232,9 +232,7 @@ export default function ChatWindow({
                     },
                     pf_rating: {
                     },
-                    ipt_log: {
-                        history: []
-                    }
+                    ipt_log: []
                 },
                 dialog_history: {
                     history: []
@@ -262,8 +260,7 @@ export default function ChatWindow({
                             cd_memory:[]
                         },
                         pf_rating:{},
-                        ipt_log:{"history": []
-                        }
+                        ipt_log:[]
                     },
                     dialog_history: {
                         history:[]
@@ -405,7 +402,7 @@ export default function ChatWindow({
                 sessionId: currentSessionId,
                 title: generatedTitle || userMessage.text.slice(0, 30),
                 sessionInsight: JSON.stringify(output.session_insight || {}),
-                iptLog: JSON.stringify(output.ipt_log || {}),
+                iptLog: JSON.stringify(output.ipt_log || []),
                 pfRating: JSON.stringify(output.pf_rating || {}),
                 selectedSupervisor: output.selected_supervisor || "None",
                 cbtBasicInsight: JSON.stringify(cbt_basic_insight || {}),
@@ -461,7 +458,6 @@ export default function ChatWindow({
                     pfRating: JSON.stringify(output.pf_rating || {})
                 })
             });
-            console.log(typeof session_insight,session_insight)
             await fetch(`${URLS.BACK}/api/chat/session/${currentSessionId}/insight`, {
                 method: "PUT",
                 headers: {

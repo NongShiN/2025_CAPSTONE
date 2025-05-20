@@ -24,7 +24,7 @@ class SessionInfo(BaseModel):
     selected_supervisor: str
     cbt_info: dict
     pf_rating: dict
-    ipt_log: dict
+    ipt_log: list
     
 
 class UserInput(BaseModel):
