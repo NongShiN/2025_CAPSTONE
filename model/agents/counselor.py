@@ -134,7 +134,7 @@ class CounselorAgent:
                                                                last_counselor_utterance,
                                                                client_utterance,
                                                                f_llm=call_llm)
-            print("==============================")
+            print("============================== cbt_info ==============================")
             print(self.session_info[self.dialogue_history_id]["cbt_info"])
             print("==============================")
         elif selected_supervisor == "ACT":
@@ -143,6 +143,8 @@ class CounselorAgent:
             prior_pf_rating = self.session_info[self.dialogue_history_id]["pf_rating"]
             pf_rating = supervisor.evaluate_pf_processes(str(self.dialogue_history), prior_pf_rating)
             self.session_info[self.dialogue_history_id]["pf_rating"] = pf_rating
+            print("==================================== pf rating ====================================")
+            print(pf_rating)
             
             intervention_points = supervisor.decide_intervention_point(pf_rating)
             
@@ -155,7 +157,8 @@ class CounselorAgent:
             problem_area = supervisor.classify_problem_area(str(self.dialogue_history))
 
             self.session_info[self.dialogue_history_id]["ipt_log"].append({"stage": stage, "problem_area": problem_area})
-
+            print("==================================== ipt log ====================================")
+            print(self.session_info[self.dialogue_history_id]["ipt_log"])
 
             dynamic_prompt = supervisor.generate_guidance(
                 dialogue_history=str(self.dialogue_history),
