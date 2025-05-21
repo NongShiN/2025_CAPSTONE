@@ -5,6 +5,7 @@ import datetime
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 from .mascc import MASCC
+from .agents.utils.util import translate_kor_to_eng, translate_eng_to_kor
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -67,9 +68,10 @@ def chat_with_mascc(user_id: str, user_input: str, mascc) -> str:
     response = mascc.generate(
         mascc.args,
         user_id=user_id,
-        client_utterance=user_input,
+        client_utterance=translate_kor_to_eng(mascc.llm, user_input),
         timestamp=timestamp
     )
+    response = translate_eng_to_kor(mascc.llm, response)
     logging.info(f"\n[Counselor Response]: {response}")
 
     return response
