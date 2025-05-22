@@ -138,6 +138,6 @@ if __name__ == "__main__":
             )
         print(f"Counselor: {response}")
 
-    counselor.update_dialogues("dlg004")
+    counselor.update_dialogues(user_id)
     print("========================= Session end =========================")
-    print(counselor.dialogues)
+    print(counselor.dialogue_history)
