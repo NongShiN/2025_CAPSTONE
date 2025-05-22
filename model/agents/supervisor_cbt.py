@@ -140,12 +140,12 @@ class SupervisorCBT:
             example = technique_data.get("example", "")
 
             stage_prompt_template = load_prompt("prompts/cbt/decide_cbt_stage.txt")
-            cbt_log = self.update_cbt_usage_log(self.cbt_log, cbt_technique, "0")
+            #self.cbt_log = self.update_cbt_usage_log(self.cbt_log, cbt_technique, "0")
             stage_prompt = (stage_prompt_template
                             .replace("[CBT technique]", cbt_technique)
                             .replace("[CBT Technique]", cbt_technique)
                             .replace("[CBT progress]", progress_description)
-                            .replace("[CBT Usage Log]", str(cbt_log))
+                            .replace("[CBT Usage Log]", str(self.cbt_log))
                             .replace("[CBT dialogue]", example)
                             )
 
