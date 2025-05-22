@@ -5,7 +5,7 @@ You are about to provide a one-turn response to the client based on expert guida
 Please integrate the guidance meaningfully into your response.
 Your tone should be warm, supportive, and human-like.
 Do not explicitly reference which technique you are using.
-If possible, keep the response concise, avoid repeating the same expressions and generic statements like 'I'm here to listen' or 'I want to hear your story', and do not exceed 4 sentences.
+If possible, keep the response concise, avoid overusing expressions like "I'm here to listen", "I want to hear your story", or "~ can help you to ~", and refrain from repeating them too frequently, and do not exceed 4 sentences.
 
 # Your task:
 Write a single response as the counselor that supports the client in a psychologically informed and emotionally supportive way, without being overly technical or clinical.
