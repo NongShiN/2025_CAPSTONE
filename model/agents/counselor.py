@@ -1,13 +1,11 @@
 import os
-import sys
 import json
 from .supervisor_empathic import SupervisorEmpathic
 from .supervisor_cbt import SupervisorCBT
 from .supervisor_act import SupervisorACT
 from .supervisor_dbt import SupervisorDBT
-from .supervisor_ifs import SupervisorIFS
 from .supervisor_ipt import SupervisorIPT
-from .utils.util import call_llm, load_prompt, str_to_json_data, generate_dialogue_history_input
+from .utils.util import call_llm, load_prompt, generate_dialogue_history_input
 from .utils.args import parse_args
 import logging
 
@@ -94,7 +92,6 @@ class CounselorAgent:
         
         info = json.loads(self.extract_insight(self.dialogue_history, client_utterance, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"]))
         #info = self.extract_insight(self.dialogue_history, client_utterance, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"])
-        print(f"==================================== info ====================================\n{info}\n====================== end ======================")
         #info = json.loads(info)
 
         self.user_info["insight"] = info["user_insight"]
@@ -105,7 +102,14 @@ class CounselorAgent:
         if len(self.dialogue_history) > 4:
             print(f"turn num : {len(self.dialogue_history)}")
             if self.session_info[self.dialogue_history_id]["selected_supervisor"] == "None":
-                self.session_info[self.dialogue_history_id]["selected_supervisor"] = self.select_supervisor(self.dialogue_history, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"])
+                supervisor = self.select_supervisor(self.dialogue_history, self.user_info["insight"], self.session_info[self.dialogue_history_id]["insight"])
+                if supervisor == "CBT":
+                    pass
+                elif supervisor == "ACT":
+                    pass
+                elif supervisor == "IPT":
+                    pass
+                self.session_info[self.dialogue_history_id]["selected_supervisor"] = supervisor
                 #print(f"선택된 supervisor:{self.session_info[self.dialogue_history_id]['selected_supervisor']}")
         selected_supervisor = self.session_info[self.dialogue_history_id]["selected_supervisor"]
         print(f"==================================== selected supervisor =============================\n{selected_supervisor}")

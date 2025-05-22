@@ -5,7 +5,6 @@ import datetime
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 from .mascc import MASCC
-from .agents.utils.util import translate_kor_to_eng, translate_eng_to_kor
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -30,9 +29,6 @@ class DefaultArgs:
     cd_prompt_name='prompts/cbt/detect_cognitive_distortion.txt'
     model='gpt-4o-mini'
     temperature=0.7
-    basic_memory_path='memory/basic_memory.json'
-    cd_memory_path='memory/cd_memory.json'
-    cbt_log_path='data/cbt_log.json'
     cbt_info_path='data/cbt_info.json'
     top_k=5
 
@@ -46,9 +42,6 @@ def load_mascc():
     return mascc
 
 
-# user가 log in 하면 counselor 에이전트 인스턴스 생성
-# 아직은 하나의 counselor에 대해서 구현
-# 이후에 user에 대한 전체 dialoue 다 받아와야함. 현재는 임시 대화 파일에서 불러옴
 def load_counselor(mascc):
     mascc.counselor.load_dialogues()
 
@@ -68,28 +61,58 @@ def chat_with_mascc(user_id: str, user_input: str, mascc) -> str:
     response = mascc.generate(
         mascc.args,
         user_id=user_id,
-        client_utterance=translate_kor_to_eng(mascc.llm, user_input),
+        client_utterance=user_input,
         timestamp=timestamp
     )
-    response = translate_eng_to_kor(mascc.llm, response)
     logging.info(f"\n[Counselor Response]: {response}")
 
     return response
 
 
 if __name__ == "__main__":
+    args = DefaultArgs()
+    
+    print("==================================================== MASCC Evaluation =====================================================")
+    ################## Load MASCC and Counselor Agent ##################
     mascc = load_mascc()
-    load_counselor(mascc)
+    print("================================================= Turn on MASCC Framework =================================================")
+    user_id = "eval_user_id"
+    user_insight = {}
+    session_id = "eval_test_session"
     
-    print("Welcome to the MASCC chatbot. Type 'exit' or 'quit' to end the conversation.\n")
+    counselor = mascc.get_counselor(user_id)
+    print("============================================ Loading Counselor Agent Complete. ============================================")
+
+    counselor.user_info["user_id"] = user_id
+    counselor.user_info["insight"] = user_insight
+    print(counselor.user_info)
+
+    hist = []
     
-    select_session(mascc, "dlg004")
+    transformed_dialogue_history = []
+    counselor.dialogue_history = transformed_dialogue_history
+    counselor.dialogue_history_id = session_id
+
+    counselor.session_info[session_id] = {
+        "insight": {},
+        "selected_supervisor": "None",
+        "cbt_info": {
+            "cbt_log": {},
+            "basic_memory": [],
+            "cd_memory": []
+        },
+        "pf_rating": {},
+        "ipt_log": []
+    }
+    print(counselor)
+    ################## Load MASCC and Counselor Agent ##################
     
-    if mascc.counselor.dialogue_history == []:
+    ######################## Start Conversation ########################
+    if counselor.dialogue_history == []:
         last_counselor = "Hello, how can I help you?"
         timestamp = datetime.datetime.now().isoformat()
 
-        mascc.counselor.update_dialogue_history(
+        counselor.update_dialogue_history(
             "Counselor", 
             last_counselor,
             timestamp
@@ -106,15 +129,15 @@ if __name__ == "__main__":
             print("Ending the chat. Take care!")
             break
 
-        response = chat_with_mascc(user_input, mascc)
+        response = mascc.generate(args, user_id, user_input, timestamp)
         timestamp = datetime.datetime.now().isoformat()
-        mascc.counselor.update_dialogue_history(
+        counselor.update_dialogue_history(
             "Counselor", 
             response,
             timestamp
             )
         print(f"Counselor: {response}")
 
-    mascc.counselor.update_dialogues("dlg004")
+    counselor.update_dialogues(user_id)
     print("========================= Session end =========================")
-    print(mascc.counselor.dialogues)
+    print(counselor.dialogue_history)

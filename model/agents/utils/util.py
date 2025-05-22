@@ -81,3 +81,27 @@ def generate_dialogue_history_input(dialogue_history):
         utterance = turn["utterance"].strip()
         lines.append(f"{speaker} : {utterance}")
     return "\n".join(lines)
+
+
+def translate_kor_to_eng(llm, text):
+    prompt = f"You are a professional Korean-to-English translator. Translate the following Korean sentence into fluent, natural English. Only output the translated English sentence. Do not include any explanations, labels, or extra text. # Korean: {text} # English:"
+    
+    response = llm.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
+    )
+    
+    return response.choices[0].message.content.strip()
+
+
+def translate_eng_to_kor(llm, text):
+    prompt = f"You are a professional English-to-Korean translator. Translate the following English sentence into fluent, natural Korean. Only output the translated Korean sentence. Do not include any explanations, labels, or extra text. # English: {text} # Korean:"
+    
+    response = llm.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
+    )
+
+    return response.choices[0].message.content.strip()
