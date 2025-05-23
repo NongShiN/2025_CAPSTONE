@@ -9,12 +9,12 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const chatExamples = [
-    "💬 What’s on your mind today?",
-    "💬 Ask me anything.",
-    "💬 Share your thoughts with me.",
-    "💬 Need help? Let’s talk.",
-    "💬 Tell me your story.",
-    "💬 Ready to chat?"
+    "💬 지금 이 시간, 어떤 생각이나 감정이 머물고 있나요?",
+    "💬 오늘 자신에게 해주고 싶은 말이 있다면 무엇인가요?",
+    "💬 지금 마음이 가는 이야기를 하나 꺼내어 나눠보실래요?",
+    "💬 지금 가장 하고 싶은 말이 있다면, 무엇일까요?",
+    "💬 조금 힘든 일이 있었다면 어떤 점이 특히 힘들게 느껴졌는지 나눠볼 수 있을까요?",
+    "💬 오늘 어떤 하루가 되기를 바라시나요?"
   ];
   const [currentExample, setCurrentExample] = useState(chatExamples[0]);
   useEffect(() => {
@@ -23,7 +23,7 @@ const LoginPage = () => {
         const nextIndex = Math.floor(Math.random() * chatExamples.length);
         return chatExamples[nextIndex];
       });
-    }, 2200); // 2.5초 간격
+    }, 2500); // 2.5초 간격
 
     return () => clearInterval(interval);
   }, []);
@@ -87,22 +87,22 @@ const LoginPage = () => {
       <div className={styles.container}>
         <div className={styles.left}>
           <img src="/logo.png" alt="로고" className={styles.logo} />
-          <h1>Talk, Think & Share — All in One Space.</h1>
-          <p>Unfold your story with a chatbot that understand you.</p>
+          <h1> 이야기하고, 공유하세요 — 지금, 마음의소리에서 </h1>
+          <p>당신의 심리를 이해하며 공감해주는 챗봇을 통해 마음 속 이야기를 펼쳐보세요</p>
           <div className={styles.chatExample}>{currentExample}</div>
         </div>
 
         <div className={styles.right}>
           <div className={styles.loginBox}>
-            <h2 className={styles.title}>Login</h2>
+            <h2 className={styles.title}>다시 오신 걸 환영해요</h2>
 
             <div className={styles.inputGroup}>
-              <label>Username</label>
+              <label>이메일</label>
               <div className={styles.inputWrapper}>
                 <span className={styles.icon}>👤</span>
                 <input
                     type="email"
-                    placeholder="Type your username"
+                    placeholder="이메일을 입력하세요"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -110,12 +110,12 @@ const LoginPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label>Password</label>
+              <label>비밀번호</label>
               <div className={styles.inputWrapper}>
                 <span className={styles.icon}>🔒</span>
                 <input
                     type="password"
-                    placeholder="Type your password"
+                    placeholder="비밀번호를 입력하세요"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
@@ -127,7 +127,7 @@ const LoginPage = () => {
                   onClick={() => router.push("/forgot-password")}
                   style={{ background: "none", border: "none", padding: 0, color: "#6c63ff", cursor: "pointer", fontSize: "13px", fontWeight: "500" }}
               >
-                Forgot password?
+                비밀번호 찾기
               </button>
               <span style={{ margin: "0 8px", color: "#aaa" }}>|</span>
               <button
@@ -135,19 +135,19 @@ const LoginPage = () => {
                   onClick={() => router.push("/signup")}
                   style={{ display: "inline", background: "none", border: "none", padding: 0 }}
               >
-                Sign up
+                회원가입
               </button>
             </div>
 
             <button className={styles.loginBtn} onClick={handleLogin}>
-              LOGIN
+              로그인하기
             </button>
 
             <button className={styles.guestBtn} onClick={handleGuestLogin}>
-              Continue as Guest
+              게스트 모드로 체험하기
             </button>
 
-            <p className={styles.orText}>Or continue with</p>
+            <p className={styles.orText}>또는 다음으로 로그인하기</p>
 
             <div className={styles.socialButtons}>
               <button onClick={() => signIn("google", { callbackUrl: "/chat" })}>

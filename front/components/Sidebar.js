@@ -216,7 +216,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                         className={`${styles.newChatBtn} ${isGuest ? styles.disabled : ""}`}
                         disabled={isGuest}
                     >
-                        + New chat
+                        + 새로운 채팅
                     </button>
 
                     <button
@@ -250,7 +250,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                 )}
 
                 <div className={styles.sectionTitle}>
-                    <span>Your conversations</span>
+                    <span>대화 목록</span>
                 </div>
             </div>
 
@@ -447,7 +447,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                             <path d="M4 21v-2a4 4 0 0 1 3-3.87" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
-                        My Profile
+                        마이 프로필
                     </button>
                 )}
 
@@ -458,7 +458,7 @@ export default function Sidebar({ isGuest = false, onNewChat, onSelectChat, newC
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" y1="12" x2="9" y2="12" />
                     </svg>
-                    Log Out
+                    로그아웃
                 </button>
             </div>
 

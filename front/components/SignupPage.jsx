@@ -60,8 +60,8 @@ const SignupPage = () => {
             {/* 왼쪽 브랜드 섹션 */}
             <div className={styles.left}>
                 <img src="/logo.png" className={styles.logo} />
-                <h1>Join the Movement 💫</h1>
-                <p className={styles.subtext}>Create your account and start building!</p>
+                <h1>마음의 변화에 함께하세요 💫</h1>
+                <p className={styles.subtext}>계정을 생성하여 내면의 소리를 들려주세요</p>
             </div>
 
             {/* 오른쪽 회원가입 폼 */}
@@ -71,20 +71,20 @@ const SignupPage = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5 }}
                 >
-                    <h1>Join 마음의 소리</h1>
-                    <p>Create your free account and start exploring today.</p>
+                    <h1>마음의 소리에 가입하세요</h1>
+                    <p>계정을 만들고 마음의 소리에 귀기울여 보세요</p>
 
                     {/* 입력 필드 그룹 */}
                     <div className={styles.inputGroup}>
                         <input
                             type="text"
-                            placeholder="Full Name"
+                            placeholder="이름"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                         />
                         <input
                             type="email"
-                            placeholder="Email address"
+                            placeholder="이메일 주소"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
@@ -93,24 +93,24 @@ const SignupPage = () => {
                     <div className={styles.inputGroup}>
                         <input
                             type="password"
-                            placeholder="Password"
+                            placeholder="비밀번호"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
                         <input
                             type="password"
-                            placeholder="Confirm Password"
+                            placeholder="비밀번호 재입력"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                     </div>
 
                     <button className={styles.signupBtn} onClick={handleSignup}>
-                        Sign Up
+                        회원가입하기
                     </button>
 
                     <p className={styles.loginLink}>
-                        Already have an account? <a href="/login">Log in</a>
+                        이미 계정이 있으신가요? <a href="/login">로그인 화면으로</a>
                     </p>
                 </motion.div>
             </div>

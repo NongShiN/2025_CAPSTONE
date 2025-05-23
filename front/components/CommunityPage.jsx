@@ -124,7 +124,7 @@ export default function CommunityPage() {
                         </svg>
                         <input
                             className={styles.inputField}
-                            placeholder="Search posts..."
+                            placeholder="검색어를 입력하세요..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -134,7 +134,7 @@ export default function CommunityPage() {
                         disabled={isGuest}
                         onClick={() => router.push("/community/create")}
                     >
-                        Create Post
+                        글 작성하기
                     </button>
                 </div>
 
@@ -161,8 +161,8 @@ export default function CommunityPage() {
 
                                     <div className={styles.postStats}>
                                         {post.likeCount?.toLocaleString() || 0} BPM
-                                        • {post.viewCount?.toLocaleString() || 0} views
-                                        • 💬 {post.commentCount || 0} comments
+                                        • {post.viewCount?.toLocaleString() || 0} 조회수
+                                        • 💬 {post.commentCount || 0} 댓글
                                     </div>
                                 </div>
                             </div>
@@ -173,7 +173,7 @@ export default function CommunityPage() {
 
             <aside className={styles.rightSidebar}>
                 <div className={styles.sectionBox}>
-                    <h4>🔥 Hot Post</h4>
+                    <h4>🔥 주간 인기글</h4>
                     <ul className={styles.sideList}>
                         {posts.length > 0 && getHotPosts(posts).map((post) => (
                             <li
@@ -187,11 +187,11 @@ export default function CommunityPage() {
                     </ul>
                 </div>
                 <div className={styles.sectionBox}>
-                    <h4>💖 Introduce Our Supervisors</h4>
+                    <h4>💖 상담가들을 소개합니다</h4>
                     <ul className={styles.sideList}>
-                        <li>ACT - Accept pain, commit to meaningful life.</li>
-                        <li>CBT - Change your thoughts, change your life.</li>
-                        <li>IPT - Heal emotions through better relationships.</li>
+                        <li>ACT - 고통을 수용하고, 가치 있는 삶을 선택하세요.</li>
+                        <li>CBT - 생각을 바꾸면 감정과 행동도 달라집니다.</li>
+                        <li>IPT - 관계를 돌아보고, 감정을 회복하세요.</li>
                     </ul>
                 </div>
             </aside>

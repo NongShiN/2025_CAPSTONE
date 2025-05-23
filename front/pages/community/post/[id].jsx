@@ -230,7 +230,7 @@ export default function PostDetailPage() {
                             >
                                 ❤️
                             </button>
-                            {post.likeCount?.toLocaleString()} BPM • 👁 {post.viewCount?.toLocaleString()} views
+                            {post.likeCount?.toLocaleString()} BPM • 👁 {post.viewCount?.toLocaleString()} 조회수
                         </div>
                         <button onClick={() => router.push("/community")} className={styles.cancelBtn}>
                             ← 돌아가기
