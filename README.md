@@ -47,7 +47,14 @@
 
 ### 1) Demo (시연 영상)
 
-#### 추후에 우리 영상을 넣어아햠
+
+
+<video controls width="600"
+       src="https://github.com/NongShiN/2025_CAPSTONE/releases/download/v1.0.0/2025-1.Capstone.Sound.of.heart.mp4">
+  Your browser does not support the video tag.
+</video>
+
+[🎥 Demo Video (Download)](https://github.com/NongShiN/2025_CAPSTONE/releases/download/v1.0.0/2025-1.Capstone.Sound.of.heart.mp4)
 
 ### 2) Service Link
 
