@@ -1,4 +1,4 @@
-![프로젝트 아키텍처](docs/banner.png)
+![프로젝트 배너](docs/banner.png)
 
 ## 1️⃣ Introduction
 
@@ -74,7 +74,7 @@
 > 각 디렉토리별 실행 방법 및 기술 상세 설명은 해당 폴더의 `README.md`를 참조하세요.
 
 ### 3.2. Project Architecture
-<p align="center"><img margin="Auto" width="600" src="docs/architecture.png"></p>
+<p align="center"><img margin="Auto" width="800" src="docs/architecture.png"></p>
 
 ㅤㅤㅤㅤ• 프론트/백엔드/모델 서버 → 각각 Docker → GCP Cloud Run
 
@@ -98,11 +98,6 @@
 <p align="center"><img margin="Auto" width="600" src="docs/Community_Scenario.png"></p>
 
 ## 4️⃣ Performance Evaluation
-
-본 프로젝트에서는 개발한 다중 에이전트 기반 심리상담 챗봇의 효과성을  
-① 전문가 기준의 정량 평가(CTRS)와 ② 사용자 기반 A/B 테스트 실험을 통해 종합적으로 검증하였습니다.
-
----
 
 ### 4.1. 전문가 기반 정량 평가: CTRS (Cognitive Therapy Rating Scale)
 
