@@ -29,9 +29,34 @@
 | 🔄 A/B 테스트 | 전략별 효과성과 사용성에 대한 실험 설계 도입 |
 
  
-## 2️⃣ Service Architecture
+## 2️⃣ Service
 
-### 2.1. Project Tree
+### 2.1. Chatbot Demo
+
+<p align="center"><img margin="Auto" width="600" src="docs/chatbot_demo.gif"></p>
+
+### 2.2. Community Demo
+
+<p align="center"><img margin="Auto" width="600" src="docs/community_demo.gif"></p>
+
+### 2.3. 발표 영상
+
+<p align="center">
+  <a href="https://youtu.be/k7hscH6lCtU" target="_blank">
+    <img width="600" src="docs/youtube_thumbnail.png" alt="AI 심리상담 챗봇 발표 영상">
+  </a>
+</p>
+
+
+### 2.4. Service Link
+
+[Click here](https://web-server-281506025529.asia-northeast3.run.app/login)
+
+
+
+## 3️⃣ Service Architecture
+
+### 3.1. Project Tree
 
 ```
 📦2025_capstone
@@ -48,8 +73,8 @@
 ```
 > 각 디렉토리별 실행 방법 및 기술 상세 설명은 해당 폴더의 `README.md`를 참조하세요.
 
-### 2.2. Project Architecture
-<p align="center"><img margin="Auto" width="900" src="docs/architecture.png"></p>
+### 3.2. Project Architecture
+<p align="center"><img margin="Auto" width="600" src="docs/architecture.png"></p>
 
 ㅤㅤㅤㅤ• 프론트/백엔드/모델 서버 → 각각 Docker → GCP Cloud Run
 
@@ -59,35 +84,18 @@
 ㅤㅤㅤㅤ• GitHub Actions: Push → Docker Build → Artifact Registry → Cloud Run Deploy
 
 
-### 2.3. ERD
-<p align="center"><img margin="Auto" width="900" src="docs/ERD.png"></p>
+### 3.3. ERD
+<p align="center"><img margin="Auto" width="600" src="docs/ERD.png"></p>
 
 
-### 2.4. Scenario
+### 3.4. Scenario
 
 
-#### 2.4.1. Counseling Scenario
-<p align="center"><img margin="Auto" width="900" src="docs/Counseling_Scenario.png"></p>
+#### 3.4.1. Counseling Scenario
+<p align="center"><img margin="Auto" width="600" src="docs/Counseling_Scenario.png"></p>
 
-#### 2.4.2. Community Scenario
-<p align="center"><img margin="Auto" width="900" src="docs/Community_Scenario.png"></p>
-
-
-
-## 3️⃣ Service 
-
-### 3.1. 발표 영상
-
-<p align="center">
-  <a href="https://youtu.be/k7hscH6lCtU" target="_blank">
-    <img width="800" src="docs/youtube_thumbnail.png" alt="AI 심리상담 챗봇 발표 영상">
-  </a>
-</p>
-
-
-### 3.2. Service Link
-
-[Click here](https://web-server-281506025529.asia-northeast3.run.app/login)
+#### 3.4.2. Community Scenario
+<p align="center"><img margin="Auto" width="600" src="docs/Community_Scenario.png"></p>
 
 ## 4️⃣ Performance Evaluation
 
@@ -102,7 +110,7 @@
   치료사의 상담 기법 수행을 0~6점 척도로 정량화합니다.
 - 총 **450개의 시나리오 기반 상담 세션**에 대해 평가를 실시하였습니다.
 
-<p align="center"><img margin="Auto" width="900" src="docs/ctrs1.png"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/ctrs1.png"></p>
 
 📌 평가 항목:
 1. 이해 (Understanding)  
@@ -113,7 +121,7 @@
 6. 전략 (Strategy)
 
 
-<p align="center"><img margin="Auto" width="900" src="docs/ctrs2.png"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/ctrs2.png"></p>
 
 ✅ **결과 요약:**
 - 두 개선된 모델 버전 모두 **GPT-4o-mini 베이스라인보다 높은 점수**를 기록
@@ -128,14 +136,14 @@
 총 **83명의 실제 사용자** 를 대상으로,  
 **고정 상담자 구조(Group A)** 와 **동적 supervisor 선택 구조(Group B)** 의 효과성을 비교 평가하였습니다.
 
-<p align="center"><img margin="Auto" width="900" src="docs/ab1.png"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/ab1.png"></p>
 
 📌 평가 항목 (5점 척도):
 1. 공감도  
 2. 응답의 적절성  
 3. 전반적인 상담 만족도
 
-<p align="center"><img margin="Auto" width="900" src="docs/ab2.png"></p> 
+<p align="center"><img margin="Auto" width="600" src="docs/ab2.png"></p> 
 
 ✅ **결과 요약:**
 - **Group B (동적 supervisor)** 가 **모든 항목에서 Group A보다 더 높은 평균 점수** 획득
