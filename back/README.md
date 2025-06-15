@@ -120,7 +120,7 @@ cd back
 ---
 
 ## 🧱 클래스 구조도
-<p align="center"><img margin="Auto" width="900" src="../docs/class_diagram.png"></p>
+<p align="center"><img margin="Auto" width="900" src="../docs/readme_pictures/class_diagram.png"></p>
 
 ## 🔧 확장 기능
 

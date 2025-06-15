@@ -34,7 +34,7 @@
 
   → Fixed 구조가 6개 항목 중 5개에서 가장 높은 평균 점수 기록 (베이스라인 대비 약 19.25% 향상)
 
-<p align="center"><img margin="Auto" width="600" src="../docs/ctrs1.png"></p>
+<p align="center"><img margin="Auto" width="600" src="../docs/readme_pictures/ctrs1.png"></p>
 
 📌 평가 항목:
 1. 이해 (Understanding)  
@@ -45,7 +45,7 @@
 6. 전략 (Strategy)
 
 
-<p align="center"><img margin="Auto" width="600" src="../docs/ctrs2.png"></p>
+<p align="center"><img margin="Auto" width="600" src="../docs/readme_pictures/ctrs2.png"></p>
 
 ✅ **결과 요약:**
 - 두 개선된 모델 버전 모두 **GPT-4o-mini 베이스라인보다 높은 점수**를 기록
@@ -61,14 +61,14 @@
 총 **83명의 실제 사용자** 를 대상으로,  
 **고정 상담자 구조(Group A)** 와 **동적 supervisor 선택 구조(Group B)** 의 효과성을 비교 평가하였습니다.
 
-<p align="center"><img margin="Auto" width="600" src="../docs/ab1.png"></p>
+<p align="center"><img margin="Auto" width="600" src="../docs/readme_pictures/ab1.png"></p>
 
 📌 평가 항목 (5점 척도):
 1. 공감도  
 2. 응답의 적절성  
 3. 전반적인 상담 만족도
 
-<p align="center"><img margin="Auto" width="600" src="../docs/ab2.png"></p> 
+<p align="center"><img margin="Auto" width="600" src="../docs/readme_pictures/ab2.png"></p> 
 
 ✅ **결과 요약:**
 - **Group B (동적 supervisor)** 가 **모든 항목에서 Group A보다 더 높은 평균 점수** 획득

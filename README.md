@@ -1,4 +1,4 @@
-![프로젝트 배너](docs/banner.png)
+![프로젝트 배너](docs/readme_pictures/banner.png)
 
 ## 1️⃣ Introduction
 
@@ -33,17 +33,17 @@
 
 ### 2.1. Chatbot Demo
 
-<p align="center"><img margin="Auto" width="600" src="docs/chatbot_demo.gif"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/readme_pictures/chatbot_demo.gif"></p>
 
 ### 2.2. Community Demo
 
-<p align="center"><img margin="Auto" width="600" src="docs/community_demo.gif"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/readme_pictures/community_demo.gif"></p>
 
 ### 2.3. 발표 영상
 
 <p align="center">
   <a href="https://youtu.be/k7hscH6lCtU" target="_blank">
-    <img width="600" src="docs/youtube_thumbnail.png" alt="AI 심리상담 챗봇 발표 영상">
+    <img width="600" src="docs/readme_pictures/youtube_thumbnail.png" alt="AI 심리상담 챗봇 발표 영상">
   </a>
 </p>
 
@@ -74,7 +74,7 @@
 > 각 디렉토리별 실행 방법 및 기술 상세 설명은 해당 폴더의 `README.md`를 참조하세요.
 
 ### 3.2. Project Architecture
-<p align="center"><img margin="Auto" width="800" src="docs/architecture.png"></p>
+<p align="center"><img margin="Auto" width="800" src="docs/readme_pictures/architecture.png"></p>
 
 ㅤㅤㅤㅤ• 프론트/백엔드/모델 서버 → 각각 Docker → GCP Cloud Run
 
@@ -85,17 +85,17 @@
 
 
 ### 3.3. ERD
-<p align="center"><img margin="Auto" width="600" src="docs/ERD.png"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/readme_pictures/ERD.png"></p>
 
 
 ### 3.4. Scenario
 
 
 #### 3.4.1. Counseling Scenario
-<p align="center"><img margin="Auto" width="600" src="docs/Counseling_Scenario.png"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/readme_pictures/Counseling_Scenario.png"></p>
 
 #### 3.4.2. Community Scenario
-<p align="center"><img margin="Auto" width="600" src="docs/Community_Scenario.png"></p>
+<p align="center"><img margin="Auto" width="600" src="docs/readme_pictures/Community_Scenario.png"></p>
 
 ## 4️⃣ 팀원 소개
 
@@ -104,19 +104,19 @@
 <table align="center" width="1000px">
   <tr height="155px">
     <td align="center" width="180px">
-      <a href="https://github.com/minzai0116"><img src="docs/members/minjea.png"/></a>
+      <a href="https://github.com/minzai0116"><img src="docs/readme_pictures/members/minjea.png"/></a>
     </td>
     <td align="center" width="180px">
-      <a href="https://github.com/andsosallycanwait"><img src="docs/members/seonghyeon.png"/></a>
+      <a href="https://github.com/andsosallycanwait"><img src="docs/readme_pictures/members/seonghyeon.png"/></a>
     </td>
     <td align="center" width="180px">
-      <a href="https://github.com/gyunggyung"><img src="docs/members/kieung.png"/></a>
+      <a href="https://github.com/gyunggyung"><img src="docs/readme_pictures/members/kieung.png"/></a>
     </td>
     <td align="center" width="180px">
-      <a href="https://github.com/chosanghyeonsju"><img src="docs/members/sanghyeon.png"/></a>
+      <a href="https://github.com/chosanghyeonsju"><img src="docs/readme_pictures/members/sanghyeon.png"/></a>
     </td>
     <td align="center" width="180px">
-      <a href="https://github.com/NongShiN"><img src="docs/members/chanwoong.png"/></a>
+      <a href="https://github.com/NongShiN"><img src="docs/readme_pictures/members/chanwoong.png"/></a>
     </td>
   </tr>
   <tr height="50px">
