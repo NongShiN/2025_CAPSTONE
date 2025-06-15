@@ -1,5 +1,4 @@
-# 🧠 Model Server - 다중 상담 전략 AI 모델
-
+# 🧠 Model
 이 디렉토리는 **GPT 기반 심리상담 멀티에이전트 플랫폼**에서 사용되는 모델 서버 코드입니다.  
 다양한 상담 이론 (CBT, ACT, DBT 등)을 시뮬레이션하는 Supervisor 에이전트와 LLM 기반 전략 선택 로직이 포함되어 있습니다.
 
@@ -26,7 +25,7 @@
 
 ## 🧪 평가 구조 및 실험
 
-- ✍️ **CTRS 평가 (LLM 기준)**  
+- ✍️ **전문가 기반 정량 평가: CTRS (Cognitive Therapy Rating Scale)**  
   총 450개의 내담자 페르소나 및 시나리오 기반 대화 생성 → LLM으로 항목별 0~6점 평가.  
   세 가지 모델 구성 비교:
   1. ✅ **Baseline**: GPT-4o-mini만 사용한 단일 구조
@@ -35,11 +34,49 @@
 
   → Fixed 구조가 6개 항목 중 5개에서 가장 높은 평균 점수 기록 (베이스라인 대비 약 19.25% 향상)
 
-- 👥 **A/B 테스트**  
-  실제 사용자 83명을 대상으로 동적 라우팅 구조 vs 고정형 구조의 만족도/공감도 평가.  
-  → 동적 supervisor 선택 구조가 통계적으로 유의하게 높은 점수 (p < 0.05)
+<p align="center"><img margin="Auto" width="600" src="../docs/ctrs1.png"></p>
+
+📌 평가 항목:
+1. 이해 (Understanding)  
+2. 대인관계 효과성 (Interpersonal Effectiveness)  
+3. 협력성 (Collaboration)  
+4. 유도적 발견 (Guided Discovery)  
+5. 집중 (Focus)  
+6. 전략 (Strategy)
+
+
+<p align="center"><img margin="Auto" width="600" src="../docs/ctrs2.png"></p>
+
+✅ **결과 요약:**
+- 두 개선된 모델 버전 모두 **GPT-4o-mini 베이스라인보다 높은 점수**를 기록
+- 특히 **Fixed Supervisor 방식**은 Guided Discovery 제외 전 항목에서 최고 점수
+- 평균적으로 **베이스라인 대비 19.25% 성능 향상**
+- 단순한 전략 병합(Ensemble)보다 **초기 정보 기반의 고정 전략 선택이 더 효과적**
 
 ---
+
+
+
+- 👥 **A/B 테스트**  
+총 **83명의 실제 사용자** 를 대상으로,  
+**고정 상담자 구조(Group A)** 와 **동적 supervisor 선택 구조(Group B)** 의 효과성을 비교 평가하였습니다.
+
+<p align="center"><img margin="Auto" width="600" src="../docs/ab1.png"></p>
+
+📌 평가 항목 (5점 척도):
+1. 공감도  
+2. 응답의 적절성  
+3. 전반적인 상담 만족도
+
+<p align="center"><img margin="Auto" width="600" src="../docs/ab2.png"></p> 
+
+✅ **결과 요약:**
+- **Group B (동적 supervisor)** 가 **모든 항목에서 Group A보다 더 높은 평균 점수** 획득
+- **세 항목 모두 p < .05 수준의 통계적으로 유의미한 차이**
+- 사용자들은 동적 구조가 더 **개인 맞춤형이고, 공감적이며, 만족스러움**을 보고함
+
+---
+
 
 ## 📁 폴더 구조 예시
 
