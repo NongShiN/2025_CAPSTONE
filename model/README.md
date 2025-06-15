@@ -98,8 +98,8 @@ uvicorn main:app --reload --port 8001
 
 | 이름 | 역할 | GitHub |
 |------|------|--------|
-| 황찬웅 | 모델 프롬프트 엔진 설계 / 평가 실험 | [@NongShiN](https://github.com/NongShiN) |
-| 김민재 | Supervisor 설계 / CTRS 평가 자동화 | [@minzai0116](https://github.com/minzai0116) |
+| 류성현 | 모델 프레임워크 디자인 / Supervisor 설계 | [@andsosallycanwait](https://github.com/andsosallycanwait) |
+| 염기웅 | Supervisor 설계 / CTRS 평가 실행 | [@gyunggyung](https://github.com/gyunggyung) |
 
 ---
 
