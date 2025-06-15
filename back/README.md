@@ -143,9 +143,10 @@ cd back
 
 | 이름   | 역할                             | GitHub          |
 |--------|----------------------------------|-----------------|
-| 조상현 | 백엔드 구조 설계 |  [@chosanghyeonsju](https://github.com/chosanghyeonsju) |
-| 황찬웅 | LLM 연동 / A/B 모듈 구현 | [@NongShiN](https://github.com/NongShiN) |
-| 김민재 | 백-프론트 연동 / 백-모델 연동 |  [@minzai0116](https://github.com/minzai0116)    |
+| 황찬웅 | LLM-모델 연동 / 백-모델 연동 | [@NongShiN](https://github.com/NongShiN) |
+| 조상현 | 백엔드 구조 설계 / 백-프론트 연동 |  [@chosanghyeonsju](https://github.com/chosanghyeonsju) |
+| 김민재 | 백-프론트 연동 |  [@minzai0116](https://github.com/minzai0116)    |
+
 
 ---
 
