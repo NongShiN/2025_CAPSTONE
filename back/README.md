@@ -1,4 +1,4 @@
-# 🛠️ Backend - GPT 기반 심리상담 챗봇
+# 🛠️ Backend
 
 본 디렉토리는 **GPT 기반 심리상담 멀티에이전트 플랫폼**의 백엔드 코드가 포함되어 있습니다.  
 Spring Boot 기반 REST API 서버로, 상담 세션 관리, 메시지 처리, LLM 연동, A/B 테스트 분기, 상담 로그 저장 등의 기능을 제공합니다.
@@ -8,20 +8,24 @@ Spring Boot 기반 REST API 서버로, 상담 세션 관리, 메시지 처리, L
 ## 📁 폴더 구조
 
 ```
-back
-├── src
-│   └── main
-│       ├── java/com/yourorg/chatbot
-│       │   ├── controller/      # REST API 엔드포인트
-│       │   ├── service/         # 핵심 비즈니스 로직
-│       │   ├── model/           # Entity, DTO 정의
-│       │   ├── repository/      # JPA Repository 인터페이스
-│       │   └── config/          # CORS, OpenAI 설정 등
-│       └── resources
-│           ├── application.yml  # 환경 설정
-│           └── prompts/         # 상담 전략 프롬프트 템플릿
-├── build.gradle
-└── Dockerfile (선택)
+📂back
+├── 📂src
+│   └── 📂main
+│       ├── 📂java/com/yourorg/chatbot
+│       │   ├── 📂controller      # REST API 엔드포인트
+│       │   ├── 📂service         # 핵심 비즈니스 로직
+│       │   ├── 📂model           # Entity, DTO 정의
+│       │   ├── 📂repository      # JPA Repository 인터페이스
+│       │   └── 📂config          # CORS, OpenAI 설정 등
+│       └── 📂resources
+│           ├── 📜application.yml # 환경 설정
+│           └── 📂prompts         # 상담 전략 프롬프트 템플릿
+├── 📂model_server                # 모델 서버 main, Dockerfile
+├── 📜Dockerfile
+├── 📜README.md
+├── 📜mwnw
+├── 📜mwnw.cmd
+└── 📜pom.xml
 ```
 
 ---
@@ -115,6 +119,9 @@ cd back
 
 ---
 
+## 🧱 클래스 구조도
+<p align="center"><img margin="Auto" width="900" src="../docs/class_diagram.png"></p>
+
 ## 🔧 확장 기능
 
 - WebSocket 기반 실시간 채팅
@@ -136,14 +143,15 @@ cd back
 
 | 이름   | 역할                             | GitHub          |
 |--------|----------------------------------|-----------------|
-| 황찬웅 | 백엔드 구조 설계 / A/B 모듈 구현 | @NongShiN       |
-| 김민재 | LLM 연동 / 데이터 모델링 / 테스트 | @minzai0116     |
+| 조상현 | 백엔드 구조 설계 |  [@chosanghyeonsju](https://github.com/chosanghyeonsju) |
+| 황찬웅 | LLM 연동 / A/B 모듈 구현 | [@NongShiN](https://github.com/NongShiN) |
+| 김민재 | 백-프론트 연동 / 백-모델 연동 |  [@minzai0116](https://github.com/minzai0116)    |
 
 ---
 
 ## 📄 라이선스
 
-MIT License © 2025 AI Counseling Team
+본 프로젝트는 팀 졸업작품 목적의 비상업적 프로젝트로, 라이선스는 별도로 지정되어 있지 않습니다.
 
 ---
 
