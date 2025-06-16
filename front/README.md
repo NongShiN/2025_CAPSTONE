@@ -105,7 +105,7 @@ npm run dev
 
 ## 🔗 서비스 링크
 
-- ▶️ **배포된 서비스 접속:** [https://web-server-281506025529.asia-northeast3.run.app/login](https://web-server-281506025529.asia-northeast3.run.app/login)
+- ▶️ **배포된 서비스 접속:** [Click here](https://web-server-281506025529.asia-northeast3.run.app/login)
 - 🧠 백엔드 코드 위치: `/back`
 - 🧠 모델 서버 코드 위치: `/back/model_server`
 
