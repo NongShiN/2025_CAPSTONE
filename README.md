@@ -43,7 +43,15 @@
 
 <p align="center">
   <a href="https://youtu.be/k7hscH6lCtU" target="_blank">
-    <img width="600" src="docs/readme_pictures/youtube_thumbnail.png" alt="AI 심리상담 챗봇 발표 영상">
+    <img width="600" src="docs/readme_pictures/youtube_thumbnail_1.png" alt="AI 심리상담 챗봇 발표 영상">
+  </a>
+</p>
+
+### 2.4. 시연 영상
+
+<p align="center">
+  <a href="https://youtu.be/1RJfVClRNxU" target="_blank">
+    <img width="600" src="docs/readme_pictures/youtube_thumbnail_2.png" alt="AI 심리상담 챗봇 시연 영상">
   </a>
 </p>
 
