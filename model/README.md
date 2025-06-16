@@ -118,7 +118,7 @@
 │  ├─ 📜cbt_info.json  
 │  ├─ 📜cbt_log.json  
 │  └─ 📜ipt_log.json  
-├─ 📂eval  
+└─ 📂eval  
    └─ 📂similarity_test  
       ├─ 📜make_index.py  
       ├─ 📜rag_test.py  
