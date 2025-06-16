@@ -142,4 +142,4 @@ uvicorn main:app --reload --port 8001
 
 ## 📄 라이선스
 
-MIT License © 2025 AI Counseling Team
+본 프로젝트는 팀 졸업작품 목적의 비상업적 프로젝트로, 라이선스는 별도로 지정되어 있지 않습니다.
