@@ -1,4 +1,5 @@
-# 🧠 Model
+![모델 배너](docs/readme_pictures/model_banner.png)
+
 이 디렉토리는 **GPT 기반 심리상담 멀티에이전트 플랫폼**에서 사용되는 모델 서버 코드입니다.  
 다양한 상담 이론 (CBT, ACT, DBT 등)을 시뮬레이션하는 Supervisor 에이전트와 LLM 기반 전략 선택 로직이 포함되어 있습니다.
 
@@ -81,14 +82,50 @@
 ## 📁 폴더 구조 예시
 
 ```
-model_server/
-├── main.py                 # FastAPI 서버 진입점
-├── prompt_engine.py        # 상담 전략 prompt 조합 로직
-├── supervisor_agents/      # 각 이론별 supervisor 에이전트 정의
-├── scenarios/              # 테스트용 페르소나, 상황 시나리오
-├── evaluation/             # CTRS 평가 스크립트
-├── model_utils/            # LLM 호출, 전처리, 응답 요약
-└── requirements.txt        # 필요 라이브러리 명세
+📂model  
+├─ 📜chat.py                     # 메인 상담 시뮬레이션 실행 스크립트  
+├─ 📜eval.py                     # 모델 평가 실행 스크립트 (CTRS 등)  
+├─ 📜mascc.py                    # MASCC 핵심 로직 포함  
+├─ 📜test.py                     # 테스트용 실행 스크립트  
+├─ 📜requirements.txt            # 모델 서버 의존성 목록  
+├─ 📜README.md                   # 설명 문서  
+├─ 📜__init__.py  
+├─ 📂agents                      # 상담사 및 supervisor 관련 코드  
+│  ├─ 📜counselor.py             # 기본 상담사 클래스  
+│  ├─ 📜supervisor_*.py          # CBT/ACT/DBT 등 각 이론별 supervisor 정의  
+│  ├─ 📜test.py  
+│  ├─ 📂data  
+│  │  ├─ 📜cbt_info.json  
+│  │  └─ 📜ipt_log.json  
+│  ├─ 📂memory  
+│  │  ├─ 📜dialogue_history_cbt.json  
+│  │  ├─ 📜input_dummy_*.json  
+│  │  └─ 📜select_session_input_act.json  
+│  ├─ 📂prompts  
+│  │  ├─ 📜pre-interview.txt  
+│  │  ├─ 📜select_supervisor.txt  
+│  │  ├─ 📜static_prompt.txt  
+│  │  ├─ 📂act  
+│  │  ├─ 📂cbt  
+│  │  ├─ 📂dbt  
+│  │  ├─ 📂empathic  
+│  │  └─ 📂ipt  
+│  └─ 📂utils  
+│     ├─ 📜args.py  
+│     ├─ 📜memory_management.py  
+│     └─ 📜util.py  
+├─ 📂data  
+│  ├─ 📜cbt_info.json  
+│  ├─ 📜cbt_log.json  
+│  └─ 📜ipt_log.json  
+├─ 📂eval  
+   └─ 📂similarity_test  
+      ├─ 📜make_index.py  
+      ├─ 📜rag_test.py  
+      ├─ 📜similarity_test.py  
+      ├─ 📜faiss_index.bin  
+      └─ 📜requirements.txt  
+
 ```
 
 ---

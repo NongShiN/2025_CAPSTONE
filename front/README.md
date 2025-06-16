@@ -1,4 +1,4 @@
-# 🖥️ Frontend
+![프론트 배너](docs/readme_pictures/front_banner.png)
 
 본 디렉토리는 **GPT 기반 심리상담 멀티에이전트 플랫폼**의 프론트엔드 코드가 포함된 폴더입니다.  
 React 기반의 SPA(Single Page Application)로 설계되었으며, Node.js 환경에서 실행됩니다.
