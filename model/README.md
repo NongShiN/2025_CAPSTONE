@@ -1,4 +1,4 @@
-![모델 배너](docs/readme_pictures/model_banner.png)
+![모델 배너](../docs/readme_pictures/model_banner.png)
 
 이 디렉토리는 **GPT 기반 심리상담 멀티에이전트 플랫폼**에서 사용되는 모델 서버 코드입니다.  
 다양한 상담 이론 (CBT, ACT, DBT 등)을 시뮬레이션하는 Supervisor 에이전트와 LLM 기반 전략 선택 로직이 포함되어 있습니다.

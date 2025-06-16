@@ -1,4 +1,4 @@
-![백엔드 배너](docs/readme_pictures/back_banner.png)
+![백엔드 배너](../docs/readme_pictures/back_banner.png)
 
 본 디렉토리는 **GPT 기반 심리상담 멀티에이전트 플랫폼**의 백엔드 코드가 포함되어 있습니다.  
 Spring Boot 기반 REST API 서버로, 상담 세션 관리, 메시지 처리, LLM 연동, A/B 테스트 분기, 상담 로그 저장 등의 기능을 제공합니다.
