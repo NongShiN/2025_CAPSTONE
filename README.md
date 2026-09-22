@@ -139,7 +139,7 @@
     <td align="center" width="180px"><a>모델링</a></td>
     <td align="center" width="180px"><a>모델링</a></td>
     <td align="center" width="180px"><a>백엔드</a></td>
-    <td align="center" width="180px"><a>프론트엔드 / 서비스 배포</a></td>
+    <td align="center" width="180px"><a>모델링 / 서비스 배포</a></td>
   </tr>
 </table>
 
